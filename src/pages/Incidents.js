@@ -45,10 +45,18 @@ const Incidents = () => {
   const filteredReports = userReports
     .filter(report =>
       report.reportDescription && report.reportDescription.toLowerCase().includes(searchTerm.toLowerCase())
+      || (report.assetName && report.assetName.toLowerCase().includes(searchTerm.toLowerCase()))
+      || (report.status && report.status.toLowerCase().includes(searchTerm.toLowerCase()))
+      || (formatDistanceToNow(new Date(report.dateTime), { addSuffix: true }) && formatDistanceToNow(new Date(report.dateTime), { addSuffix: true }).toLowerCase().includes(searchTerm.toLowerCase()))
+      || (report.incidentCriticalityLevel && report.incidentCriticalityLevel.toLowerCase().includes(searchTerm.toLowerCase()))
     )
-    .filter(report => (statusFilter === 'All' || report.status === statusFilter))
-    .filter(report => (requestTypeFilter === 'All' || report.request_type === requestTypeFilter));
+    .filter(report => (statusFilter === 'All' || report.status.toLowerCase() === statusFilter.toLowerCase()))
 
+    useEffect(() => {
+      console.log("Filtered reports:", filteredReports);
+    }, [searchTerm, statusFilter, requestTypeFilter, userReports]);
+    
+    
   if (loading) return <div className="text-center py-8">Loading...</div>;
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
 
@@ -66,26 +74,20 @@ const Incidents = () => {
           className="border rounded px-4 py-2 w-1/3"
         />
 
+
         <div className="flex space-x-4">
-          <select
+        <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="border rounded px-4 py-2"
           >
             <option value="All">All Statuses</option>
             <option value="Open">Open</option>
-            <option value="Closed">Closed</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+
           </select>
 
-          <select
-            value={requestTypeFilter}
-            onChange={(e) => setRequestTypeFilter(e.target.value)}
-            className="border rounded px-4 py-2"
-          >
-            <option value="All">All Request Types</option>
-            <option value="System Problem">System Problem</option>
-            <option value="Other">Other</option>
-          </select>
         </div>
       </div>
 

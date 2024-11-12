@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { FaClipboardList, FaCalendarAlt, FaBell, FaAngleDown, FaChevronLeft } from 'react-icons/fa';
+import { FaClipboardList, FaCalendarAlt, FaBell, FaAngleDown, FaChevronLeft, FaChartLine } from 'react-icons/fa';
 import { ReactComponent as SafifyIcon } from '../assets/images/safify_it_icon.svg';
 
 const Sidebar = () => {
@@ -118,9 +118,43 @@ const Sidebar = () => {
       {!isCollapsed && <span className="text-gray-500 bg-gray-200 px-2 py-1 rounded-full">0</span>}
     </NavLink>
   </div>
+
+  
 )}
 
       </div>
+      <div className="px-5">
+          <h3 className="text-gray-600 font-semibold mb-2 mt-2">Knowledge Base</h3>
+        </div>
+
+        <NavLink
+      to="/solution-forum"
+      className="px-4 flex items-center justify-between text-gray-700 p-2 rounded"
+      activeClassName="bg-primary text-white"
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#E0F7FA')}
+      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '')}
+    >
+      <div className="flex items-center gap-2">
+        <FaClipboardList />
+        <span>Solution Forum</span>
+      </div>
+    </NavLink>
+
+    <NavLink
+      to="/solution-forum"
+      className="px-4 flex items-center justify-between text-gray-700 p-2 rounded"
+      activeClassName="bg-primary text-white"
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#E0F7FA')}
+      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '')}
+    >
+      <div className="flex items-center gap-2">
+        <FaChartLine />
+        <span>Reports</span>
+      </div>
+    </NavLink>
+    
     </div>
   );
 };

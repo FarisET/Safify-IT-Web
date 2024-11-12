@@ -13,7 +13,7 @@ const App = () => {
         {/* Adjust the main content area margin to make space for Sidebar and TopNav */}
         <div className="ml-64 mt-12 p-4"> {/* Sidebar is 16rem (64) and TopNav is 3rem (12) */}
           <Routes>
-            <Route path="/incidents" element={<Incidents />} />
+            <Route path="/" element={<Incidents />} />
           </Routes>
         </div>
       </Router>
