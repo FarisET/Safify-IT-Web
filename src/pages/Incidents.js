@@ -16,7 +16,7 @@ const Incidents = () => {
   useEffect(() => {
     const fetchUserReports = async () => {
       try {
-        const jwtToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWRtaW5Ac2FmaWZ5Iiwicm9sZV9uYW1lIjoiYWRtaW4iLCJ1c2VyX25hbWUiOiJTdXBlciBBZG1pbiIsImlhdCI6MTczMTMyNjI2NCwiZXhwIjoxNzMxNDEyNjY0fQ.qJTI9oFJEIJ1KBPU-ogEGDZQudbmv9rBdLmCLytPndg";
+        const jwtToken = sessionStorage.getItem('jwt');
         const response = await axios.get(
           'http://localhost:3001/admin/dashboard/fetchAllUserReports',
           {
@@ -106,17 +106,14 @@ const Incidents = () => {
         <FaLink className="mr-2" />
         Link issue
       </button>
-      <button className="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded">
-        <FaComment className="mr-2" />
-        Comment
-      </button>
+
       <button className="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded">
         <FaUser className="mr-2" />
         Assign
       </button>
       <button className="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded">
         <FaExchangeAlt className="mr-2" />
-        Transition
+        Status
       </button>
       <button className="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded">
         <FaCheck className="mr-2" />
