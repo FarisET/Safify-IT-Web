@@ -11,14 +11,16 @@ const TopNav = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showTeams, setShowTeams] = useState(false);
 
+  // Toggle Notifications Dropdown
   const toggleNotifications = () => {
-    setShowNotifications(!showNotifications);
-    setShowTeams(false); // Hide Teams if Notifications are open
+    setShowNotifications((prev) => !prev);
+    if (showTeams) setShowTeams(false); // Hide Teams if open
   };
 
+  // Toggle Teams Dropdown
   const toggleTeams = () => {
-    setShowTeams(!showTeams);
-    setShowNotifications(false); // Hide Notifications if Teams are open
+    setShowTeams((prev) => !prev);
+    if (showNotifications) setShowNotifications(false); // Hide Notifications if open
   };
 
   return (
@@ -37,10 +39,20 @@ const TopNav = () => {
       {/* Center Section: Menu Items */}
       <div className="hidden md:flex flex-grow justify-center gap-6 font-semibold text-gray-700 relative">
         {/* Dashboard Menu Item */}
-        <span className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded">Dashboard</span>
+        <span
+          className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+          onClick={() => navigate('/dashboard')}
+        >
+          Dashboard
+        </span>
 
         {/* Assets Menu Item */}
-        <span className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded">Assets</span>
+        <span
+          className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+          onClick={() => navigate('/assets')}
+        >
+          Assets
+        </span>
 
         {/* Teams Menu Item with Dropdown */}
         <span
@@ -57,7 +69,6 @@ const TopNav = () => {
           </div>
         )}
       </div>
-
 
       {/* Right Section: Icons and Profile */}
       <div className="flex items-center gap-4 relative">

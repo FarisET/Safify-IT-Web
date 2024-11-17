@@ -5,6 +5,7 @@ import Incidents from './pages/Incidents';
 import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
 import TopNav from './components/TopNav';
+import AssetPage from './pages/Assets';
 
 
 const AppRouter = () => {
@@ -21,6 +22,15 @@ const AppRouter = () => {
             element={
               <ProtectedRoute>
                 <Incidents />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/assets"
+            element={
+              <ProtectedRoute>
+                <AssetPage />
               </ProtectedRoute>
             }
           />
