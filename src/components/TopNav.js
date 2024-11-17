@@ -4,13 +4,21 @@ import Button from '../components/Button';
 import { FaBell, FaQuestionCircle, FaCog } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Notifications from '../components/NotificationsCard';
+import TeamsCard from '../components/ActionTeamsCard';
 
 const TopNav = () => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showTeams, setShowTeams] = useState(false);
 
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
+    setShowTeams(false); // Hide Teams if Notifications are open
+  };
+
+  const toggleTeams = () => {
+    setShowTeams(!showTeams);
+    setShowNotifications(false); // Hide Notifications if Teams are open
   };
 
   return (
@@ -27,12 +35,29 @@ const TopNav = () => {
       </div>
 
       {/* Center Section: Menu Items */}
-      <div className="hidden md:flex flex-grow justify-center gap-6 font-semibold text-gray-700">
+      <div className="hidden md:flex flex-grow justify-center gap-6 font-semibold text-gray-700 relative">
+        {/* Dashboard Menu Item */}
         <span className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded">Dashboard</span>
-        <span className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded">Teams</span>
+
+        {/* Assets Menu Item */}
         <span className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded">Assets</span>
-        <Button onClick={() => alert('Report')}>Report</Button>
+
+        {/* Teams Menu Item with Dropdown */}
+        <span
+          className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+          onClick={toggleTeams}
+        >
+          Teams
+        </span>
+
+        {/* Dropdown Card for Teams */}
+        {showTeams && (
+          <div className="absolute top-full mt-1 right-0 w-72 bg-white border border-gray-200 shadow-lg rounded-lg z-50">
+            <TeamsCard />
+          </div>
+        )}
       </div>
+
 
       {/* Right Section: Icons and Profile */}
       <div className="flex items-center gap-4 relative">
@@ -42,7 +67,11 @@ const TopNav = () => {
           onClick={toggleNotifications}
         >
           <FaBell />
-          {showNotifications && <Notifications />}
+          {showNotifications && (
+            <div className="absolute right-0 mt-2">
+              <Notifications />
+            </div>
+          )}
         </span>
 
         {/* Help and Settings Icons */}

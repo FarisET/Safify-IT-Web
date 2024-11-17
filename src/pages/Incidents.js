@@ -45,8 +45,8 @@ const Incidents = () => {
   const getStatusClass = (status) => {
     const normalizedStatus = status.trim().toLowerCase();
     if (normalizedStatus === 'open') return 'text-red-500';
-    if (normalizedStatus === 'in progress') return 'text-blue-600';
-    if (normalizedStatus === 'completed') return 'text-gray-500';
+    if (normalizedStatus === 'in progress') return 'text-yellow-500	';
+    if (normalizedStatus === 'completed') return 'text-lime-500';
     return '';
   };
   
@@ -62,7 +62,6 @@ const Incidents = () => {
     .filter(report => (statusFilter === 'All' || report.status.toLowerCase() === statusFilter.toLowerCase()))
 
     useEffect(() => {
-      console.log("Filtered reports:", filteredReports);
     }, [searchTerm, statusFilter, requestTypeFilter, userReports]);
     
     
@@ -149,7 +148,7 @@ const Incidents = () => {
               />
             </th>
             <th className="px-4 py-2 border-b">Asset</th>
-            <th className="px-4 py-2 border-b">Key</th>
+            {/* <th className="px-4 py-2 border-b">Key</th> */}
             <th className="px-4 py-2 border-b">Summary</th>
             <th className="px-4 py-2 border-b">Reporter</th>
             <th className="px-4 py-2 border-b">Assignee</th>
@@ -169,7 +168,7 @@ const Incidents = () => {
         />
       </td>
       <td className="px-4 py-2 border-b">{report.assetName}</td>
-      <td className="px-4 py-2 border-b">IMS-{report.userReportId}</td>
+      {/* <td className="px-4 py-2 border-b">IMS-{report.userReportId}</td> */}
       <td className="px-4 py-2 border-b">{report.reportDescription}</td>
       <td className="px-4 py-2 border-b">{report.userId}</td>
       <td className="px-4 py-2 border-b">

@@ -34,7 +34,6 @@ const LoginPage = () => {
         sessionStorage.setItem('role', role);
         sessionStorage.setItem('deviceToken', deviceToken);
         sessionStorage.setItem('userName', userName);
-        console.log(token);
         navigate('/incidents');
       } else if (response.status === 401) {
         setError("Incorrect credentials, please try again.");
@@ -42,7 +41,6 @@ const LoginPage = () => {
         handleServerError(responseError);
       }
     } catch (err) {
-      console.error('Login error:', err);
   
       // Check if the error has a response with a message from the server
       if (err.response && err.response.data && err.response.data.error) {
