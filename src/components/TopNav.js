@@ -5,8 +5,10 @@ import { FaBell, FaQuestionCircle, FaCog } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Notifications from '../components/NotificationsCard';
 import TeamsCard from '../components/ActionTeamsCard';
+import useFetch from '../hooks/useFetch';
 
 const TopNav = () => {
+  const {data: teams} = useFetch('http://localhost:3001/admin/dashboard/fetchAllActionTeamsWithDepartments?department_id=D1')
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showTeams, setShowTeams] = useState(false);
@@ -65,7 +67,7 @@ const TopNav = () => {
         {/* Dropdown Card for Teams */}
         {showTeams && (
           <div className="absolute top-full mt-1 right-0 w-72 bg-white border border-gray-200 shadow-lg rounded-lg z-50">
-            <TeamsCard />
+            <TeamsCard teams={teams}/>
           </div>
         )}
       </div>

@@ -1,29 +1,20 @@
 import React, { useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 
-const teamsList = [
-  { id: 1, name: 'Development' },
-  { id: 2, name: 'Marketing' },
-  { id: 3, name: 'HR' },
-  { id: 4, name: 'Finance' },
-  { id: 5, name: 'Support' },
-  { id: 6, name: 'Sales' },
-  { id: 7, name: 'Design' },
-  { id: 8, name: 'Operations' },
-];
-
 const getRandomColor = () => {
   const colors = ['bg-gray-500','bg-red-500', 'bg-purple-500', 'bg-yellow-500'];
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
-const TeamsCard = () => {
+const TeamsCard = ({teams}) => {
+
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredTeams = teamsList.filter((team) =>
-    team.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  const filteredTeams = Array.isArray(teams)
+  ? teams.filter((team) =>
+      team.action_team_name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  : [];
   return (
     <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden z-50">
       {/* Search Bar */}
@@ -43,15 +34,15 @@ const TeamsCard = () => {
         {filteredTeams.length > 0 ? (
           filteredTeams.map((team) => (
             <div
-              key={team.id}
+              key={team.action_team_id}
               className="flex items-center p-4 border-b hover:bg-gray-100 transition duration-200 ease-in-out cursor-pointer"
             >
               <div
                 className={`${getRandomColor()} text-white flex items-center justify-center w-10 h-10 rounded-full mr-4`}
               >
-                {team.name.charAt(0)}
+                {team.action_team_name.charAt(0)}
               </div>
-              <span className="text-gray-900 font-medium">{team.name}</span>
+              <span className="text-gray-900 font-medium">{team.action_team_name}</span>
             </div>
           ))
         ) : (
