@@ -11,8 +11,11 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent re-execution if already loading
     setLoading(true);
     setError('');
+  
+    console.log('Login function triggered'); // Debugging log
   
     try {
       const deviceToken = "webapp";
@@ -41,17 +44,16 @@ const LoginPage = () => {
         handleServerError(responseError);
       }
     } catch (err) {
-  
-      // Check if the error has a response with a message from the server
       if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error); // Use the server error message
+        setError(err.response.data.error);
       } else {
-        setError("An error occurred. Please try again."); // Fallback message
+        setError("An error occurred. Please try again.");
       }
     } finally {
       setLoading(false);
     }
   };
+  
     
 
   const handleServerError = (errorMessage) => {

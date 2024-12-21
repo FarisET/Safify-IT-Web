@@ -8,7 +8,7 @@ import TeamsCard from '../components/ActionTeamsCard';
 import useFetch from '../hooks/useFetch';
 
 const TopNav = () => {
-  const {data: teams} = useFetch('http://localhost:3001/admin/dashboard/fetchAllActionTeamsWithDepartments?department_id=D1')
+  //const {data: teams} = useFetch('http://localhost:3001/admin/dashboard/fetchAllActionTeamsWithDepartments?department_id=D1')
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showTeams, setShowTeams] = useState(false);
@@ -20,10 +20,10 @@ const TopNav = () => {
   };
 
   // Toggle Teams Dropdown
-  const toggleTeams = () => {
-    setShowTeams((prev) => !prev);
-    if (showNotifications) setShowNotifications(false); // Hide Notifications if open
-  };
+  // const toggleTeams = () => {
+  //   setShowTeams((prev) => !prev);
+  //   if (showNotifications) setShowNotifications(false); // Hide Notifications if open
+  // };
 
   return (
     <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 h-16 flex items-center px-4 md:px-6 z-50">
@@ -59,7 +59,7 @@ const TopNav = () => {
         {/* Teams Menu Item with Dropdown */}
         <span
           className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
-          onClick={toggleTeams}
+          // onClick={toggleTeams}
         >
           Teams
         </span>
@@ -67,7 +67,7 @@ const TopNav = () => {
         {/* Dropdown Card for Teams */}
         {showTeams && (
           <div className="absolute top-full mt-1 right-0 w-72 bg-white border border-gray-200 shadow-lg rounded-lg z-50">
-            <TeamsCard teams={teams}/>
+            {/* <TeamsCard teams={teams}/> */}
           </div>
         )}
       </div>

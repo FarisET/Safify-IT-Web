@@ -11,36 +11,45 @@ import AssetPage from './pages/Assets';
 const AppRouter = () => {
   return (
     <Router>
-      <Sidebar />
-      <TopNav />
-      <div className="ml-64 mt-12 p-4">
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
+      <div className="flex h-screen">
+        {/* Sidebar */}
+        <Sidebar />
 
-          <Route
-            path="/incidents"
-            element={
-              <ProtectedRoute>
-                <Incidents />
-              </ProtectedRoute>
-            }
-          />
+        {/* Main Content Area */}
+          {/* Top Navigation */}
+          <TopNav />
 
-          <Route
-            path="/assets"
-            element={
-              <ProtectedRoute>
-                <AssetPage />
-              </ProtectedRoute>
-            }
-          />
+          {/* Page Content */}
+          <div className="flex-1 mt-12 p-4 ml-12">
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
 
-          {/* Optionally, add a default route to redirect to login */}
-          <Route path="*" element={<Navigate to="/login" />} />
-        </Routes>
-      </div>
+              <Route
+                path="/incidents"
+                element={
+                  <ProtectedRoute>
+                    <Incidents />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/assets"
+                element={
+                  <ProtectedRoute>
+                    <AssetPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Default route to redirect to login */}
+              <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
+          </div>
+        </div>
     </Router>
   );
 };
+
 
 export default AppRouter;

@@ -10,6 +10,8 @@ const Assets = () => {
     const [selectedAsset, setSelectedAsset] = useState(null);
     const [assetDetails, setAssetDetails] = useState(null);
     const [ticketHistory, setTicketHistory] = useState([]);
+    const [AssetHistory, setAssetHistory] = useState([]);
+
     const [activeTab, setActiveTab] = useState('Ticket History'); // Default tab
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -79,6 +81,16 @@ const Assets = () => {
                 }
             );
             setTicketHistory(ticketHistoryResponse.data);
+            //Fetch Asset History
+            const assetHistoryResponse = await axios.get(
+                `http://localhost:3001/analytics/fetchAssetHistory?asset_no=${assetNo}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                    },
+                }
+            );
+            setAssetHistory(assetHistoryResponse.data);
         } catch (error) {
             setError('Error fetching data');
             console.error(error);
@@ -93,7 +105,7 @@ const Assets = () => {
     };
 
     return (
-        <div className="flex h-screen">
+        <div className="flex">
             <div className="w-1/6 overflow-auto border-x">
                 <h2 className="text-lg font-semibold p-4 border-b bg-white">Asset Types</h2>
                 <ul className="p-2 space-y-2">
@@ -144,7 +156,7 @@ const Assets = () => {
                 </ul>
             </div>
 
-            <div className="w-full md:w-3/6 bg-gray-50 overflow-hidden flex flex-col">
+            <div className="w-4/6 bg-gray-50 overflow-hidden flex flex-col">
                 <h2 className="text-lg font-semibold p-4 border-b bg-white">Asset Details</h2>
                 {loading ? (
                     <p className="p-4 text-gray-500">Loading...</p>
@@ -167,7 +179,7 @@ const Assets = () => {
                                 {format(assetDetails.asset_creation_date, "MMM dd, yyyy")}
                             </p>
                             <p>
-                                <strong>Asset Assignment:</strong> {assetDetails.assigned_to}
+                                <strong>Assigned To:</strong> {assetDetails.assigned_to}
                             </p>
                             <p>
                                 <strong>Location:</strong> {assetDetails.asset_location}
@@ -183,8 +195,8 @@ const Assets = () => {
                             <ul className="flex border-b text-sm font-medium">
                                 <li
                                     className={`p-3 cursor-pointer transition-all ${activeTab === "Ticket History"
-                                            ? "border-b-2 border-blue-500 text-blue-600"
-                                            : "hover:text-blue-600"
+                                        ? "border-b-2 border-blue-500 text-blue-600"
+                                        : "hover:text-blue-600"
                                         }`}
                                     onClick={() => setActiveTab("Ticket History")}
                                 >
@@ -192,8 +204,8 @@ const Assets = () => {
                                 </li>
                                 <li
                                     className={`p-3 cursor-pointer transition-all ${activeTab === "Asset History"
-                                            ? "border-b-2 border-blue-500 text-blue-600"
-                                            : "hover:text-blue-600"
+                                        ? "border-b-2 border-blue-500 text-blue-600"
+                                        : "hover:text-blue-600"
                                         }`}
                                     onClick={() => setActiveTab("Asset History")}
                                 >
@@ -205,13 +217,13 @@ const Assets = () => {
                             <div className="mt-4">
                                 {activeTab === "Ticket History" && (
                                     <div>
-        
+
                                         <div className="overflow-auto max-h-64 border rounded-lg">
                                             <table className="w-full text-left">
                                                 <thead className="sticky top-0 bg-gray-100">
                                                     <tr>
                                                         <th className="p-3 text-sm text-gray-600">
-                                                            Log ID
+                                                            ID
                                                         </th>
                                                         <th className="p-3 text-sm text-gray-600">
                                                             Action
@@ -254,10 +266,53 @@ const Assets = () => {
                                 )}
                                 {activeTab === "Asset History" && (
                                     <div>
+                                        <div className="overflow-auto max-h-64 border rounded-lg">
+                                            <table className="w-full text-left">
+                                                <thead className="sticky top-0 bg-gray-100">
+                                                    <tr>
+                                                        <th className="p-3 text-sm text-gray-600">ID</th>
+                                                        <th className="p-3 text-sm text-gray-600">Reported By</th>
+                                                        <th className="p-3 text-sm text-gray-600">Problem</th>
+                                                        <th className="p-3 text-sm text-gray-600">Status</th>
+                                                        <th className="p-3 text-sm text-gray-600">Date</th>
+                                                        <th className="p-3 text-sm text-gray-600">Location</th>
+                                                        <th className="p-3 text-sm text-gray-600">Criticality</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {AssetHistory.map((history, index) => (
+                                                        <tr key={index} className="hover:bg-gray-50">
+                                                            <td className="p-3 text-sm">{history['Report ID']}</td>
+                                                            <td className="p-3 text-sm">{history['Reported by']}</td>
+                                                            <td
+                                                                className="p-3 text-sm overflow-hidden whitespace-nowrap max-w-[200px] cursor-pointer"
+                                                                onClick={(e) => {
+                                                                    const target = e.currentTarget;
+                                                                    if (target.style.whiteSpace === "normal") {
+                                                                        target.style.maxWidth = "200px";
+                                                                    } else {
+                                                                        target.style.whiteSpace = "normal";
+                                                                        target.style.maxWidth = "none";
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {history['Problem']}
+                                                            </td>
+                                                            <td className="p-3 text-sm">{history['Problem status']}</td>
+                                                            <td className="p-3 text-sm">
+                                                                {format(new Date(history['Datetime']), "MMM dd, yyyy")}
+                                                            </td>
+                                                            <td className="p-3 text-sm">{history['Location']}</td>
+                                                            <td className="p-3 text-sm">{history['Problem Criticality']}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
 
-                                        <p className="text-gray-500">No data available yet</p>
+                                        </div>
                                     </div>
                                 )}
+
                             </div>
                         </div>
                     </div>
