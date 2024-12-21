@@ -10,6 +10,17 @@ import {
   FaUsers,
   FaMapMarkerAlt,
   FaBox,
+  FaIdBadge,
+  FaCheckCircle,
+  FaCheckDouble,
+  FaCheck,
+  FaSign,
+  FaSignature,
+  FaRProject,
+  FaRegCheckCircle,
+  FaClipboardCheck,
+  FaRegClipboard,
+  FaTicketAlt,
 } from 'react-icons/fa';
 import { ReactComponent as SafifyIcon } from '../assets/images/safify_it_icon.svg';
 
@@ -20,9 +31,8 @@ const Sidebar = () => {
     <>
       {/* Sidebar */}
       <div
-        className={`fixed top-12 left-0 h-[calc(100vh-3rem)] bg-white border-r shadow-sm z-40 transition-all duration-300 ${
-          isCollapsed ? 'w-16' : 'w-64'
-        }`}
+        className={`fixed top-12 left-0 h-[calc(100vh-3rem)] bg-white border-r shadow-sm z-40 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'
+          }`}
       >
         {/* Header with logo and toggle button */}
         <div className="flex items-center justify-between px-3 mb-2 mt-6">
@@ -40,9 +50,8 @@ const Sidebar = () => {
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             <FaChevronLeft
-              className={`text-gray-600 transition-transform ${
-                isCollapsed ? 'rotate-180' : ''
-              }`}
+              className={`text-gray-600 transition-transform ${isCollapsed ? 'rotate-180' : ''
+                }`}
             />
           </div>
         </div>
@@ -53,15 +62,24 @@ const Sidebar = () => {
         {/* Sections */}
         <SidebarSection
           isCollapsed={isCollapsed}
-          title="Incidents"
+          title="Tickets"
           links={[
-            { to: '/incidents', icon: FaClipboardList, label: 'Open Incidents' },
-            { to: '/incidents', icon: FaBell, label: 'My Incidents' },
-            { to: '/incidents', icon: FaCalendarAlt, label: 'Major Incidents' },
+            { to: '/incidents', icon: FaTicketAlt, label: 'Open Tickets' },
+            { to: '/incidents', icon: FaTicketAlt, label: 'Critical Tickets' },
+          ]}
+        />
+        <div className="border-t border-gray-200 my-2"></div>
+
+
+        <SidebarSection
+          isCollapsed={isCollapsed}
+          title="Approvals"
+          links={[
+            { to: '/approvals', icon: FaSign, label: 'Pending Approvals' },
             {
-              to: '/incidents',
-              icon: FaClipboardList,
-              label: 'Resolved Incidents (last 30)',
+              to: '/approvals',
+              icon: FaCheckCircle,
+              label: 'Approved Reports (last 30)',
             },
           ]}
         />
@@ -97,20 +115,20 @@ const SidebarSection = ({ title, links, isCollapsed }) => (
     {!isCollapsed && <h3 className="text-gray-600 font-semibold mb-2">{title}</h3>}
     <div className="space-y-2">
       {links.map(({ to, icon: Icon, label }) => (
-                <NavLink
-                key={to}
-                to={to}
-                className="flex items-center gap-2 text-gray-700 p-2 rounded hover:bg-gray-200 transition-all relative group"
-                activeClassName="bg-blue-500 text-white"
-              >
-                <Icon className="text-lg" />
-                {!isCollapsed && <span>{label}</span>}
-                {isCollapsed && (
-<span className="absolute left-full ml-2 hidden group-hover:block bg-black text-white text-sm rounded py-1 px-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-{label}
-</span>
-                )}
-              </NavLink>
+        <NavLink
+          key={to}
+          to={to}
+          className="flex items-center gap-2 text-gray-700 p-2 rounded hover:bg-gray-200 transition-all relative group"
+          activeClassName="bg-blue-500 text-white"
+        >
+          <Icon className="text-lg" />
+          {!isCollapsed && <span>{label}</span>}
+          {isCollapsed && (
+            <span className="absolute left-full ml-2 hidden group-hover:block bg-black text-white text-sm rounded py-1 px-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+              {label}
+            </span>
+          )}
+        </NavLink>
       ))}
     </div>
   </div>

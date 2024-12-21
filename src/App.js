@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
 import TopNavWrapper from './components/TopNavWrapper'; // New Wrapper Component
 import AssetPage from './pages/Assets';
+import Approvals from './pages/Approvals';
 
 const AppRouter = () => {
   return (
@@ -34,6 +35,14 @@ const AppRouter = () => {
               element={
                 <ProtectedRoute>
                   <AssetPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/approvals"
+              element={
+                <ProtectedRoute>
+                  <Approvals />
                 </ProtectedRoute>
               }
             />
