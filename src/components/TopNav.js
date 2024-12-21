@@ -120,34 +120,33 @@ const TopNav = ({ teams, fetchTeams }) => {
             </button>
           </div>
           <nav className="flex flex-col gap-4 font-semibold text-gray-700">
-            <span
-              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
-              onClick={() => {
-                navigate('/dashboard');
-                toggleMenu();
-              }}
-            >
-              Dashboard
-            </span>
-            <span
-              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
-              onClick={() => {
-                navigate('/assets');
-                toggleMenu();
-              }}
-            >
-              Assets
-            </span>
-            <span
-              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
-              onClick={() => {
-                toggleTeams();
-                toggleMenu();
-              }}
-            >
-              Teams
-            </span>
-          </nav>
+  <span
+    className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+    onClick={() => {
+      navigate('/dashboard');
+      toggleMenu();
+    }}
+  >
+    Dashboard
+  </span>
+  <span
+    className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+    onClick={() => {
+      navigate('/assets');
+      toggleMenu();
+    }}
+  >
+    Assets
+  </span>
+  <span
+    className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+    onClick={toggleTeams}
+
+  >
+    Teams
+  </span>
+</nav>
+
           <div className="mt-auto flex flex-col gap-4">
             <button
               className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded"
