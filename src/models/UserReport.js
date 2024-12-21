@@ -13,6 +13,9 @@ class UserReport {
       this.image = data['image'];
       this.status = data['status'];
       this.assetName = data['asset_name'];
+      this.assetNo = data['asset_no'];
+      this.Assignee = data['Assignee'];
+
     }
   
     // Optional: Add any methods you want to format data here, such as date formatting
