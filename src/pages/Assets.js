@@ -143,7 +143,8 @@ const Assets = () => {
                                     💻
                                 </div>
                                 <div>
-                                    <p className="text-md">{asset.assetName}</p>
+                                    <p className="text-md font-semibold">{asset.assetNo}</p>
+                                    <p className="text-sm">{asset.assetName}</p>
                                     <p className="text-sm text-gray-500">
                                         Issue Count: {asset.assetIssueCount}
                                     </p>

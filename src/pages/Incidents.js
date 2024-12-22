@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import Report from '../models/UserReport';  // Adjust path as necessary
-import { FaSearch, FaLink, FaComment,FaClipboard, FaUser, FaExchangeAlt, FaCheck, FaTrash, FaArrowAltCircleRight, FaArrowRight, FaImage } from 'react-icons/fa';
+import {FaUser, FaTrash, FaArrowRight, FaImage } from 'react-icons/fa';
 
 const Incidents = () => {
   const [userReports, setUserReports] = useState([]);
@@ -17,9 +17,15 @@ const Incidents = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [selectedReportId, setSelectedReportId] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedTeam, setSelectedTeam] = useState('');
   const [selectedCriticality, setSelectedCriticality] = useState('');
+  const [responseMessage, setResponseMessage] = useState('');
+  const [responseStatus, setResponseStatus] = useState(''); // 'success' or 'error'
+  const [isLoading, setIsLoading] = useState(false);
 
+
+  
 
   useEffect(() => {
     if (isModalOpen) {
@@ -46,35 +52,90 @@ const Incidents = () => {
     }
   }, [isModalOpen]);
 
-  const handleAssignClick = (reportId) => {
+  const handleAssignClick = (reportId, userId) => {
     console.log('Assign clicked for report:', reportId); // Debug log
     setSelectedReportId(reportId);
+    setSelectedUserId(userId);
     setIsModalOpen(true);
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTeam(''); 
+    setSelectedCriticality(''); 
+    setResponseMessage(''); 
+    setResponseStatus(''); 
+  };
+  
 
-  useEffect(() => {
-    const fetchUserReports = async () => {
-      try {
-        const jwtToken = sessionStorage.getItem('jwt');
-        const response = await axios.get(
-          'http://localhost:3001/admin/dashboard/fetchAllUserReports',
-          {
-            headers: {
-              'Authorization': `Bearer ${jwtToken}`,
-            },
-          }
-        );
-        const reports = response.data.map(reportData => new Report(reportData));
-        setUserReports(reports);
-      } catch (err) {
-        setError('Failed to load reports');
-      } finally {
-        setLoading(false);
+
+// Define fetchUserReports outside of useEffect so it can be reused
+const fetchUserReports = async () => {
+  try {
+    const jwtToken = sessionStorage.getItem('jwt');
+    const response = await axios.get(
+      'http://localhost:3001/admin/dashboard/fetchAllUserReports',
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
       }
+    );
+    const reports = response.data.map(reportData => new Report(reportData));
+    setUserReports(reports);
+  } catch (err) {
+    setError('Failed to load reports');
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Use fetchUserReports inside useEffect to load reports initially
+useEffect(() => {
+  fetchUserReports();
+}, []);
+
+// Updated handleAssignTask function
+const handleAssignTask = async () => {
+  if (!selectedReportId || !selectedTeam || !selectedCriticality || !selectedUserId) {
+    return { status: 'error', message: 'Please select all fields before assigning the task.' };
+  }
+
+  setIsLoading(true); // Show loading indicator
+  try {
+    const jwtToken = sessionStorage.getItem('jwt');
+    const payload = {
+      user_report_id: selectedReportId,
+      user_id: selectedUserId,
+      action_team_id: selectedTeam,
+      incident_criticality_id: selectedCriticality,
     };
-    fetchUserReports();
-  }, []);
+
+    const response = await axios.post(
+      'http://localhost:3001/admin/dashboard/InsertAssignTask',
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      await fetchUserReports(); // Reuse fetchUserReports here
+      return { status: 'success', message: 'Task assigned successfully!' };
+    }
+  } catch (error) {
+    console.error('Failed to assign task', error);
+    return { status: 'error', message: 'Error assigning task. Please try again.' };
+  } finally {
+    setIsLoading(false); // Hide loading indicator
+  }
+};
+
+
+
+
 
   const toggleReportSelection = (id) => {
     setSelectedReports((prev) =>
@@ -199,30 +260,30 @@ const Incidents = () => {
               <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.subLocationName}</td>
 
               <td className="px-4 py-2 border-b">
-  <div
-    className={`flex ${report.Assignee === 'Unassigned' ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} font-semibold`}
-    onClick={report.Assignee === 'Unassigned' ? () => handleAssignClick(report.userReportId) : undefined}
-  >
-    {/* User Icon */}
-    <span className={`text-gray-700 p-1 mr-2 `}>
-      <FaUser />
-    </span>
+                <div
+                  className={`flex ${report.Assignee === 'Unassigned' ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} font-semibold`}
+                  onClick={report.Assignee === 'Unassigned' ? () => handleAssignClick(report.userReportId, report.userId) : undefined}
+                >
+                  {/* User Icon */}
+                  <span className={`text-gray-700 p-1 mr-2 `}>
+                    <FaUser />
+                  </span>
 
-    {/* Clipboard Icon (conditionally rendered) */}
+                  {/* Clipboard Icon (conditionally rendered) */}
 
 
-    {/* Assignee Text */}
-    <span className={report.Assignee === 'Unassigned' ? 'text-sky-600' : 'text-gray-900'}>
-      {report.Assignee}
-    </span>
+                  {/* Assignee Text */}
+                  <span className={report.Assignee === 'Unassigned' ? 'text-sky-600' : 'text-gray-900'}>
+                    {report.Assignee}
+                  </span>
 
-    {report.Assignee === 'Unassigned' && (
-      <span className="text-gray-700 p-1 mr-2">
-        <FaArrowRight />
-      </span>
-    )}
-  </div>
-</td>
+                  {report.Assignee === 'Unassigned' && (
+                    <span className="text-gray-700 p-1 mr-2">
+                      <FaArrowRight />
+                    </span>
+                  )}
+                </div>
+              </td>
 
               <td className="px-4 py-2 border-b text-center">
                 {report.image ? (
@@ -231,7 +292,7 @@ const Incidents = () => {
                     onClick={() => setSelectedImage(report.image)}
                     title="Click to view the image"
                   >
-                    <FaImage/>
+                    <FaImage />
                   </button>
                 ) : (
                   <span className="text-gray-700 font-bold">X</span>
@@ -245,7 +306,7 @@ const Incidents = () => {
               </td>
 
               <td className="px-4 py-2 border-b font-semibold">
-              {new Date(report.dateTime).toLocaleDateString('en-GB')}
+                {new Date(report.dateTime).toLocaleDateString('en-GB')}
               </td>
             </tr>
           ))}
@@ -269,76 +330,102 @@ const Incidents = () => {
         </div>
       )}
 
-      {isModalOpen && (
+{isModalOpen && (
+  <div
+    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+    onClick={() => handleCloseModal()} // Close modal and reset form on background click
+  >
+    <div
+      className="bg-white rounded-lg shadow-lg w-1/3 p-6"
+      onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+    >
+      <h3 className="text-xl font-semibold mb-4">Assign Task</h3>
+
+      {/* Response Message */}
+      {responseMessage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          onClick={() => setIsModalOpen(false)} // Close modal on background click
+          className={`mb-4 p-3 rounded ${
+            responseStatus === 'success'
+              ? 'text-emerald-600 bg-emerald-100'
+              : 'text-red-600 bg-red-100'
+          }`}
         >
-          <div
-            className="bg-white rounded-lg shadow-lg w-1/3 p-6"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
-          >
-            <h3 className="text-xl font-semibold mb-4">Assign Task</h3>
-
-            {/* Action Team Dropdown */}
-            {loadingTeams ? (
-              <p>Loading teams...</p>
-            ) : (
-              <div className="mb-4">
-                <label htmlFor="actionTeam" className="block text-gray-700 mb-2">Select Action Team</label>
-                <select
-                  id="actionTeam"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setSelectedTeam(e.target.value)} // Handle team selection
-                >
-                  <option value="">Select Team</option>
-                  {actionTeams.map((team) => (
-                    <option key={team.action_team_id} value={team.action_team_id}>
-                      {team.action_team_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-
-            <div className="mb-4">
-              <label htmlFor="criticality" className="block text-gray-700 mb-2">Select Criticality</label>
-              <select
-                id="criticality"
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onChange={(e) => setSelectedCriticality(e.target.value)} // Handle criticality selection
-              >
-                <option value="">Select Criticality</option>
-                <option value="CRT1">Minor</option>
-                <option value="CRT2">Serious</option>
-                <option value="CRT3">Critical</option>
-              </select>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end space-x-2">
-
-
-              <button
-                className="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-red-200 transition"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 hover:bg-emerald-200 transition"
-                onClick={() => {
-                  console.log(`Assigned to team: ${selectedTeam}, Criticality: ${selectedCriticality}`);
-                  setIsModalOpen(false);
-                }}
-              >
-                Assign
-              </button>
-            </div>
-          </div>
+          {responseMessage}
         </div>
       )}
+
+      {/* Action Team Dropdown */}
+      {loadingTeams ? (
+        <p>Loading teams...</p>
+      ) : (
+        <div className="mb-4">
+          <label htmlFor="actionTeam" className="block text-gray-700 mb-2">
+            Select Action Team
+          </label>
+          <select
+            id="actionTeam"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={selectedTeam}
+            onChange={(e) => setSelectedTeam(e.target.value)} // Handle team selection
+          >
+            <option value="">Select Team</option>
+            {actionTeams.map((team) => (
+              <option key={team.action_team_id} value={team.action_team_id}>
+                {team.action_team_name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div className="mb-4">
+        <label htmlFor="criticality" className="block text-gray-700 mb-2">
+          Select Criticality
+        </label>
+        <select
+          id="criticality"
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={selectedCriticality}
+          onChange={(e) => setSelectedCriticality(e.target.value)} // Handle criticality selection
+        >
+          <option value="">Select Criticality</option>
+          <option value="CRT1">Minor</option>
+          <option value="CRT2">Serious</option>
+          <option value="CRT3">Critical</option>
+        </select>
+      </div>
+
+      {/* Loading Indicator */}
+      {isLoading && <p className="text-blue-500 mb-4">Assigning task, please wait...</p>}
+
+      {/* Action Buttons */}
+      <div className="flex justify-end space-x-2">
+        <button
+          className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+          onClick={() => handleCloseModal()}
+          disabled={isLoading} // Disable button while loading
+        >
+          Cancel
+        </button>
+        <button
+          className="px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 hover:bg-emerald-200 transition"
+          onClick={async () => {
+            const result = await handleAssignTask();
+            setResponseMessage(result.message);
+            setResponseStatus(result.status);
+            if (result.status === 'success') {
+              setTimeout(() => handleCloseModal(), 2000); // Close modal after 2 seconds
+            }
+          }}
+          disabled={isLoading} // Disable button while loading
+        >
+          Assign
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
 
 
