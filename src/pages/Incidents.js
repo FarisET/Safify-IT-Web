@@ -53,7 +53,6 @@ const Incidents = () => {
   }, [isModalOpen]);
 
   const handleAssignClick = (reportId, userId) => {
-    console.log('Assign clicked for report:', reportId); // Debug log
     setSelectedReportId(reportId);
     setSelectedUserId(userId);
     setIsModalOpen(true);
