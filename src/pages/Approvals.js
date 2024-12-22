@@ -48,9 +48,8 @@ const Approvals = () => {
 
   const getStatusClass = (status) => {
     const normalizedStatus = status.trim().toLowerCase();
-    if (normalizedStatus === 'open') return 'bg-red-100';
-    if (normalizedStatus === 'in progress') return 'bg-gray-100 text-gray-700';
-    if (normalizedStatus === 'completed') return 'bg-emerald-100';
+    if (normalizedStatus === 'approval pending') return 'bg-gray-100 text-gray-700';
+    if (normalizedStatus === 'approved') return 'bg-emerald-100';
     return '';
   };
 
@@ -95,16 +94,15 @@ const Approvals = () => {
             className="font-semibold text-gray-700 rounded px-2 py-2 border"
           >
             <option value="All">All</option>
-            <option value="Open">Open</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
+            <option value="approved">Approved</option>
+            <option value="approval pending">Pending</option>
 
           </select>
 
         </div>
       </div>
 
-      <div className="mb-4 text-gray-700">{filteredReports.length} issue{filteredReports.length !== 1 ? 's' : ''}</div>
+      <div className="mb-4 text-gray-700">{filteredReports.length} report{filteredReports.length !== 1 ? 's' : ''}</div>
 
       {/* Action Buttons - Shown when any checkbox is selected */}
       {selectedReports.length > 0 && (
@@ -112,10 +110,6 @@ const Approvals = () => {
           <span>{selectedReports.length} selected</span>
           <div className="flex gap-2">
 
-            <button className="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded">
-              <FaCheck className="mr-2" />
-              Approve
-            </button>
             <button className="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded">
               <FaTrash className="mr-2" />
               Delete
@@ -139,8 +133,8 @@ const Approvals = () => {
             <th className="px-4 py-2 border-b">Asset</th>
             {/* <th className="px-4 py-2 border-b">Asset.No</th> */}
             <th className="px-4 py-2 border-b">Summary</th>
-            <th className="px-4 py-2 border-b">Reporter</th>
             <th className="px-4 py-2 border-b">Assignee</th>
+            <th className="px-4 py-2 border-b">Action Team</th>
             <th className="px-4 py-2 border-b">Image</th>
             <th className="px-4 py-2 border-b">Status</th>
             <th className="px-4 py-2 border-b">Created</th>
@@ -160,7 +154,11 @@ const Approvals = () => {
               <td className="px-4 py-2 border-b font-semibold text-sky-600 cursor-pointer hover:underline transition">{report.assetName}</td>
               {/* <td className="px-4 py-2 border-b">{report.asset_no}</td> */}
               {/* <td className="px-4 py-2 border-b">IMS-{report.userReportId}</td> */}
-              <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportDescription}</td>
+              <td className="px-4 py-2 border-b font-semibold text-gray-700">
+  <span className="block text-gray-800">⚠️ {report.reportDescription}</span>
+  <span className="block text-gray-500 text-sm">💬 {report.resolutionDescription}</span>
+</td>
+
               <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportedBy}</td>
               <td className="px-4 py-2 border-b">
   <div
@@ -208,7 +206,7 @@ const Approvals = () => {
               </td>
 
               <td className="px-4 py-2 border-b">
-                {formatDistanceToNow(new Date(report.dateTime), { addSuffix: true })}
+              <div>{new Date(report.dateTime).toLocaleDateString('en-GB')}</div>
               </td>
             </tr>
           ))}

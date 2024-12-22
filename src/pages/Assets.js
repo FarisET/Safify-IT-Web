@@ -165,6 +165,9 @@ const Assets = () => {
                 ) : assetDetails ? (
                     <div className="p-4 space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <p>
+                                <strong>Asset Number:</strong> {assetDetails.asset_no}
+                            </p>
                             <p>
                                 <strong>Asset Name:</strong> {assetDetails.asset_name}
                             </p>
@@ -194,15 +197,6 @@ const Assets = () => {
                         <div className="mt-6">
                             <ul className="flex border-b text-sm font-medium">
                                 <li
-                                    className={`p-3 cursor-pointer transition-all ${activeTab === "Ticket History"
-                                        ? "border-b-2 border-blue-500 text-blue-600"
-                                        : "hover:text-blue-600"
-                                        }`}
-                                    onClick={() => setActiveTab("Ticket History")}
-                                >
-                                    Ticket History
-                                </li>
-                                <li
                                     className={`p-3 cursor-pointer transition-all ${activeTab === "Asset History"
                                         ? "border-b-2 border-blue-500 text-blue-600"
                                         : "hover:text-blue-600"
@@ -211,11 +205,20 @@ const Assets = () => {
                                 >
                                     Asset History
                                 </li>
+                                <li
+                                    className={`p-3 cursor-pointer transition-all ${activeTab === "Ticket History"
+                                        ? "border-b-2 border-blue-500 text-blue-600"
+                                        : "hover:text-blue-600"
+                                        }`}
+                                    onClick={() => setActiveTab("Ticket History")}
+                                >
+                                    Ticket History
+                                </li>
                             </ul>
 
                             {/* Content Section */}
                             <div className="mt-4">
-                                {activeTab === "Ticket History" && (
+                                {activeTab === "Asset History" && (
                                     <div>
 
                                         <div className="overflow-auto max-h-64 border rounded-lg">
@@ -264,7 +267,7 @@ const Assets = () => {
                                         </div>
                                     </div>
                                 )}
-                                {activeTab === "Asset History" && (
+                                {activeTab === "Ticket History" && (
                                     <div>
                                         <div className="overflow-auto max-h-64 border rounded-lg">
                                             <table className="w-full text-left">

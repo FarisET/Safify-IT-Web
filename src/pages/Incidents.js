@@ -140,7 +140,7 @@ const Incidents = () => {
         </div>
       </div>
 
-      <div className="mb-4 text-gray-700">{filteredReports.length} issue{filteredReports.length !== 1 ? 's' : ''}</div>
+      <div className="mb-4 text-gray-700">{filteredReports.length} ticket{filteredReports.length !== 1 ? 's' : ''}</div>
 
       {/* Action Buttons - Shown when any checkbox is selected */}
       {selectedReports.length > 0 && (
@@ -148,11 +148,8 @@ const Incidents = () => {
           <span>{selectedReports.length} selected</span>
           <div className="flex gap-2">
 
-            <button className="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded">
-              <FaCheck className="mr-2" />
-              Approve
-            </button>
-            <button className="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded">
+
+            <button className="flex items-center bg-gray-100 hover:bg-red-200 px-4 py-2 rounded">
               <FaTrash className="mr-2" />
               Delete
             </button>
@@ -176,6 +173,7 @@ const Incidents = () => {
             {/* <th className="px-4 py-2 border-b">Asset.No</th> */}
             <th className="px-4 py-2 border-b">Summary</th>
             <th className="px-4 py-2 border-b">Reporter</th>
+            <th className="px-4 py-2 border-b">Location</th>
             <th className="px-4 py-2 border-b">Assignee</th>
             <th className="px-4 py-2 border-b">Image</th>
             <th className="px-4 py-2 border-b">Status</th>
@@ -198,6 +196,8 @@ const Incidents = () => {
               {/* <td className="px-4 py-2 border-b">IMS-{report.userReportId}</td> */}
               <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportDescription}</td>
               <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.userId}</td>
+              <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.subLocationName}</td>
+
               <td className="px-4 py-2 border-b">
   <div
     className={`flex ${report.Assignee === 'Unassigned' ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} font-semibold`}
@@ -244,8 +244,8 @@ const Incidents = () => {
                 </span>
               </td>
 
-              <td className="px-4 py-2 border-b">
-                {formatDistanceToNow(new Date(report.dateTime), { addSuffix: true })}
+              <td className="px-4 py-2 border-b font-semibold">
+              {new Date(report.dateTime).toLocaleDateString('en-GB')}
               </td>
             </tr>
           ))}
