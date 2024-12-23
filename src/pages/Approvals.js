@@ -192,7 +192,7 @@ const Approvals = () => {
               <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportedBy}</td>
               <td className="px-4 py-2 border-b">{report.actionTeamName}</td>
               <td
-                className={`px-4 py-2 border-b whitespace-nowrap ${report.status.toLowerCase() === 'approval pending' ? 'hover:underline cursor-pointer' : ''}`}
+                className={`px-4 py-2 border-b whitespace-nowrap`}
               >
                 <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getStatusClass(report.status)}`}>
                   {report.status}
@@ -209,24 +209,25 @@ const Approvals = () => {
                       className="bg-gray-300 text-gray-700 px-2 py-1 rounded flex items-center space-x-2"
                     >
                       <FaChevronDown />
-                      <span>Action</span>
                     </button>
                     {isDropdownOpen === report.userReportId && (
-                      <div className="absolute left-0 mt-2 w-40 bg-white border rounded shadow-lg">
+                      <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-10 p-2"
+                      >
                         <button
                           onClick={() => approveReport(report.userReportId, report.actionReportId)}
-                          className="block px-4 py-2 text-green-500 hover:bg-green-100 w-full text-left"
+                          className="block w-full text-gray-700 font-bold text-sm py-1 px-2 rounded bg-emerald-100 hover:bg-emerald-200 transition duration-200 ease-in-out"
                         >
-                          <FaCheck /> Approve
+                          Approve
                         </button>
                         <button
                           onClick={() => rejectReport(report.actionReportId)}
-                          className="block px-4 py-2 text-red-500 hover:bg-red-100 w-full text-left"
+                          className="block w-full text-gray-700 text-sm font-bold py-1 px-2 rounded mt-2 bg-red-100 hover:bg-red-200 transition duration-200 ease-in-out"
                         >
-                          <FaTrash /> Reject
+                          Reject
                         </button>
                       </div>
                     )}
+
                   </div>
                 )}
               </td>

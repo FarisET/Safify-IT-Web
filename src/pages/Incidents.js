@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import Report from '../models/UserReport';  // Adjust path as necessary
-import {FaUser, FaTrash, FaArrowRight, FaImage } from 'react-icons/fa';
+import { FaUser, FaTrash, FaArrowRight, FaImage } from 'react-icons/fa';
 
 const Incidents = () => {
   const [userReports, setUserReports] = useState([]);
@@ -21,11 +21,11 @@ const Incidents = () => {
   const [selectedTeam, setSelectedTeam] = useState('');
   const [selectedCriticality, setSelectedCriticality] = useState('');
   const [responseMessage, setResponseMessage] = useState('');
-  const [responseStatus, setResponseStatus] = useState(''); // 'success' or 'error'
+  const [responseStatus, setResponseStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
 
-  
+
 
   useEffect(() => {
     if (isModalOpen) {
@@ -60,77 +60,77 @@ const Incidents = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedTeam(''); 
-    setSelectedCriticality(''); 
-    setResponseMessage(''); 
-    setResponseStatus(''); 
+    setSelectedTeam('');
+    setSelectedCriticality('');
+    setResponseMessage('');
+    setResponseStatus('');
   };
-  
 
 
-// Define fetchUserReports outside of useEffect so it can be reused
-const fetchUserReports = async () => {
-  try {
-    const jwtToken = sessionStorage.getItem('jwt');
-    const response = await axios.get(
-      'http://localhost:3001/admin/dashboard/fetchAllUserReports',
-      {
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      }
-    );
-    const reports = response.data.map(reportData => new Report(reportData));
-    setUserReports(reports);
-  } catch (err) {
-    setError('Failed to load reports');
-  } finally {
-    setLoading(false);
-  }
-};
 
-// Use fetchUserReports inside useEffect to load reports initially
-useEffect(() => {
-  fetchUserReports();
-}, []);
-
-// Updated handleAssignTask function
-const handleAssignTask = async () => {
-  if (!selectedReportId || !selectedTeam || !selectedCriticality || !selectedUserId) {
-    return { status: 'error', message: 'Please select all fields before assigning the task.' };
-  }
-
-  setIsLoading(true); // Show loading indicator
-  try {
-    const jwtToken = sessionStorage.getItem('jwt');
-    const payload = {
-      user_report_id: selectedReportId,
-      user_id: selectedUserId,
-      action_team_id: selectedTeam,
-      incident_criticality_id: selectedCriticality,
-    };
-
-    const response = await axios.post(
-      'http://localhost:3001/admin/dashboard/InsertAssignTask',
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      }
-    );
-
-    if (response.status === 200) {
-      await fetchUserReports(); // Reuse fetchUserReports here
-      return { status: 'success', message: 'Task assigned successfully!' };
+  // Define fetchUserReports outside of useEffect so it can be reused
+  const fetchUserReports = async () => {
+    try {
+      const jwtToken = sessionStorage.getItem('jwt');
+      const response = await axios.get(
+        'http://localhost:3001/admin/dashboard/fetchAllUserReports',
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+      const reports = response.data.map(reportData => new Report(reportData));
+      setUserReports(reports);
+    } catch (err) {
+      setError('Failed to load reports');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Failed to assign task', error);
-    return { status: 'error', message: 'Error assigning task. Please try again.' };
-  } finally {
-    setIsLoading(false); // Hide loading indicator
-  }
-};
+  };
+
+  // Use fetchUserReports inside useEffect to load reports initially
+  useEffect(() => {
+    fetchUserReports();
+  }, []);
+
+  // Updated handleAssignTask function
+  const handleAssignTask = async () => {
+    if (!selectedReportId || !selectedTeam || !selectedCriticality || !selectedUserId) {
+      return { status: 'error', message: 'Please select all fields before assigning the task.' };
+    }
+
+    setIsLoading(true); // Show loading indicator
+    try {
+      const jwtToken = sessionStorage.getItem('jwt');
+      const payload = {
+        user_report_id: selectedReportId,
+        user_id: selectedUserId,
+        action_team_id: selectedTeam,
+        incident_criticality_id: selectedCriticality,
+      };
+
+      const response = await axios.post(
+        'http://localhost:3001/admin/dashboard/InsertAssignTask',
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        await fetchUserReports(); // Reuse fetchUserReports here
+        return { status: 'success', message: 'Task assigned successfully!' };
+      }
+    } catch (error) {
+      console.error('Failed to assign task', error);
+      return { status: 'error', message: 'Error assigning task. Please try again.' };
+    } finally {
+      setIsLoading(false); // Hide loading indicator
+    }
+  };
 
 
 
@@ -251,7 +251,15 @@ const handleAssignTask = async () => {
                   onChange={() => toggleReportSelection(report.userReportId)}
                 />
               </td>
-              <td className="px-4 py-2 border-b font-semibold text-sky-600 cursor-pointer hover:underline transition">{report.assetName}</td>
+              <td className="px-4 py-2 border-b">
+                <div className="font-semibold text-sky-600 cursor-pointer hover:underline transition">
+                  {report.assetNo}
+                </div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {report.assetName}
+                </div>
+              </td>
+
               {/* <td className="px-4 py-2 border-b">{report.asset_no}</td> */}
               {/* <td className="px-4 py-2 border-b">IMS-{report.userReportId}</td> */}
               <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportDescription}</td>
@@ -329,108 +337,103 @@ const handleAssignTask = async () => {
         </div>
       )}
 
-{isModalOpen && (
-  <div
-    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-    onClick={() => handleCloseModal()} // Close modal and reset form on background click
-  >
-    <div
-      className="bg-white rounded-lg shadow-lg w-1/3 p-6"
-      onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
-    >
-      <h3 className="text-xl font-semibold mb-4">Assign Task</h3>
-
-      {/* Response Message */}
-      {responseMessage && (
+      {isModalOpen && (
         <div
-          className={`mb-4 p-3 rounded ${
-            responseStatus === 'success'
-              ? 'text-emerald-600 bg-emerald-100'
-              : 'text-red-600 bg-red-100'
-          }`}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          onClick={() => handleCloseModal()} // Close modal and reset form on background click
         >
-          {responseMessage}
-        </div>
-      )}
-
-      {/* Action Team Dropdown */}
-      {loadingTeams ? (
-        <p>Loading teams...</p>
-      ) : (
-        <div className="mb-4">
-          <label htmlFor="actionTeam" className="block text-gray-700 mb-2">
-            Select Action Team
-          </label>
-          <select
-            id="actionTeam"
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={selectedTeam}
-            onChange={(e) => setSelectedTeam(e.target.value)} // Handle team selection
+          <div
+            className="bg-white rounded-lg shadow-lg w-1/3 p-6"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
           >
-            <option value="">Select Team</option>
-            {actionTeams.map((team) => (
-              <option key={team.action_team_id} value={team.action_team_id}>
-                {team.action_team_name}
-              </option>
-            ))}
-          </select>
+            <h3 className="text-xl font-semibold mb-4">Assign Task</h3>
+
+            {/* Response Message */}
+            {responseMessage && (
+              <div
+                className={`mb-4 p-3 rounded ${responseStatus === 'success'
+                    ? 'text-emerald-600 bg-emerald-100'
+                    : 'text-red-600 bg-red-100'
+                  }`}
+              >
+                {responseMessage}
+              </div>
+            )}
+
+            {/* Action Team Dropdown */}
+            {loadingTeams ? (
+              <p>Loading teams...</p>
+            ) : (
+              <div className="mb-4">
+                <label htmlFor="actionTeam" className="block text-gray-700 mb-2">
+                  Select Action Team
+                </label>
+                <select
+                  id="actionTeam"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={selectedTeam}
+                  onChange={(e) => setSelectedTeam(e.target.value)} // Handle team selection
+                >
+                  <option value="">Select Team</option>
+                  {actionTeams.map((team) => (
+                    <option key={team.action_team_id} value={team.action_team_id}>
+                      {team.action_team_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label htmlFor="criticality" className="block text-gray-700 mb-2">
+                Select Criticality
+              </label>
+              <select
+                id="criticality"
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={selectedCriticality}
+                onChange={(e) => setSelectedCriticality(e.target.value)} // Handle criticality selection
+              >
+                <option value="">Select Criticality</option>
+                <option value="CRT1">Minor</option>
+                <option value="CRT2">Serious</option>
+                <option value="CRT3">Critical</option>
+              </select>
+            </div>
+
+            {/* Loading Indicator */}
+            {isLoading && <p className="text-blue-500 mb-4">Assigning task, please wait...</p>}
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-2">
+              <button
+                className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                onClick={() => handleCloseModal()}
+                disabled={isLoading} // Disable button while loading
+              >
+                Cancel
+              </button>
+              <button
+                className="px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 hover:bg-emerald-200 transition"
+                onClick={async () => {
+                  const result = await handleAssignTask();
+                  setResponseMessage(result.message);
+                  setResponseStatus(result.status);
+                  if (result.status === 'success') {
+                    setTimeout(() => handleCloseModal(), 2000); // Close modal after 2 seconds
+                  }
+                }}
+                disabled={isLoading} // Disable button while loading
+              >
+                Assign
+              </button>
+            </div>
+          </div>
         </div>
       )}
-
-      <div className="mb-4">
-        <label htmlFor="criticality" className="block text-gray-700 mb-2">
-          Select Criticality
-        </label>
-        <select
-          id="criticality"
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={selectedCriticality}
-          onChange={(e) => setSelectedCriticality(e.target.value)} // Handle criticality selection
-        >
-          <option value="">Select Criticality</option>
-          <option value="CRT1">Minor</option>
-          <option value="CRT2">Serious</option>
-          <option value="CRT3">Critical</option>
-        </select>
-      </div>
-
-      {/* Loading Indicator */}
-      {isLoading && <p className="text-blue-500 mb-4">Assigning task, please wait...</p>}
-
-      {/* Action Buttons */}
-      <div className="flex justify-end space-x-2">
-        <button
-          className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
-          onClick={() => handleCloseModal()}
-          disabled={isLoading} // Disable button while loading
-        >
-          Cancel
-        </button>
-        <button
-          className="px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 hover:bg-emerald-200 transition"
-          onClick={async () => {
-            const result = await handleAssignTask();
-            setResponseMessage(result.message);
-            setResponseStatus(result.status);
-            if (result.status === 'success') {
-              setTimeout(() => handleCloseModal(), 2000); // Close modal after 2 seconds
-            }
-          }}
-          disabled={isLoading} // Disable button while loading
-        >
-          Assign
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-
 
     </div>
   );
 };
-
 
 export default Incidents;
