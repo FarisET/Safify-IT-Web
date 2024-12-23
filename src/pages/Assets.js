@@ -289,41 +289,62 @@ const Assets = () => {
 
                 <span className='flex justify-left items-left border-b bg-white'>
                     <h2 className="text-lg font-semibold p-4 border-b bg-white">Asset Details</h2>
+                    <button
+        onClick={() => handleEditClick(assetDetails)}
+        className="flex items-center space-x-2 text-blue-600 hover:text-blue-800"
+      >
+        {assetDetails ?(
+            <FaEdit className="text-lg" />
+            ) : null}
+        {assetDetails ?(<span>Edit</span>  ) : null}
+      </button>
                 </span>
                 {loading ? (
                     <p className="p-4 text-gray-500">Loading...</p>
                 ) : error ? (
                     <p className="p-4 text-red-500">{error}</p>
                 ) : assetDetails ? (
-                    <div className="p-4 space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <p>
-                                <strong>Asset Number:</strong> {assetDetails.asset_no}
-                            </p>
-                            <p>
-                                <strong>Asset Name:</strong> {assetDetails.asset_name}
-                            </p>
-                            <p>
-                                <strong>Description:</strong> {assetDetails.asset_desc}
-                            </p>
-                            <p>
-                                <strong>Status:</strong> {assetDetails.asset_status}
-                            </p>
-                            <p>
-                                <strong>Creation Date:</strong>{" "}
-                                {format(assetDetails.asset_creation_date, "MMM dd, yyyy")}
-                            </p>
-                            <p>
-                                <strong>Assigned To:</strong> {assetDetails.assigned_to}
-                            </p>
-                            <p>
-                                <strong>Location:</strong> {assetDetails.asset_location}
-                            </p>
-                            <p>
-                                <strong>Is Active:</strong>{" "}
-                                {assetDetails.is_active ? "Yes" : "No"}
-                            </p>
-                        </div>
+                    <div className="p-6 bg-white rounded-md shadow-md space-y-6">
+
+    {/* Asset Details Grid */}
+    <div className="grid grid-cols-2 gap-3">
+  {/* Asset Number */}
+  <strong className="text-gray-600 font-semibold text-sm">Asset Number</strong>
+  <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_no}</span>
+
+  {/* Asset Name */}
+  <strong className="text-gray-600 font-semibold text-sm">Asset Name</strong>
+  <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_name}</span>
+
+  {/* Description */}
+  <strong className="text-gray-600 font-semibold text-sm">Description</strong>
+  <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_desc}</span>
+
+  {/* Status */}
+  <strong className="text-gray-600 font-semibold text-sm">Status</strong>
+  <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_status}</span>
+
+  {/* Creation Date */}
+  <strong className="text-gray-600 font-semibold text-sm">Creation Date</strong>
+  <span className="text-gray-800 text-sm font-medium">
+    {format(assetDetails.asset_creation_date, "MMM dd, yyyy")}
+  </span>
+
+  {/* Assigned To */}
+  <strong className="text-gray-600 font-semibold text-sm">Assigned To</strong>
+  <span className="text-gray-800 text-sm font-medium">{assetDetails.assigned_to}</span>
+
+  {/* Location */}
+  <strong className="text-gray-600 font-semibold text-sm">Location</strong>
+  <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_location}</span>
+
+  {/* Is Active */}
+  <strong className="text-gray-600 font-semibold text-sm">Is Active</strong>
+  <span className="text-gray-800 text-sm font-medium">
+    {assetDetails.is_active ? "Yes" : "No"}
+  </span>
+</div>
+
 
                         {/* Tabs Section */}
                         <div className="mt-6">
