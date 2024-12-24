@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { AssetType } from '../models/AssetType';
 import { format } from 'date-fns';
-import { FaUser, FaTrash, FaArrowRight, FaImage, FaEdit } from 'react-icons/fa';
+import { FaUser, FaTrash, FaArrowRight, FaImage, FaEdit, FaEllipsisV } from 'react-icons/fa';
 import LocationDropdown from "../components/SearchableLocationDropdown";
 import AssignToDropdown from "../components/SearchableUsersDropdown";
 
@@ -15,6 +15,11 @@ const Assets = () => {
     const [assetDetails, setAssetDetails] = useState(null);
     const [ticketHistory, setTicketHistory] = useState([]);
     const [AssetHistory, setAssetHistory] = useState([]);
+    const [activeOptionsId, setActiveOptionsId] = useState(null);
+
+    const toggleOptions = (id) => {
+        setActiveOptionsId((prev) => (prev === id ? null : id));
+    };
 
     const [activeTab, setActiveTab] = useState('Ticket History'); // Default tab
     const [loading, setLoading] = useState(false);
@@ -26,12 +31,60 @@ const Assets = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(null);
 
-    // Asset types useStates
+
+    //Add Asset types useStates
     const [addTypeModalOpen, setaddTypeModalOpen] = useState(false);
     const [assetTypeDesc, setAssetTypeDesc] = useState("");
     const [addTypeloading, setaddTypeLoading] = useState(false);
     const [addTypeerrorMessage, setaddTypeErrorMessage] = useState("");
     const [addTypesuccessMessage, setAddTypeSuccessMessage] = useState("");
+
+    const onCloseAddTypeModal = () => {
+        setaddTypeModalOpen(false);
+        setAssetTypeDesc('');
+        setaddTypeErrorMessage('');
+    }
+
+    const handleAssetTypeUpdate = () => { }
+    const handleAssetTypeDelete = () => {
+
+    }
+
+    //Add Asset useStates
+    const [addAssetModalOpen, setaddAssetModalOpen] = useState(false);
+    const [addAssetDesc, setAssetDesc] = useState("");
+    const [addAssetName, setAssetName] = useState("");
+    const [addAssetloading, setaddAssetLoading] = useState(false);
+    const [addAsseterrorMessage, setaddAssetErrorMessage] = useState("");
+    const [addAssetsuccessMessage, setaddAssetSuccessMessage] = useState("");
+
+    const onCloseAddAssetModal = () => {
+        setaddAssetModalOpen(false);
+        setAssetName('');
+        setAssetDesc('');
+        setaddAssetErrorMessage('');
+    }
+
+    //Assign To
+    const [AssignmodalOpen, setAssignModalOpen] = useState(false);
+    const [AssignmodalMessage, setAssignModalMessage] = useState(null);
+    const [assignTo, setassignTo] = useState('');
+    const [assignToloading, setAssignToLoading] = useState(false);
+    const [assignToerror, setassignToError] = useState(null);
+
+    const onCloseAssignToModal = () => {
+        setAssignModalOpen(false);
+        setassignTo('');
+        setassignToError('');
+    }
+
+    const handleAssignToSubmit = () => {
+
+    }
+
+
+
+
 
     const [formData, setFormData] = useState({
         assetNo: "",
@@ -40,17 +93,12 @@ const Assets = () => {
         location: "",
         sublocation: "",
         sublocationId: "",
-        assignTo: "",
         status: "",
         assettypeId: "",
 
     });
 
-    const onCloseAddTypeModal = () => {
-        setaddTypeModalOpen(false);
-        setAssetTypeDesc('');
-        setaddTypeErrorMessage('');
-    }
+
 
 
 
@@ -107,6 +155,48 @@ const Assets = () => {
             setaddTypeLoading(false);
         }
     };
+
+
+    const handleAddAsset = async () => {
+        setaddAssetLoading(true);
+        setaddAssetErrorMessage("");
+        setaddAssetSuccessMessage("");
+
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.post(
+                `http://localhost:3001/admin/dashboard/addAsset`,
+                {
+                    asset_name: addAssetName,
+                    asset_desc: addAssetDesc,
+                    asset_type_id: selectedAssetTypeId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setaddAssetSuccessMessage("Asset added successfully!");
+            setAssetTypeDesc("");
+            setTimeout(() => {
+                setaddAssetModalOpen(false);
+                fetchAssetTypes(); // Refresh asset types list
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setaddAssetErrorMessage(error.response.data.error);
+            } else {
+                setaddAssetErrorMessage("Failed to add asset. Please try again.");
+            }
+        } finally {
+            setaddAssetLoading(false);
+        }
+    };
+
 
 
 
@@ -170,9 +260,9 @@ const Assets = () => {
             );
             setAssetDetails(assetDetailsResponse.data[0]);
 
-            // Fetch Ticket History
+            // Fetch Asset History
             const ticketHistoryResponse = await axios.get(
-                `http://localhost:3001/analytics/fetchAssetIssueLogs?asset_no=${assetNo}`,
+                `http://localhost:3001/analytics/fetchAssetLogs?asset_no=${assetNo}`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -180,7 +270,7 @@ const Assets = () => {
                 }
             );
             setTicketHistory(ticketHistoryResponse.data);
-            //Fetch Asset History
+            //Fetch Ticket History
             const assetHistoryResponse = await axios.get(
                 `http://localhost:3001/analytics/fetchAssetHistory?asset_no=${assetNo}`,
                 {
@@ -259,7 +349,6 @@ const Assets = () => {
             assetName: asset.asset_name,
             assetDescription: asset.asset_desc,
             location: asset.location_name,
-            assignTo: asset.assigned_to,
             sublocation: asset.asset_location || "",
             status: asset.status,
             assettypeId: asset.asset_type_id,
@@ -270,12 +359,32 @@ const Assets = () => {
     };
 
 
+    const handleAssignClick = () => {
+        fetchUsers();
+        setAssignModalOpen(true);
+    };
+
+
 
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+
+    const handleAssignToInputChange = (input) => {
+        const { value } = input;
+        setassignTo(value);
+    };
+
+    const setOnEditModalClose = () => {
+        formData.assetDescription='';
+        formData.assetName='';
+        formData.location='';
+        setModalOpen(false);
+
+
+    }
 
     const handleSubmit = async () => {
         seteditLoading(true);
@@ -287,18 +396,10 @@ const Assets = () => {
             asset_desc: formData.assetDescription,
             asset_type_id: formData.assettypeId || null,
             asset_location: formData.sublocation,
-            status: formData.status || "available",
-            assigned_to: formData.assignTo,
+            status: formData.asset_status || "available",
         };
 
 
-        // 'asset_no': asset_no,
-        // 'asset_name': asset_name,
-        // 'asset_desc': asset_desc,
-        // 'asset_type_id': asset_type_id,
-        // 'asset_location': asset_location,
-        // 'status': status,
-        // 'assigned_to': assignedTo,
 
         try {
             const jwtToken = sessionStorage.getItem("jwt");
@@ -317,7 +418,7 @@ const Assets = () => {
                 setTimeout(() => {
                     setModalOpen(false);
                     fetchAssetDetails(formData.assetNo); // Refresh the assets list
-                }, 2000);
+                }, 3000);
             } else {
                 setModalMessage(`Error: ${response.status} - ${response.statusText}`);
             }
@@ -345,29 +446,70 @@ const Assets = () => {
                     {assetTypes.map((type) => (
                         <li
                             key={type.assetTypeId}
-                            className={`px-3 py-1 rounded flex items-center gap-2 cursor-pointer transition ${selectedAssetTypeId === type.assetTypeId
-                                ? 'bg-gray-100 shadow'
-                                : 'bg-white hover:bg-gray-100'
+                            className={`px-3 py-1 rounded flex items-center justify-between gap-2 cursor-pointer transition ${selectedAssetTypeId === type.assetTypeId ? "bg-gray-100 shadow" : "bg-white hover:bg-gray-100"
                                 }`}
                             onClick={() => setSelectedAssetTypeId(type.assetTypeId)}
                         >
+                            {/* Asset Type Details */}
                             <div>
                                 <p className="text-sm font-medium">
                                     {type.assetTypeDesc}
                                     <span className="text-sm text-gray-500"> ({type.assets.length})</span>
                                 </p>
                             </div>
+
+                            {/* More Options Icon */}
+                            {selectedAssetTypeId === type.assetTypeId && (
+                                <div className="relative">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent parent click event
+                                            toggleOptions(type.assetTypeId);
+                                        }}
+                                        className="p-1 transition text-sm text-gray-700"
+                                    >
+                                        <FaEllipsisV />
+                                    </button>
+
+                                    {/* Options Card */}
+                                    {activeOptionsId === type.assetTypeId && (
+                                        <div className="absolute right-0 mt-2 w-20 bg-white shadow-md border rounded-md z-10">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleAssetTypeUpdate(type.assetTypeId);
+                                                    setActiveOptionsId(null); // Close menu
+                                                }}
+                                                className="block w-full text-center p-1 font-semibold text-sm text-gray-700 hover:bg-gray-100"
+                                            >
+                                                Rename
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleAssetTypeDelete(type.assetTypeId);
+                                                    setActiveOptionsId(null); // Close menu
+                                                }}
+                                                className="block w-full text-center p-1 font-semibold text-sm text-red-500 hover:bg-red-100"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </li>
                     ))}
                 </ul>
             </div>
-
             <div className="w-2/6 bg-white overflow-auto">
                 <div className="flex justify-between items-center p-4 border-b border-b bg-gray-50">
                     <h2 className="text-lg font-semibold">Assets</h2>
                     <button
                         type="button"
                         className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                        onClick={() => setaddAssetModalOpen(true)}
+
                     >
                         Add +
                     </button>
@@ -407,13 +549,14 @@ const Assets = () => {
 
                 <span className='flex justify-between items-left p-4 border-b bg-white'>
                     <h2 className="text-lg font-semibold bg-white">Asset Details</h2>
-                    <button
+                    {assetDetails ? <button
                         onClick={() => handleEditClick(assetDetails)}
                         className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
                     >
-                        {assetDetails ? <span>Edit</span> : null}
-                        {assetDetails ? <FaEdit className="text-sm" /> : null}
-                    </button>
+                        <span>Edit</span>
+                        <FaEdit className="text-sm" />
+                    </button> : null
+                    }
 
                 </span>
                 {loading ? (
@@ -460,7 +603,28 @@ const Assets = () => {
 
                             {/* Assigned To */}
                             <strong className="text-gray-600 font-semibold text-sm">Assigned To</strong>
-                            <span className="text-gray-800 text-sm font-medium">{assetDetails.assigned_to}</span>
+                            <span className="text-gray-800 text-sm font-medium">
+                                {assetDetails.assigned_to}
+
+                                {assetDetails.asset_status === 'available' && (
+                                    <button
+                                        onClick={() => handleAssignClick()}
+                                        className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-emerald-200 transition"
+
+                                    >
+                                        Assign
+                                    </button>
+                                )}
+
+                                {assetDetails.asset_status === 'in use' && (
+                                    <button
+                                        // onClick={() => handleUnassign(assetDetails.asset_id)}
+                                        className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-red-200 transition"
+                                    >
+                                        Unassign
+                                    </button>
+                                )}
+                            </span>
 
                             {/* Location */}
                             <strong className="text-gray-600 font-semibold text-sm">Location</strong>
@@ -523,7 +687,7 @@ const Assets = () => {
                                                 <tbody>
                                                     {ticketHistory.map((ticket) => (
                                                         <tr
-                                                            key={ticket.ticketID}
+                                                            key={ticket.asset_log_id}
                                                             className="hover:bg-gray-50"
                                                         >
                                                             <td className="p-3 text-sm">
@@ -643,23 +807,12 @@ const Assets = () => {
                                 />
                             </label>
 
-                            {/* Assign To */}
-                            <label className="block">
-                                <span className="text-gray-700 text-sm">Assign To:</span>
-                                <AssignToDropdown
-                                    options={users} // Array of users
-                                    selectedValue={formData.assignTo} // Current selected user ID
-                                    onChange={(id) => handleInputChange({ target: { name: "assignTo", value: id } })}
-                                />
-                            </label>
-
-
 
                             {/* Action Buttons */}
                             <div className="flex justify-end space-x-2">
                                 <button
                                     type="button"
-                                    onClick={() => setModalOpen(false)}
+                                    onClick={() => setOnEditModalClose()}
                                     className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
                                 >
                                     Cancel
@@ -680,6 +833,54 @@ const Assets = () => {
                     </div>
                 </div>
             )}
+
+
+            {AssignmodalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Assign Asset</h2>
+                        <form className="space-y-4">
+
+
+                            {/* Assign To */}
+                            <label className="block">
+                                <span className="text-gray-700 text-sm">Assign To:</span>
+                                <AssignToDropdown
+                                    options={users} // Array of users
+                                    selectedValue={assignTo} // Current selected user ID
+                                    onChange={(id) => handleAssignToInputChange({ value: id })}
+
+                                />
+                            </label>
+
+
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => onCloseAssignToModal()}
+                                    className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleAssignToSubmit}
+                                    disabled={assignToloading}
+                                    className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${assignToloading
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-gray-100 hover:bg-emerald-200"
+                                        }`}
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
 
             {addTypeModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -720,6 +921,66 @@ const Assets = () => {
                                     className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${addTypeloading ? "bg-gray-400 cursor-not-allowed" : "bg-gray-100 hover:bg-emerald-200"
                                         }`}
                                     disabled={addTypeloading}
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {addAssetModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Add Asset</h2>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleAddAsset();
+                            }}
+                        >
+                            <label className="block mb-4">
+                                <span className="text-gray-700 text-sm">Asset Name:</span>
+                                <input
+                                    type="text"
+                                    value={addAssetName}
+                                    onChange={(e) => setAssetName(e.target.value)}
+                                    className="m-1 block w-full rounded-md border-b border-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
+                                    required
+                                />
+                            </label>
+
+                            <label className="block mb-4">
+                                <span className="text-gray-700 text-sm">Asset Description:</span>
+                                <input
+                                    type="text"
+                                    value={addAssetDesc}
+                                    onChange={(e) => setAssetDesc(e.target.value)}
+                                    className="m-1 block w-full rounded-md border-b border-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
+                                    required
+                                />
+                            </label>
+
+
+                            {addAssetloading && <p className="text-blue-500">Loading...</p>}
+                            {addAssetsuccessMessage && <p className="text-green-500">{addAssetsuccessMessage}</p>}
+                            {addAsseterrorMessage && <p className="text-red-500">{addAsseterrorMessage}</p>}
+
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => onCloseAddAssetModal()}
+                                    className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                    disabled={addAssetloading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${addAssetloading ? "bg-gray-400 cursor-not-allowed" : "bg-gray-100 hover:bg-emerald-200"
+                                        }`}
+                                    disabled={addAssetloading}
                                 >
                                     Save
                                 </button>
