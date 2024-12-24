@@ -30,6 +30,8 @@ const Assets = () => {
     const [users, setUsers] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(null);
+    const [modalErrorMessage, setModalErrorMessage] = useState(null);
+
 
 
     //Add Asset types useStates
@@ -73,17 +75,112 @@ const Assets = () => {
     const [assignToerror, setassignToError] = useState(null);
 
     const onCloseAssignToModal = () => {
+        setAssignModalMessage('')
         setAssignModalOpen(false);
         setassignTo('');
         setassignToError('');
     }
 
-    const handleAssignToSubmit = () => {
 
+
+    const handleAssignToSubmit = async () =>  {
+        setAssignModalMessage('')
+        setAssignToLoading(true)
+        setassignToError(null)
+
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.put(
+                `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
+                { 
+                    asset_no: selectedAsset.assetNo,
+                    user_id:assignTo,
+                    flag:0
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setAssignModalMessage("Asset assigned successfully!");
+            setTimeout(() => {
+                setAssignToLoading(false);
+                setAssignModalOpen(false);
+                setAssignModalMessage('')
+                fetchAssetDetails(selectedAsset); // Refresh asset types list
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setassignToError(error.response.data.error);
+            } else {
+                setassignToError("Failed to assign asset. Please try again.");
+            }
+        } finally {
+            setAssignToLoading(false);
+        }
+    
     }
 
 
+        //Unassign
+        const [UnAssignmodalOpen, setUnAssignModalOpen] = useState(false);
+        const [UnAssignmodalMessage, setUnAssignModalMessage] = useState(null);
+        const [UnassignToloading, setUnAssignToLoading] = useState(false);
+        const [UnassignToerror, setUnassignToError] = useState(null);
+    
+        const onCloseUnAssignToModal = () => {
+            setUnAssignModalMessage('');
+            setUnAssignModalOpen(false);
+            setassignTo('');
+            setUnassignToError('');
+        }
 
+
+    const handleUnassignSubmit = async () =>  {
+        setUnAssignToLoading(true);
+        setUnAssignModalMessage('')
+        setUnassignToError('');
+
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.put(
+                `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
+                { 
+                    asset_no: selectedAsset.assetNo,
+                    user_id:assignTo,
+                    flag:1
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setUnAssignModalMessage("Asset unassigned successfully!");
+            setTimeout(() => {
+                setAssignToLoading(false);
+                setUnAssignModalOpen(false);
+                setUnAssignModalMessage('')
+                fetchAssetDetails(selectedAsset); // Refresh asset types list
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setUnassignToError(error.response.data.error);
+            } else {
+                setUnassignToError("Failed to assign asset. Please try again.");
+            }
+        } finally {
+            setUnAssignToLoading(false);
+        }
+    
+    }
 
 
     const [formData, setFormData] = useState({
@@ -359,10 +456,17 @@ const Assets = () => {
     };
 
 
-    const handleAssignClick = () => {
+    const handleAssignClick = (assignTo) => {
         fetchUsers();
+        setassignTo(assignTo);
         setAssignModalOpen(true);
     };
+
+    const handleUnAssignClick = (assignTo) => {
+        setassignTo(assignTo);
+        setUnAssignModalOpen(true);
+    };
+
 
 
 
@@ -385,6 +489,8 @@ const Assets = () => {
 
 
     }
+
+    
 
     const handleSubmit = async () => {
         seteditLoading(true);
@@ -417,13 +523,15 @@ const Assets = () => {
                 setModalMessage("Asset updated successfully!");
                 setTimeout(() => {
                     setModalOpen(false);
+                    setModalMessage(null);
+                    setModalErrorMessage(null);
                     fetchAssetDetails(formData.assetNo); // Refresh the assets list
                 }, 3000);
             } else {
-                setModalMessage(`Error: ${response.status} - ${response.statusText}`);
+                setModalErrorMessage(`Error: ${response.status} - ${response.statusText}`);
             }
         } catch (error) {
-            setModalMessage(`An error occurred: ${error.message}`);
+            setModalErrorMessage(`An error occurred: ${error.message}`);
         } finally {
             seteditLoading(false);
         }
@@ -586,11 +694,14 @@ const Assets = () => {
                                 className={`text-sm font-medium ${assetDetails.asset_status === "available"
                                     ? "text-emerald-600"
                                     : assetDetails.asset_status === "under repair"
-                                        ? "text-yellow-600"
-                                        : assetDetails.asset_status === "disposed"
-                                            ? "text-red-600"
-                                            : "text-gray-800"
-                                    }`}
+                                    ? "text-yellow-600"
+                                    : assetDetails.asset_status === "disposed"
+                                    ? "text-red-600"
+                                    : assetDetails.asset_status === "in use"
+                                    ? "text-sky-600"
+                                    : "text-gray-800"
+                                }`}
+                                
                             >
                                 {assetDetails.asset_status.charAt(0).toUpperCase() + assetDetails.asset_status.slice(1)}
                             </span>
@@ -608,7 +719,7 @@ const Assets = () => {
 
                                 {assetDetails.asset_status === 'available' && (
                                     <button
-                                        onClick={() => handleAssignClick()}
+                                        onClick={() => handleAssignClick(assetDetails.assigned_to)}
                                         className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-emerald-200 transition"
 
                                     >
@@ -620,6 +731,8 @@ const Assets = () => {
                                     <button
                                         // onClick={() => handleUnassign(assetDetails.asset_id)}
                                         className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-red-200 transition"
+                                        onClick={() => handleUnAssignClick(assetDetails.assigned_to)}
+
                                     >
                                         Unassign
                                     </button>
@@ -628,7 +741,7 @@ const Assets = () => {
 
                             {/* Location */}
                             <strong className="text-gray-600 font-semibold text-sm">Location</strong>
-                            <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_location}</span>
+                            <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_location} {assetDetails.location_name !='unassigned' ? ((`(${assetDetails.location_name})`)):null}</span>
 
                             {/* Is Active */}
                             <strong className="text-gray-600 font-semibold text-sm">Is Active</strong>
@@ -807,6 +920,10 @@ const Assets = () => {
                                 />
                             </label>
 
+                            {editloading && <p className="text-blue-500">Loading...</p>}
+                            {modalMessage && <p className="text-green-500">{modalMessage}</p>}
+                            {modalErrorMessage && <p className="text-red-500">{modalErrorMessage}</p>}
+
 
                             {/* Action Buttons */}
                             <div className="flex justify-end space-x-2">
@@ -853,6 +970,10 @@ const Assets = () => {
                                 />
                             </label>
 
+                            {assignToloading && <p className="text-sky-500">Loading...</p>}
+                            {AssignmodalMessage && <p className="text-emerald-500">{AssignmodalMessage}</p>}
+                            {assignToerror && <p className="text-red-500">{assignToerror}</p>}
+
 
 
                             {/* Action Buttons */}
@@ -882,6 +1003,49 @@ const Assets = () => {
             )}
 
 
+{UnAssignmodalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Unassign Asset</h2>
+                        <p className="text-md mb-4">Are you sure you wan't to unassign this asset?</p>
+                        <form className="space-y-4">
+
+
+
+                            {UnassignToloading && <p className="text-sky-500">Loading...</p>}
+                            {UnAssignmodalMessage && <p className="text-emerald-500">{UnAssignmodalMessage}</p>}
+                            {UnassignToerror && <p className="text-red-500">{UnassignToerror}</p>}
+
+
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setUnAssignModalOpen(false)}
+                                    className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                >
+                                    No
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleUnassignSubmit}
+                                    disabled={UnassignToloading}
+                                    className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${UnassignToloading
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-gray-100 hover:bg-emerald-200"
+                                        }`}
+                                >
+                                    Yes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+
+
             {addTypeModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
@@ -903,8 +1067,8 @@ const Assets = () => {
                                 />
                             </label>
 
-                            {addTypeloading && <p className="text-blue-500">Loading...</p>}
-                            {addTypesuccessMessage && <p className="text-green-500">{addTypesuccessMessage}</p>}
+                            {addTypeloading && <p className="text-sky-500">Loading...</p>}
+                            {addTypesuccessMessage && <p className="text-emerald-500">{addTypesuccessMessage}</p>}
                             {addTypeerrorMessage && <p className="text-red-500">{addTypeerrorMessage}</p>}
 
                             <div className="flex justify-end space-x-2">
@@ -963,8 +1127,8 @@ const Assets = () => {
                             </label>
 
 
-                            {addAssetloading && <p className="text-blue-500">Loading...</p>}
-                            {addAssetsuccessMessage && <p className="text-green-500">{addAssetsuccessMessage}</p>}
+                            {addAssetloading && <p className="text-sky-500">Loading...</p>}
+                            {addAssetsuccessMessage && <p className="text-emerald-500">{addAssetsuccessMessage}</p>}
                             {addAsseterrorMessage && <p className="text-red-500">{addAsseterrorMessage}</p>}
 
                             <div className="flex justify-end space-x-2">
