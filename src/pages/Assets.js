@@ -83,7 +83,7 @@ const Assets = () => {
 
 
 
-    const handleAssignToSubmit = async () =>  {
+    const handleAssignToSubmit = async () => {
         setAssignModalMessage('')
         setAssignToLoading(true)
         setassignToError(null)
@@ -92,10 +92,10 @@ const Assets = () => {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.put(
                 `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
-                { 
+                {
                     asset_no: selectedAsset.assetNo,
-                    user_id:assignTo,
-                    flag:0
+                    user_id: assignTo,
+                    flag: 0
                 },
                 {
                     headers: {
@@ -122,25 +122,25 @@ const Assets = () => {
         } finally {
             setAssignToLoading(false);
         }
-    
+
     }
 
 
-        //Unassign
-        const [UnAssignmodalOpen, setUnAssignModalOpen] = useState(false);
-        const [UnAssignmodalMessage, setUnAssignModalMessage] = useState(null);
-        const [UnassignToloading, setUnAssignToLoading] = useState(false);
-        const [UnassignToerror, setUnassignToError] = useState(null);
-    
-        const onCloseUnAssignToModal = () => {
-            setUnAssignModalMessage('');
-            setUnAssignModalOpen(false);
-            setassignTo('');
-            setUnassignToError('');
-        }
+    //Unassign
+    const [UnAssignmodalOpen, setUnAssignModalOpen] = useState(false);
+    const [UnAssignmodalMessage, setUnAssignModalMessage] = useState(null);
+    const [UnassignToloading, setUnAssignToLoading] = useState(false);
+    const [UnassignToerror, setUnassignToError] = useState(null);
+
+    const onCloseUnAssignToModal = () => {
+        setUnAssignModalMessage('');
+        setUnAssignModalOpen(false);
+        setassignTo('');
+        setUnassignToError('');
+    }
 
 
-    const handleUnassignSubmit = async () =>  {
+    const handleUnassignSubmit = async () => {
         setUnAssignToLoading(true);
         setUnAssignModalMessage('')
         setUnassignToError('');
@@ -149,10 +149,10 @@ const Assets = () => {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.put(
                 `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
-                { 
+                {
                     asset_no: selectedAsset.assetNo,
-                    user_id:assignTo,
-                    flag:1
+                    user_id: assignTo,
+                    flag: 1
                 },
                 {
                     headers: {
@@ -179,7 +179,7 @@ const Assets = () => {
         } finally {
             setUnAssignToLoading(false);
         }
-    
+
     }
 
 
@@ -482,15 +482,15 @@ const Assets = () => {
     };
 
     const setOnEditModalClose = () => {
-        formData.assetDescription='';
-        formData.assetName='';
-        formData.location='';
+        formData.assetDescription = '';
+        formData.assetName = '';
+        formData.location = '';
         setModalOpen(false);
 
 
     }
 
-    
+
 
     const handleSubmit = async () => {
         seteditLoading(true);
@@ -623,6 +623,16 @@ const Assets = () => {
                     </button>
                 </div>
 
+                {/* Search Bar */}
+                <div className="p-4">
+                    <input
+                        type="text"
+                        placeholder="🔍 Search assets..."
+                        className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none"
+                       // onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
 
                 <ul className="p-4 space-y-2">
                     {filteredAssets.filter(asset => asset.assetNo !== null || asset.assetName !== null || asset.assetIssueCount !== null).length > 0 ? (
@@ -694,14 +704,14 @@ const Assets = () => {
                                 className={`text-sm font-medium ${assetDetails.asset_status === "available"
                                     ? "text-emerald-600"
                                     : assetDetails.asset_status === "under repair"
-                                    ? "text-yellow-600"
-                                    : assetDetails.asset_status === "disposed"
-                                    ? "text-red-600"
-                                    : assetDetails.asset_status === "in use"
-                                    ? "text-sky-600"
-                                    : "text-gray-800"
-                                }`}
-                                
+                                        ? "text-yellow-600"
+                                        : assetDetails.asset_status === "disposed"
+                                            ? "text-red-600"
+                                            : assetDetails.asset_status === "in use"
+                                                ? "text-sky-600"
+                                                : "text-gray-800"
+                                    }`}
+
                             >
                                 {assetDetails.asset_status.charAt(0).toUpperCase() + assetDetails.asset_status.slice(1)}
                             </span>
@@ -741,7 +751,7 @@ const Assets = () => {
 
                             {/* Location */}
                             <strong className="text-gray-600 font-semibold text-sm">Location</strong>
-                            <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_location} {assetDetails.location_name !='unassigned' ? ((`(${assetDetails.location_name})`)):null}</span>
+                            <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_location} {assetDetails.location_name != 'unassigned' ? ((`(${assetDetails.location_name})`)) : null}</span>
 
                             {/* Is Active */}
                             <strong className="text-gray-600 font-semibold text-sm">Is Active</strong>
@@ -887,6 +897,12 @@ const Assets = () => {
                     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
                         <h2 className="text-xl font-semibold mb-4">Edit Asset</h2>
                         <form className="space-y-4">
+
+
+                            {editloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {modalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{modalMessage}</p>}
+                            {modalErrorMessage && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{modalErrorMessage}</p>}
+
                             <label className="block">
                                 <span className="text-gray-700 text-sm">Asset Name:</span>
                                 <input
@@ -919,11 +935,6 @@ const Assets = () => {
                                     onChange={handleSublocationChange}
                                 />
                             </label>
-
-                            {editloading && <p className="text-blue-500">Loading...</p>}
-                            {modalMessage && <p className="text-green-500">{modalMessage}</p>}
-                            {modalErrorMessage && <p className="text-red-500">{modalErrorMessage}</p>}
-
 
                             {/* Action Buttons */}
                             <div className="flex justify-end space-x-2">
@@ -958,6 +969,11 @@ const Assets = () => {
                         <h2 className="text-xl font-semibold mb-4">Assign Asset</h2>
                         <form className="space-y-4">
 
+                            {assignToloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {AssignmodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{AssignmodalMessage}</p>}
+                            {assignToerror && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{assignToerror}</p>}
+
+
 
                             {/* Assign To */}
                             <label className="block">
@@ -970,9 +986,6 @@ const Assets = () => {
                                 />
                             </label>
 
-                            {assignToloading && <p className="text-sky-500">Loading...</p>}
-                            {AssignmodalMessage && <p className="text-emerald-500">{AssignmodalMessage}</p>}
-                            {assignToerror && <p className="text-red-500">{assignToerror}</p>}
 
 
 
@@ -1003,7 +1016,7 @@ const Assets = () => {
             )}
 
 
-{UnAssignmodalOpen && (
+            {UnAssignmodalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
                         <h2 className="text-xl font-semibold mb-4">Unassign Asset</h2>
@@ -1012,9 +1025,9 @@ const Assets = () => {
 
 
 
-                            {UnassignToloading && <p className="text-sky-500">Loading...</p>}
-                            {UnAssignmodalMessage && <p className="text-emerald-500">{UnAssignmodalMessage}</p>}
-                            {UnassignToerror && <p className="text-red-500">{UnassignToerror}</p>}
+                            {UnassignToloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {UnAssignmodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{UnAssignmodalMessage}</p>}
+                            {UnassignToerror && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{UnassignToerror}</p>}
 
 
 
@@ -1056,20 +1069,23 @@ const Assets = () => {
                                 handleAddAssetType();
                             }}
                         >
+
+                            {addTypeloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {addTypesuccessMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{addTypesuccessMessage}</p>}
+                            {addTypeerrorMessage && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{addTypeerrorMessage}</p>}
+
+
                             <label className="block mb-4">
                                 <span className="text-gray-700 text-sm">Asset Type Description:</span>
                                 <input
                                     type="text"
                                     value={assetTypeDesc}
                                     onChange={(e) => setAssetTypeDesc(e.target.value)}
-                                    className="m-1 block w-full rounded-md border-b border-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
-                                    required
+                                    className="m-1 block w-full rounded-md border-b borequiredrder-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
+
                                 />
                             </label>
 
-                            {addTypeloading && <p className="text-sky-500">Loading...</p>}
-                            {addTypesuccessMessage && <p className="text-emerald-500">{addTypesuccessMessage}</p>}
-                            {addTypeerrorMessage && <p className="text-red-500">{addTypeerrorMessage}</p>}
 
                             <div className="flex justify-end space-x-2">
                                 <button
@@ -1104,6 +1120,11 @@ const Assets = () => {
                                 handleAddAsset();
                             }}
                         >
+
+                            {addAssetloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {addAssetsuccessMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{addAssetsuccessMessage}</p>}
+                            {addAsseterrorMessage && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{addAsseterrorMessage}</p>}
+
                             <label className="block mb-4">
                                 <span className="text-gray-700 text-sm">Asset Name:</span>
                                 <input
@@ -1127,10 +1148,6 @@ const Assets = () => {
                             </label>
 
 
-                            {addAssetloading && <p className="text-sky-500">Loading...</p>}
-                            {addAssetsuccessMessage && <p className="text-emerald-500">{addAssetsuccessMessage}</p>}
-                            {addAsseterrorMessage && <p className="text-red-500">{addAsseterrorMessage}</p>}
-
                             <div className="flex justify-end space-x-2">
                                 <button
                                     type="button"
@@ -1153,10 +1170,6 @@ const Assets = () => {
                     </div>
                 </div>
             )}
-
-
-
-
 
 
         </div>
