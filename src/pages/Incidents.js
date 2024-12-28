@@ -156,9 +156,11 @@ const Incidents = () => {
     .filter(report =>
       report.reportDescription && report.reportDescription.toLowerCase().includes(searchTerm.toLowerCase())
       || (report.assetName && report.assetName.toLowerCase().includes(searchTerm.toLowerCase()))
+      || (report.assetNo && report.assetNo.toLowerCase().includes(searchTerm.toLowerCase()))
       || (report.status && report.status.toLowerCase().includes(searchTerm.toLowerCase()))
       || (formatDistanceToNow(new Date(report.dateTime), { addSuffix: true }) && formatDistanceToNow(new Date(report.dateTime), { addSuffix: true }).toLowerCase().includes(searchTerm.toLowerCase()))
       || (report.incidentCriticalityLevel && report.incidentCriticalityLevel.toLowerCase().includes(searchTerm.toLowerCase()))
+      || (report.userReportId==searchTerm)
     )
     .filter(report => (statusFilter === 'All' || report.status.toLowerCase() === statusFilter.toLowerCase()))
 
@@ -177,7 +179,7 @@ const Incidents = () => {
         {/* Search and Filter Section */}
         <input
           type="text"
-          placeholder="search..."
+          placeholder="🔍 Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border rounded px-4 py-2 w-1/3"
@@ -220,7 +222,7 @@ const Incidents = () => {
 
       {/* Table to display reports */}
       <table className="table-auto w-full border-collapse shadow-lg rounded-md">
-        <thead className="bg-blue-600 text-black text-left">
+        <thead className="text-black text-left">
           <tr>
             <th className="px-4 py-2 border-b">
               <input
@@ -229,6 +231,7 @@ const Incidents = () => {
                 checked={selectedReports.length === filteredReports.length}
               />
             </th>
+            <th className="px-4 py-2 border-b">Ticket</th>
             <th className="px-4 py-2 border-b">Asset</th>
             {/* <th className="px-4 py-2 border-b">Asset.No</th> */}
             <th className="px-4 py-2 border-b">Summary</th>
@@ -252,19 +255,35 @@ const Incidents = () => {
                 />
               </td>
               <td className="px-4 py-2 border-b">
-                <div className="font-semibold text-sky-600 cursor-pointer hover:underline transition">
-                  {report.assetNo}
+                <div className="font-semibold text-gray-700 cursor-pointer hover:underline transition">
+                  {report.userReportId}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">
-                  {report.assetName}
+              </td>
+              <td className="px-4 py-2 border-b">
+                <div className="font-semibold text-sky-600 cursor-pointer hover:underline transition">
+                  {report.assetNo || report.assetName ? (
+                    <>
+                      {report.assetNo}
+                      <div className="text-sm text-gray-500 mt-1">
+                        {report.assetName}
+                      </div>
+                    </>
+                  ) : (
+                    <span className="text-gray-700 font-bold">X</span>
+                  )}
                 </div>
               </td>
 
-              {/* <td className="px-4 py-2 border-b">{report.asset_no}</td> */}
-              {/* <td className="px-4 py-2 border-b">IMS-{report.userReportId}</td> */}
-              <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportDescription}</td>
-              <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.userId}</td>
-              <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.subLocationName}</td>
+
+              <td className="px-4 py-2 border-b font-semibold text-gray-700">
+                {report.reportDescription ? report.reportDescription : <span className="text-gray-700 font-bold">X</span>}
+              </td>
+              <td className="px-4 py-2 border-b font-semibold text-gray-700">
+                {report.userId ? report.userId : <span className="text-gray-700 font-bold">X</span>}
+              </td>
+              <td className="px-4 py-2 border-b font-semibold text-gray-700">
+                {report.subLocationName ? report.subLocationName : <span className="text-gray-700 font-bold">X</span>}
+              </td>
 
               <td className="px-4 py-2 border-b">
                 <div
@@ -275,9 +294,6 @@ const Incidents = () => {
                   <span className={`text-gray-700 p-1 mr-2 `}>
                     <FaUser />
                   </span>
-
-                  {/* Clipboard Icon (conditionally rendered) */}
-
 
                   {/* Assignee Text */}
                   <span className={report.Assignee === 'Unassigned' ? 'text-sky-600' : 'text-gray-900'}>
@@ -352,8 +368,8 @@ const Incidents = () => {
             {responseMessage && (
               <div
                 className={`mb-4 p-3 rounded ${responseStatus === 'success'
-                    ? 'text-emerald-600 bg-emerald-100'
-                    : 'text-red-600 bg-red-100'
+                  ? 'text-emerald-600 bg-emerald-100'
+                  : 'text-red-600 bg-red-100'
                   }`}
               >
                 {responseMessage}

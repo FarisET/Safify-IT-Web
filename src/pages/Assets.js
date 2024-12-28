@@ -550,8 +550,10 @@ const Assets = () => {
                         Add +
                     </button>
                 </div>
-                <ul className="p-2 space-y-2">
-                    {assetTypes.map((type) => (
+                <ul className="p-4 space-y-2 overflow-y-auto"
+                    style={{
+                        maxHeight: '80vh',
+                    }}>                    {assetTypes.map((type) => (
                         <li
                             key={type.assetTypeId}
                             className={`px-3 py-1 rounded flex items-center justify-between gap-2 cursor-pointer transition ${selectedAssetTypeId === type.assetTypeId ? "bg-gray-100 shadow" : "bg-white hover:bg-gray-100"
@@ -629,12 +631,16 @@ const Assets = () => {
                         type="text"
                         placeholder="🔍 Search assets..."
                         className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none"
-                       // onChange={(e) => setSearchTerm(e.target.value)}
+                    // onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
 
 
-                <ul className="p-4 space-y-2">
+                <ul className="p-4 space-y-2 overflow-y-auto"
+                    style={{
+                        maxHeight: '80vh',
+                    }}>
+
                     {filteredAssets.filter(asset => asset.assetNo !== null || asset.assetName !== null || asset.assetIssueCount !== null).length > 0 ? (
                         filteredAssets
                             .filter(asset => asset.assetNo !== null || asset.assetName !== null || asset.assetIssueCount !== null)
@@ -667,14 +673,30 @@ const Assets = () => {
 
                 <span className='flex justify-between items-left p-4 border-b bg-white'>
                     <h2 className="text-lg font-semibold bg-white">Asset Details</h2>
-                    {assetDetails ? <button
-                        onClick={() => handleEditClick(assetDetails)}
-                        className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
-                    >
-                        <span>Edit</span>
-                        <FaEdit className="text-sm" />
-                    </button> : null
-                    }
+                    <div className="flex space-x-4">
+                        {assetDetails ? (
+                            <>
+                                {/* Edit Button */}
+                                <button
+                                    onClick={() => handleEditClick(assetDetails)}
+                                    className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                                >
+                                    <span>Edit</span>
+                                    <FaEdit className="text-sm" />
+                                </button>
+
+                                {/* Dispose Button */}
+                                <button
+                                   // onClick={() => handleDisposeClick(assetDetails)} // Add the appropriate handler function
+                                    className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                >
+                                    <span>Dispose</span>
+                                    <FaTrash className="text-sm" />
+                                </button>
+                            </>
+                        ) : null}
+                    </div>
+
 
                 </span>
                 {loading ? (
@@ -825,7 +847,7 @@ const Assets = () => {
                                                             <td className="p-3 text-sm">
                                                                 {format(
                                                                     ticket.action_datetime,
-                                                                    "MMM dd, yyyy"
+                                                                    "MMM dd, yyyy HH:mm:ss"
                                                                 )}
                                                             </td>
                                                         </tr>
@@ -871,7 +893,7 @@ const Assets = () => {
                                                             </td>
                                                             <td className="p-3 text-sm">{history['Problem status']}</td>
                                                             <td className="p-3 text-sm">
-                                                                {format(new Date(history['Datetime']), "MMM dd, yyyy")}
+                                                                {format(new Date(history['Datetime']), "MMM dd, yyyy HH:mm:ss")}
                                                             </td>
                                                             <td className="p-3 text-sm">{history['Location']}</td>
                                                             <td className="p-3 text-sm">{history['Problem Criticality']}</td>

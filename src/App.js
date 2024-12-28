@@ -7,6 +7,7 @@ import Sidebar from './components/Sidebar';
 import TopNavWrapper from './components/TopNavWrapper'; // New Wrapper Component
 import AssetPage from './pages/Assets';
 import Approvals from './pages/Approvals';
+import SolutionForum from './pages/SolutionForum';
 
 const AppRouter = () => {
   return (
@@ -17,7 +18,7 @@ const AppRouter = () => {
 
         {/* Main Content Area */}
         <TopNavWrapper /> {/* Wrapper Component for TopNav */}
-        
+
         {/* Page Content */}
         <div className="flex-1 mt-12 p-4 ml-12">
           <Routes>
@@ -43,6 +44,14 @@ const AppRouter = () => {
               element={
                 <ProtectedRoute>
                   <Approvals />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/solution-forum"
+              element={
+                <ProtectedRoute>
+                  <SolutionForum />
                 </ProtectedRoute>
               }
             />
