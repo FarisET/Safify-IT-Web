@@ -8,10 +8,6 @@ import AssignToDropdown from "../components/SearchableUsersDropdown";
 
 
 const Assets = () => {
-    const [assetTypes, setAssetTypes] = useState([]);
-    const [selectedAssetTypeId, setSelectedAssetTypeId] = useState(null);
-    const [filteredAssets, setFilteredAssets] = useState([]);
-    const [selectedAsset, setSelectedAsset] = useState(null);
     const [assetDetails, setAssetDetails] = useState(null);
     const [ticketHistory, setTicketHistory] = useState([]);
     const [AssetHistory, setAssetHistory] = useState([]);
@@ -22,9 +18,6 @@ const Assets = () => {
     };
 
     const [activeTab, setActiveTab] = useState('Ticket History'); // Default tab
-    const [loading, setLoading] = useState(false);
-    const [editloading, seteditLoading] = useState(false);
-    const [error, setError] = useState(null);
     const [locations, setLocations] = useState([]);
     const [filteredSublocations, setFilteredSublocations] = useState([]); const [sublocations, setSublocations] = useState([]);
     const [users, setUsers] = useState([]);
@@ -34,268 +27,9 @@ const Assets = () => {
 
 
 
-    //Add Asset types useStates
-    const [addTypeModalOpen, setaddTypeModalOpen] = useState(false);
-    const [assetTypeDesc, setAssetTypeDesc] = useState("");
-    const [addTypeloading, setaddTypeLoading] = useState(false);
-    const [addTypeerrorMessage, setaddTypeErrorMessage] = useState("");
-    const [addTypesuccessMessage, setAddTypeSuccessMessage] = useState("");
-
-    const onCloseAddTypeModal = () => {
-        setaddTypeModalOpen(false);
-        setAssetTypeDesc('');
-        setaddTypeErrorMessage('');
-    }
-
-    const handleAssetTypeUpdate = () => { }
-    const handleAssetTypeDelete = () => {
-
-    }
-
-    //Add Asset useStates
-    const [addAssetModalOpen, setaddAssetModalOpen] = useState(false);
-    const [addAssetDesc, setAssetDesc] = useState("");
-    const [addAssetName, setAssetName] = useState("");
-    const [addAssetloading, setaddAssetLoading] = useState(false);
-    const [addAsseterrorMessage, setaddAssetErrorMessage] = useState("");
-    const [addAssetsuccessMessage, setaddAssetSuccessMessage] = useState("");
-
-    const onCloseAddAssetModal = () => {
-        setaddAssetModalOpen(false);
-        setAssetName('');
-        setAssetDesc('');
-        setaddAssetErrorMessage('');
-    }
-
-    //Assign To
-    const [AssignmodalOpen, setAssignModalOpen] = useState(false);
-    const [AssignmodalMessage, setAssignModalMessage] = useState(null);
-    const [assignTo, setassignTo] = useState('');
-    const [assignToloading, setAssignToLoading] = useState(false);
-    const [assignToerror, setassignToError] = useState(null);
-
-    const onCloseAssignToModal = () => {
-        setAssignModalMessage('')
-        setAssignModalOpen(false);
-        setassignTo('');
-        setassignToError('');
-    }
-
-
-
-    const handleAssignToSubmit = async () => {
-        setAssignModalMessage('')
-        setAssignToLoading(true)
-        setassignToError(null)
-
-        try {
-            const jwtToken = sessionStorage.getItem('jwt');
-            const response = await axios.put(
-                `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
-                {
-                    asset_no: selectedAsset.assetNo,
-                    user_id: assignTo,
-                    flag: 0
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${jwtToken}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            setAssignModalMessage("Asset assigned successfully!");
-            setTimeout(() => {
-                setAssignToLoading(false);
-                setAssignModalOpen(false);
-                setAssignModalMessage('')
-                fetchAssetDetails(selectedAsset); // Refresh asset types list
-            }, 2000);
-
-        } catch (error) {
-            if (error.response && error.response.data.error) {
-                setassignToError(error.response.data.error);
-            } else {
-                setassignToError("Failed to assign asset. Please try again.");
-            }
-        } finally {
-            setAssignToLoading(false);
-        }
-
-    }
-
-
-    //Unassign
-    const [UnAssignmodalOpen, setUnAssignModalOpen] = useState(false);
-    const [UnAssignmodalMessage, setUnAssignModalMessage] = useState(null);
-    const [UnassignToloading, setUnAssignToLoading] = useState(false);
-    const [UnassignToerror, setUnassignToError] = useState(null);
-
-    const onCloseUnAssignToModal = () => {
-        setUnAssignModalMessage('');
-        setUnAssignModalOpen(false);
-        setassignTo('');
-        setUnassignToError('');
-    }
-
-
-    const handleUnassignSubmit = async () => {
-        setUnAssignToLoading(true);
-        setUnAssignModalMessage('')
-        setUnassignToError('');
-
-        try {
-            const jwtToken = sessionStorage.getItem('jwt');
-            const response = await axios.put(
-                `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
-                {
-                    asset_no: selectedAsset.assetNo,
-                    user_id: assignTo,
-                    flag: 1
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${jwtToken}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            setUnAssignModalMessage("Asset unassigned successfully!");
-            setTimeout(() => {
-                setAssignToLoading(false);
-                setUnAssignModalOpen(false);
-                setUnAssignModalMessage('')
-                fetchAssetDetails(selectedAsset); // Refresh asset types list
-            }, 2000);
-
-        } catch (error) {
-            if (error.response && error.response.data.error) {
-                setUnassignToError(error.response.data.error);
-            } else {
-                setUnassignToError("Failed to assign asset. Please try again.");
-            }
-        } finally {
-            setUnAssignToLoading(false);
-        }
-
-    }
-
-
-    const [formData, setFormData] = useState({
-        assetNo: "",
-        assetName: "",
-        assetDescription: "",
-        location: "",
-        sublocation: "",
-        sublocationId: "",
-        status: "",
-        assettypeId: "",
-
-    });
-
-
-
-
-
-    useEffect(() => {
-        // Flatten sublocations for dropdown
-        const flattenedSublocations = locations.flatMap((loc) =>
-            loc.sub_locations.map((subloc) => ({
-                ...subloc,
-                location_name: loc.location_name,
-            }))
-        );
-        setSublocations(flattenedSublocations);
-    }, [locations]);
-
-    const handleSublocationChange = (selectedSublocationId) => {
-        setFormData((prevData) => ({
-            ...prevData,
-            sublocation: selectedSublocationId,
-        }));
-    };
-
-    const handleAddAssetType = async () => {
-        setaddTypeLoading(true);
-        setaddTypeErrorMessage("");
-        setAddTypeSuccessMessage("");
-
-        try {
-            const jwtToken = sessionStorage.getItem('jwt');
-            const response = await axios.post(
-                `http://localhost:3001/admin/dashboard/addAssetType`,
-                { asset_type_desc: assetTypeDesc },
-                {
-                    headers: {
-                        Authorization: `Bearer ${jwtToken}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            setAddTypeSuccessMessage("Asset type added successfully!");
-            setAssetTypeDesc("");
-            setTimeout(() => {
-                setaddTypeModalOpen(false);
-                fetchAssetTypes(); // Refresh asset types list
-            }, 2000);
-
-        } catch (error) {
-            if (error.response && error.response.data.error) {
-                setaddTypeErrorMessage(error.response.data.error);
-            } else {
-                setaddTypeErrorMessage("Failed to add asset type. Please try again.");
-            }
-        } finally {
-            setaddTypeLoading(false);
-        }
-    };
-
-
-    const handleAddAsset = async () => {
-        setaddAssetLoading(true);
-        setaddAssetErrorMessage("");
-        setaddAssetSuccessMessage("");
-
-        try {
-            const jwtToken = sessionStorage.getItem('jwt');
-            const response = await axios.post(
-                `http://localhost:3001/admin/dashboard/addAsset`,
-                {
-                    asset_name: addAssetName,
-                    asset_desc: addAssetDesc,
-                    asset_type_id: selectedAssetTypeId,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${jwtToken}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            setaddAssetSuccessMessage("Asset added successfully!");
-            setAssetTypeDesc("");
-            setTimeout(() => {
-                setaddAssetModalOpen(false);
-                fetchAssetTypes(); // Refresh asset types list
-            }, 2000);
-
-        } catch (error) {
-            if (error.response && error.response.data.error) {
-                setaddAssetErrorMessage(error.response.data.error);
-            } else {
-                setaddAssetErrorMessage("Failed to add asset. Please try again.");
-            }
-        } finally {
-            setaddAssetLoading(false);
-        }
-    };
-
-
-
+    //-------------Asset types-------------
+    const [assetTypes, setAssetTypes] = useState([]);
+    const [selectedAssetTypeId, setSelectedAssetTypeId] = useState(null);
 
 
     const fetchAssetTypes = async () => {
@@ -339,6 +73,69 @@ const Assets = () => {
             setFilteredAssets(selectedType ? selectedType.assets : []);
         }
     }, [selectedAssetTypeId, assetTypes]);
+
+
+    //-------------Add Asset types-------------
+    const [addTypeModalOpen, setaddTypeModalOpen] = useState(false);
+    const [assetTypeDesc, setAssetTypeDesc] = useState("");
+    const [addTypeloading, setaddTypeLoading] = useState(false);
+    const [addTypeerrorMessage, setaddTypeErrorMessage] = useState("");
+    const [addTypesuccessMessage, setAddTypeSuccessMessage] = useState("");
+
+    const onCloseAddTypeModal = () => {
+        setaddTypeModalOpen(false);
+        setAssetTypeDesc('');
+        setaddTypeErrorMessage('');
+    }
+
+    const handleAssetTypeUpdate = () => { }
+    const handleAssetTypeDelete = () => {
+
+    }
+
+    const handleAddAssetType = async () => {
+        setaddTypeLoading(true);
+        setaddTypeErrorMessage("");
+        setAddTypeSuccessMessage("");
+
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.post(
+                `http://localhost:3001/admin/dashboard/addAssetType`,
+                { asset_type_desc: assetTypeDesc },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setAddTypeSuccessMessage("Asset type added successfully!");
+            setAssetTypeDesc("");
+            setTimeout(() => {
+                setaddTypeModalOpen(false);
+                fetchAssetTypes(); // Refresh asset types list
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setaddTypeErrorMessage(error.response.data.error);
+            } else {
+                setaddTypeErrorMessage("Failed to add asset type. Please try again.");
+            }
+        } finally {
+            setaddTypeLoading(false);
+        }
+    };
+
+    //-------------X-------------
+
+
+
+    //-------------Asset-------------
+    const [filteredAssets, setFilteredAssets] = useState([]);
+    const [selectedAsset, setSelectedAsset] = useState(null);
 
     const fetchAssetDetails = async (assetNo) => {
         setLoading(true);
@@ -399,6 +196,209 @@ const Assets = () => {
         }
     }, [selectedAssetTypeId, assetTypes]);
 
+
+
+    //-------------Add Asset-------------
+
+    const [addAssetModalOpen, setaddAssetModalOpen] = useState(false);
+    const [addAssetDesc, setAssetDesc] = useState("");
+    const [addAssetName, setAssetName] = useState("");
+    const [addAssetloading, setaddAssetLoading] = useState(false);
+    const [addAsseterrorMessage, setaddAssetErrorMessage] = useState("");
+    const [addAssetsuccessMessage, setaddAssetSuccessMessage] = useState("");
+
+    const onCloseAddAssetModal = () => {
+        setaddAssetModalOpen(false);
+        setAssetName('');
+        setAssetDesc('');
+        setaddAssetErrorMessage('');
+    }
+
+    const handleAddAsset = async () => {
+        setaddAssetLoading(true);
+        setaddAssetErrorMessage("");
+        setaddAssetSuccessMessage("");
+
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.post(
+                `http://localhost:3001/admin/dashboard/addAsset`,
+                {
+                    asset_name: addAssetName,
+                    asset_desc: addAssetDesc,
+                    asset_type_id: selectedAssetTypeId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setaddAssetSuccessMessage("Asset added successfully!");
+            setAssetTypeDesc("");
+            setTimeout(() => {
+                setaddAssetModalOpen(false);
+                fetchAssetTypes(); // Refresh asset types list
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setaddAssetErrorMessage(error.response.data.error);
+            } else {
+                setaddAssetErrorMessage("Failed to add asset. Please try again.");
+            }
+        } finally {
+            setaddAssetLoading(false);
+        }
+    };
+
+    //-------------X-------------
+
+
+    //-------------Assign To User-------------
+    const [AssignmodalOpen, setAssignModalOpen] = useState(false);
+    const [AssignmodalMessage, setAssignModalMessage] = useState(null);
+    const [assignTo, setassignTo] = useState('');
+    const [assignToloading, setAssignToLoading] = useState(false);
+    const [assignToerror, setassignToError] = useState(null);
+
+    const onCloseAssignToModal = () => {
+        setAssignModalMessage('')
+        setAssignModalOpen(false);
+        setassignTo('');
+        setassignToError('');
+    }
+
+
+
+    const handleAssignToSubmit = async () => {
+        setAssignModalMessage('')
+        setAssignToLoading(true)
+        setassignToError(null)
+
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.put(
+                `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
+                {
+                    asset_no: selectedAsset.assetNo,
+                    user_id: assignTo,
+                    flag: 0
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setAssignModalMessage("Asset assigned successfully!");
+            setTimeout(() => {
+                setAssignToLoading(false);
+                setAssignModalOpen(false);
+                setAssignModalMessage('')
+                fetchAssetDetails(selectedAsset); // Refresh asset types list
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setassignToError(error.response.data.error);
+            } else {
+                setassignToError("Failed to assign asset. Please try again.");
+            }
+        } finally {
+            setAssignToLoading(false);
+        }
+
+    }
+
+    //-------------X-------------
+
+
+    //-------------Unassign Asset-------------
+    const [UnAssignmodalOpen, setUnAssignModalOpen] = useState(false);
+    const [UnAssignmodalMessage, setUnAssignModalMessage] = useState(null);
+    const [UnassignToloading, setUnAssignToLoading] = useState(false);
+    const [UnassignToerror, setUnassignToError] = useState(null);
+
+
+
+
+    const handleUnassignSubmit = async () => {
+        setUnAssignToLoading(true);
+        setUnAssignModalMessage('')
+        setUnassignToError('');
+
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.put(
+                `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
+                {
+                    asset_no: selectedAsset.assetNo,
+                    user_id: assignTo,
+                    flag: 1
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setUnAssignModalMessage("Asset unassigned successfully!");
+            setTimeout(() => {
+                setAssignToLoading(false);
+                setUnAssignModalOpen(false);
+                setUnAssignModalMessage('')
+                fetchAssetDetails(selectedAsset); // Refresh asset types list
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setUnassignToError(error.response.data.error);
+            } else {
+                setUnassignToError("Failed to assign asset. Please try again.");
+            }
+        } finally {
+            setUnAssignToLoading(false);
+        }
+
+    }
+
+    const handleAssignClick = (assignTo) => {
+        fetchUsers();
+        setassignTo(assignTo);
+        setAssignModalOpen(true);
+    };
+
+    const handleAssignToInputChange = (input) => {
+        const { value } = input;
+        setassignTo(value);
+    };
+
+    //-------------X-------------
+
+
+
+
+
+    //-------------Fetch Locations-------------
+
+    useEffect(() => {
+        // Flatten sublocations for dropdown
+        const flattenedSublocations = locations.flatMap((loc) =>
+            loc.sub_locations.map((subloc) => ({
+                ...subloc,
+                location_name: loc.location_name,
+            }))
+        );
+        setSublocations(flattenedSublocations);
+    }, [locations]);
+
     const fetchLocationsAndSublocations = async () => {
         try {
             const jwtToken = sessionStorage.getItem("jwt");
@@ -424,6 +424,26 @@ const Assets = () => {
             console.error("Error fetching locations and sublocations:", error);
         }
     };
+
+
+    const handleSublocationChange = (selectedSublocationId) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            sublocation: selectedSublocationId,
+        }));
+    };
+
+
+
+
+
+
+
+
+
+    //-------------Fetch Users-------------
+
+
     const fetchUsers = async () => {
         try {
             const jwtToken = sessionStorage.getItem("jwt");
@@ -437,6 +457,36 @@ const Assets = () => {
         } catch (error) {
             console.error("Error fetching users:", error);
         }
+    };
+
+    //-------------X-------------
+
+
+
+    //-------------Edit Asset Details
+
+    const [formData, setFormData] = useState({
+        assetNo: "",
+        assetName: "",
+        assetDescription: "",
+        location: "",
+        sublocation: "",
+        sublocationId: "",
+        status: "",
+        assettypeId: "",
+
+    });
+
+    const setOnEditModalClose = () => {
+        formData.assetDescription = '';
+        formData.assetName = '';
+        formData.location = '';
+        setModalOpen(false);
+    }
+
+    const handleUnAssignClick = (assignTo) => {
+        setassignTo(assignTo);
+        setUnAssignModalOpen(true);
     };
 
     const handleEditClick = (asset) => {
@@ -456,41 +506,17 @@ const Assets = () => {
     };
 
 
-    const handleAssignClick = (assignTo) => {
-        fetchUsers();
-        setassignTo(assignTo);
-        setAssignModalOpen(true);
-    };
-
-    const handleUnAssignClick = (assignTo) => {
-        setassignTo(assignTo);
-        setUnAssignModalOpen(true);
-    };
-
-
-
-
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleAssignToInputChange = (input) => {
-        const { value } = input;
-        setassignTo(value);
-    };
-
-    const setOnEditModalClose = () => {
-        formData.assetDescription = '';
-        formData.assetName = '';
-        formData.location = '';
-        setModalOpen(false);
 
 
-    }
-
-
+    const [loading, setLoading] = useState(false);
+    const [editloading, seteditLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const handleSubmit = async () => {
         seteditLoading(true);
@@ -536,6 +562,9 @@ const Assets = () => {
             seteditLoading(false);
         }
     };
+
+    //-------------X-------------
+
 
     return (
         <div className="flex">
@@ -687,7 +716,7 @@ const Assets = () => {
 
                                 {/* Dispose Button */}
                                 <button
-                                   // onClick={() => handleDisposeClick(assetDetails)} // Add the appropriate handler function
+                                    // onClick={() => handleDisposeClick(assetDetails)} // Add the appropriate handler function
                                     className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
                                 >
                                     <span>Dispose</span>
