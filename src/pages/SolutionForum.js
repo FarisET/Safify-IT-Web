@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaList, FaPen, FaResolving, FaRoad, FaStepForward } from 'react-icons/fa';
+import { FaList, FaPen, FaQuestion, FaQuestionCircle, FaResolving, FaRoad, FaStepForward } from 'react-icons/fa';
 
 const SolutionForum = () => {
   const [forumEntries, setForumEntries] = useState([]);
@@ -88,10 +88,17 @@ const SolutionForum = () => {
             <th className="px-4 py-2 border-b">ID</th>
             <th className="px-4 py-2 border-b">⚠️ Problem</th>
             <th className="px-4 py-2 border-b">💡 Solution</th>
-            <th className="px-4 py-2 border-b">Asset Name</th>
             <th className="px-4 py-2 border-b">Asset</th>
             <th className="px-4 py-2 border-b">Reported Time</th>
-            <th className="px-4 py-2 border-b">Steps</th>
+            <th className="px-4 py-2 border-b flex items-center">
+              Steps
+              <span className="ml-2 relative group">
+                <FaQuestionCircle className="fas fa-question-circle text-gray-500 text-sm hover:text-sky-500 cursor-pointer"/>
+                <div className="absolute right-0 mt-2 w-64 p-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                  Steps taken by the investigator to solve the issue
+                </div>
+              </span>
+            </th>
           </tr>
         </thead>
         <tbody className="text-left">
@@ -100,8 +107,20 @@ const SolutionForum = () => {
               <td className="px-4 py-2 font-semibold text-gray-700 border-b">{index + 1}</td>
               <td className="px-4 py-2 font-semibold text-gray-700 border-b">{item.Problem || 'N/A'}</td>
               <td className="px-4 py-2 font-semibold text-gray-700 border-b">{item.Solution || 'N/A'}</td>
-              <td className="px-4 py-2 font-semibold text-gray-700 border-b">{item['Asset Name'] === 'No asset name specified' ? 'X' : item['Asset Name']}</td>
-              <td className="px-4 py-2 font-semibold text-gray-700 border-b">{item['Asset Number'] === 'No asset number specified' ? 'X' : item['Asset Number']}</td>
+              <td className="px-4 py-2 border-b">
+                <div className="font-semibold text-sky-600">
+                  {item['Asset Number'] !== 'No asset number specified' || item['Asset Name'] !== 'No asset name specified' ? (
+                    <>
+                      {item['Asset Number']}
+                      <div className="text-sm text-gray-500 mt-1">
+                        {item['Asset Name']}
+                      </div>
+                    </>
+                  ) : (
+                    <span className="text-gray-700 font-bold">X</span>
+                  )}
+                </div>
+              </td>
               <td className="px-4 py-2 font-semibold text-gray-700 border-b">{item['Reported Time'] || 'N/A'}</td>
               <td className="px-4 py-2 font-semibold text-gray-700 border-b">
                 {item.steps && item.steps.length > 0 ? (
@@ -109,7 +128,7 @@ const SolutionForum = () => {
                     onClick={() => handleStepsClick(item.steps)}
                     className="text-blue-500 underline"
                   >
-                    <FaList className='text-sky-600'/> 
+                    <FaList className='text-sky-600' />
                   </button>
                 ) : (
                   'X'
@@ -121,42 +140,42 @@ const SolutionForum = () => {
       </table>
 
       {isModalOpen && (
-  <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-    <div className="relative bg-white p-6 rounded-lg shadow-lg w-1/3">
-      {/* Close button at the top-right */}
-      <button
-        onClick={closeModal}
-        className="absolute top-2 right-2 text-gray-700 hover:text-red-600 focus:outline-none"
-        aria-label="Close Modal"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="relative bg-white p-6 rounded-lg shadow-lg w-1/3">
+            {/* Close button at the top-right */}
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-2 text-gray-700 hover:text-red-600 focus:outline-none"
+              aria-label="Close Modal"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
 
-      <h3 className="text-xl font-semibold mb-4 text-gray-800">Steps</h3>
-      <ul className="list-decimal pl-6">
-        {selectedSteps.map((step, idx) => (
-          <li key={idx} className="mb-2 text-gray-700">
-            {Object.values(step)}
-          </li>
-        ))}
-      </ul>
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Steps</h3>
+            <ul className="list-decimal pl-6">
+              {selectedSteps.map((step, idx) => (
+                <li key={idx} className="mb-2 text-gray-700">
+                  {Object.values(step)}
+                </li>
+              ))}
+            </ul>
 
-    </div>
-  </div>
-)}
+          </div>
+        </div>
+      )}
 
     </div>
   );

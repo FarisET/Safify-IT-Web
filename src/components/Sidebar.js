@@ -101,7 +101,7 @@ const Sidebar = () => {
           isCollapsed={isCollapsed}
           title="Resource Directory"
           links={[
-            { to: '/users', icon: FaUsers, label: 'Users' },
+            { to: '/users-directory', icon: FaUsers, label: 'Users' },
             { to: '/locations', icon: FaMapMarkerAlt, label: 'Locations' },
             { to: '/assets', icon: FaBox, label: 'Assets' },
           ]}

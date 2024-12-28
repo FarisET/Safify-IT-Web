@@ -8,16 +8,8 @@ import AssignToDropdown from "../components/SearchableUsersDropdown";
 
 
 const Assets = () => {
-    const [assetDetails, setAssetDetails] = useState(null);
-    const [ticketHistory, setTicketHistory] = useState([]);
-    const [AssetHistory, setAssetHistory] = useState([]);
-    const [activeOptionsId, setActiveOptionsId] = useState(null);
 
-    const toggleOptions = (id) => {
-        setActiveOptionsId((prev) => (prev === id ? null : id));
-    };
 
-    const [activeTab, setActiveTab] = useState('Ticket History'); // Default tab
     const [locations, setLocations] = useState([]);
     const [filteredSublocations, setFilteredSublocations] = useState([]); const [sublocations, setSublocations] = useState([]);
     const [users, setUsers] = useState([]);
@@ -129,13 +121,28 @@ const Assets = () => {
         }
     };
 
+    //------------Update Asset Type----------
+    const [activeOptionsId, setActiveOptionsId] = useState(null); //for update asset type
+
+    const toggleOptions = (id) => {
+        setActiveOptionsId((prev) => (prev === id ? null : id));
+    };
+
+
+
     //-------------X-------------
 
 
 
-    //-------------Asset-------------
+    //-------------Asset and Asset Detail-------------
     const [filteredAssets, setFilteredAssets] = useState([]);
     const [selectedAsset, setSelectedAsset] = useState(null);
+    //-------
+    const [assetDetails, setAssetDetails] = useState(null);
+    const [ticketHistory, setTicketHistory] = useState([]);
+    const [AssetHistory, setAssetHistory] = useState([]);
+    const [activeTab, setActiveTab] = useState('Ticket History'); // Default tab
+
 
     const fetchAssetDetails = async (assetNo) => {
         setLoading(true);

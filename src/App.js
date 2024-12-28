@@ -8,6 +8,7 @@ import TopNavWrapper from './components/TopNavWrapper'; // New Wrapper Component
 import AssetPage from './pages/Assets';
 import Approvals from './pages/Approvals';
 import SolutionForum from './pages/SolutionForum';
+import UsersDirectory from './pages/UserDirectory';
 
 const AppRouter = () => {
   return (
@@ -52,6 +53,15 @@ const AppRouter = () => {
               element={
                 <ProtectedRoute>
                   <SolutionForum />
+                </ProtectedRoute>
+              }
+            />
+
+<Route
+              path="/users-directory"
+              element={
+                <ProtectedRoute>
+                  <UsersDirectory />
                 </ProtectedRoute>
               }
             />
