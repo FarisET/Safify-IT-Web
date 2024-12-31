@@ -581,8 +581,7 @@ const Assets = () => {
 
         try {
 
-            if (assignTo === 'unassigned' || assignTo === 'Select a user')
-                {
+            if (assignTo === 'unassigned' || assignTo === 'Select a user') {
                 setassignToError('Please select a valid user');
                 return;
             } else if (assignTo === currentUser) {
@@ -833,6 +832,68 @@ const Assets = () => {
     };
     //----------------X------------------
 
+    //DELETE Asset
+    const [DisposemodalOpen, setDisposeModalOpen] = useState(false);
+    const [DisposemodalMessage, setDisposeModalMessage] = useState(null);
+    const [Disposeloading, setDisposeLoading] = useState(false);
+    const [DisposeInput, setDisposeInput] = useState("");
+    const [Disposerror, setDisposeError] = useState(null);
+
+    const onCloseDisposeModal = () => {
+        setDisposeModalMessage('')
+        setDisposeModalOpen(false);
+        setDisposeError('');
+        setDisposeInput('');
+    }
+
+
+
+
+    const handleDisposeSubmit = async () => {
+        setDisposeLoading(true);
+        setDisposeModalMessage('')
+        setDisposeError('');
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.delete(
+                `http://localhost:3001/admin/dashboard/disposeAsset/${selectedAsset}`,
+
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setDisposeModalMessage("Asset disposed successfully!");
+            setTimeout(() => {
+                setDisposeLoading(false);
+                setDisposeModalOpen(false);
+                setDisposeModalMessage('')
+                fetchAssetDetails(selectedAsset);
+                //fetchAssetTypes();
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setDisposeError(error.response.data.error);
+            } else {
+                setDisposeError("Failed to delete asset. Please try again.");
+            }
+        } finally {
+            setDisposeLoading(false);
+        }
+
+    }
+
+    const handleDisposeClick = (asset_no) => {
+        setSelectedAsset(asset_no);
+        setDisposeModalOpen(true);
+    };
+    //----------------X------------------
+
+
 
     //-------------Edit Asset Details
 
@@ -1008,58 +1069,57 @@ const Assets = () => {
                 </ul>
             </div>
             <div className="w-2/6 bg-white overflow-auto">
-            <div className="flex justify-between items-center p-4 border-b border-b bg-gray-50">
-                <h2 className="text-lg font-semibold">Assets</h2>
-                <button
-                    type="button"
-                    className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
-                    onClick={() => setaddAssetModalOpen(true)}
+                <div className="flex justify-between items-center p-4 border-b border-b bg-gray-50">
+                    <h2 className="text-lg font-semibold">Assets</h2>
+                    <button
+                        type="button"
+                        className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                        onClick={() => setaddAssetModalOpen(true)}
+                    >
+                        Add +
+                    </button>
+                </div>
+
+                {/* Search Bar */}
+                <div className="p-4">
+                    <input
+                        type="text"
+                        placeholder="🔍 Search assets..."
+                        className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
+                <ul
+                    className="p-4 space-y-2 overflow-y-auto"
+                    style={{
+                        maxHeight: "80vh",
+                    }}
                 >
-                    Add +
-                </button>
+                    {displayedAssets.length > 0 ? (
+                        displayedAssets.map((asset) => (
+                            <li
+                                key={asset.assetNo}
+                                className={`p-3 border rounded-lg flex items-center gap-3 hover:bg-gray-100 ${selectedAsset?.assetNo === asset.assetNo ? "bg-gray-100" : ""
+                                    }`}
+                                onClick={() => handleAssetClick(asset)}
+                            >
+                                <div className="bg-gray-200 text-gray-700 flex items-center justify-center w-10 h-10 rounded-full">
+                                    💻
+                                </div>
+                                <div>
+                                    <p className="text-md font-semibold">{asset.assetNo}</p>
+                                    <p className="text-sm">{asset.assetName}</p>
+                                    <p className="text-sm text-gray-500">Issue Count: {asset.assetIssueCount}</p>
+                                </div>
+                            </li>
+                        ))
+                    ) : (
+                        <p className="text-center text-gray-500">No assets available</p>
+                    )}
+                </ul>
             </div>
-
-            {/* Search Bar */}
-            <div className="p-4">
-                <input
-                    type="text"
-                    placeholder="🔍 Search assets..."
-                    className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
-
-            <ul
-                className="p-4 space-y-2 overflow-y-auto"
-                style={{
-                    maxHeight: "80vh",
-                }}
-            >
-                {displayedAssets.length > 0 ? (
-                    displayedAssets.map((asset) => (
-                        <li
-                            key={asset.assetNo}
-                            className={`p-3 border rounded-lg flex items-center gap-3 hover:bg-gray-100 ${
-                                selectedAsset?.assetNo === asset.assetNo ? "bg-gray-100" : ""
-                            }`}
-                            onClick={() => handleAssetClick(asset)}
-                        >
-                            <div className="bg-gray-200 text-gray-700 flex items-center justify-center w-10 h-10 rounded-full">
-                                💻
-                            </div>
-                            <div>
-                                <p className="text-md font-semibold">{asset.assetNo}</p>
-                                <p className="text-sm">{asset.assetName}</p>
-                                <p className="text-sm text-gray-500">Issue Count: {asset.assetIssueCount}</p>
-                            </div>
-                        </li>
-                    ))
-                ) : (
-                    <p className="text-center text-gray-500">No assets available</p>
-                )}
-            </ul>
-        </div>
 
             <div className="w-4/6 bg-gray-50 overflow-hidden border-l flex flex-col">
 
@@ -1078,15 +1138,17 @@ const Assets = () => {
                                 </button>
 
                                 {/* Dispose Button */}
-                                <button
-                                    // onClick={() => handleDisposeClick(assetDetails)} // Add the appropriate handler function
-                                    className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
-                                >
-                                    <span>Dispose</span>
-                                    <FaRecycle className="text-sm" />
-                                </button>
+                                {assetDetails.asset_status === 'available' && (
 
-                                {/* Dispose Button */}
+                                    <button
+                                        onClick={() => handleDisposeClick(assetDetails.asset_no)} // Add the appropriate handler function
+                                        className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                    >
+                                        <span>Dispose</span>
+                                        <FaRecycle className="text-sm" />
+                                    </button>)}
+
+                                {/* Delete Button */}
                                 <button
                                     onClick={() => handleDeleteClick(assetDetails.asset_no)} // Add the appropriate handler function
                                     className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
@@ -1150,7 +1212,7 @@ const Assets = () => {
                             <span className="text-gray-800 text-sm font-medium">
                                 {assetDetails.assigned_to}
 
-                                {assetDetails.asset_status === 'available' && (
+                                {(assetDetails.asset_status === 'available' && assetDetails.asset_status !== 'disposed') && (
                                     <button
                                         onClick={() => handleAssignClick(assetDetails.assigned_to)}
                                         className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-emerald-200 transition"
@@ -1179,7 +1241,7 @@ const Assets = () => {
                                 <span className="text-gray-800 text-sm font-medium">
                                     {assetDetails.asset_location} {assetDetails.location_name !== 'unassigned' ? `(${assetDetails.location_name})` : null}
                                 </span>
-                                {(assetDetails.asset_location === 'unassigned') && (
+                                {(assetDetails.asset_location === 'unassigned' && assetDetails.asset_status !== 'disposed') && (
                                     <button
                                         onClick={() => handleAssignToLocClick(assetDetails.location_name)}
                                         className="px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-emerald-200 transition"
@@ -1516,6 +1578,64 @@ const Assets = () => {
                     </div>
                 </div>
             )}
+
+            {/* Dispose Asset Modal */}
+            {DisposemodalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Dispose Asset</h2>
+                        <p className="text-md mb-4">
+                            Are you sure you want to dispose asset:
+                            <span className="font-semibold"> {assetDetails.asset_no}</span>
+                        </p>
+                        <form className="space-y-4">
+                            {Disposeloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {DisposemodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{DisposemodalMessage}</p>}
+                            {Disposerror && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{Disposerror}</p>}
+
+                            {/* Input Field for Confirmation */}
+                            <div>
+                                <label htmlFor="delete-confirm" className="block text-gray-700">
+                                    Type <strong className='text-red-500 font-semibold'>DISPOSE</strong> to confirm:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="delete-confirm"
+                                    value={DisposeInput}
+                                    onChange={(e) => setDisposeInput(e.target.value)}
+                                    className="w-full border p-2 rounded mt-2"
+                                    placeholder="DISPOSE"
+                                />
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => onCloseDisposeModal()}
+                                    className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                >
+                                    No
+                                </button>
+                                {DisposeInput === "DISPOSE" && (
+                                    <button
+                                        type="button"
+                                        onClick={handleDisposeSubmit}
+                                        disabled={Disposeloading}
+                                        className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${Disposeloading
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-gray-100 hover:bg-emerald-200"
+                                            }`}
+                                    >
+                                        Yes
+                                    </button>
+                                )}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
 
             {/* Delete Asset Type Modal */}
             {DeleteTypeModalOpen && (
