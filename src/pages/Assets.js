@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { AssetType } from '../models/AssetType';
 import { format } from 'date-fns';
-import { FaUser, FaTrash, FaArrowRight, FaImage, FaEdit, FaEllipsisV } from 'react-icons/fa';
+import { FaUser, FaTrash, FaArrowRight, FaImage, FaEdit, FaEllipsisV, FaRecycle } from 'react-icons/fa';
 import LocationDropdown from "../components/SearchableLocationDropdown";
 import AssignToDropdown from "../components/SearchableUsersDropdown";
 
@@ -22,6 +22,7 @@ const Assets = () => {
     //-------------Asset types-------------
     const [assetTypes, setAssetTypes] = useState([]);
     const [selectedAssetTypeId, setSelectedAssetTypeId] = useState(null);
+    const [selectedAssetType, setSelectedAssetType] = useState(null);
 
 
     const fetchAssetTypes = async () => {
@@ -80,10 +81,6 @@ const Assets = () => {
         setaddTypeErrorMessage('');
     }
 
-    const handleAssetTypeUpdate = () => { }
-    const handleAssetTypeDelete = () => {
-
-    }
 
     const handleAddAssetType = async () => {
         setaddTypeLoading(true);
@@ -121,6 +118,75 @@ const Assets = () => {
         }
     };
 
+
+
+
+    //-------------X-------------
+
+    //------------Delete Asset Type----------
+    const [DeleteTypeModalOpen, setDeleteTypeModalOpen] = useState(false);
+    const [DeleteTypemodalMessage, setDeleteTypeModalMessage] = useState(null);
+    const [DeleteTypeloading, setDeleteTypeLoading] = useState(false);
+    const [deleteTypeInput, setDeleteTypeInput] = useState("");
+    const [DeletTypeError, setDeleteTypeError] = useState(null);
+
+
+
+    const onCloseDeleteTypeModal = () => {
+        setDeleteTypeModalMessage('')
+        setDeleteTypeModalOpen(false);
+        setDeleteTypeError('');
+        setDeleteTypeInput('');
+    }
+
+
+
+
+    const handleDeleteTypeSubmit = async () => {
+        setDeleteTypeLoading(true);
+        setDeleteTypeModalMessage('')
+        setDeleteTypeError('');
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.delete(
+                `http://localhost:3001/admin/dashboard/deleteAssetType/${selectedAssetTypeId}`,
+
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setDeleteTypeModalMessage("Asset Type deleted successfully!");
+            setTimeout(() => {
+                setDeleteTypeLoading(false);
+                setDeleteTypeModalOpen(false);
+                setDeleteTypeModalMessage('');
+                fetchAssetTypes();
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setDeleteTypeError(error.response.data.error);
+            } else {
+                setDeleteTypeError("Failed to delete asset. Please try again.");
+            }
+        } finally {
+            setDeleteTypeLoading(false);
+        }
+
+    }
+
+    const handleDeleteTypeClick = (asset_type_id, asset_type) => {
+        setSelectedAssetTypeId(asset_type_id);
+        setSelectedAssetType(asset_type);
+        setDeleteTypeModalOpen(true);
+    };
+    //----------------X------------------
+
+
     //------------Update Asset Type----------
     const [activeOptionsId, setActiveOptionsId] = useState(null); //for update asset type
 
@@ -128,9 +194,72 @@ const Assets = () => {
         setActiveOptionsId((prev) => (prev === id ? null : id));
     };
 
+    const [UpdateTypeModalOpen, setUpdateTypeModalOpen] = useState(false);
+    const [UpdateTypemodalMessage, setUpdateTypeModalMessage] = useState(null);
+    const [UpdateTypeloading, setUpdateTypeLoading] = useState(false);
+    const [UpdateTypeInput, setUpdateTypeInput] = useState("");
+    const [UpdateTypeError, setUpdateTypeError] = useState(null);
 
 
-    //-------------X-------------
+
+    const onCloseUpdateTypeModal = () => {
+        setUpdateTypeModalMessage('')
+        setUpdateTypeModalOpen(false);
+        setUpdateTypeError('');
+        setUpdateTypeInput('');
+        setAssetTypeDesc('');
+    }
+
+
+
+
+    const handleUpdateTypeSubmit = async () => {
+        setUpdateTypeLoading(true);
+        setUpdateTypeModalMessage('')
+        setUpdateTypeError('');
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.put(
+                `http://localhost:3001/admin/dashboard/updateAssetType`,
+                { asset_type_id: selectedAssetTypeId, asset_type_desc: assetTypeDesc },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setUpdateTypeModalMessage("Asset Type renamed successfully!");
+            setTimeout(() => {
+                setUpdateTypeLoading(false);
+                setUpdateTypeModalOpen(false);
+                setUpdateTypeModalMessage('');
+                fetchAssetTypes();
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setUpdateTypeError(error.response.data.error);
+            } else {
+                setUpdateTypeError("Failed to rename asset. Please try again.");
+            }
+        } finally {
+            setUpdateTypeLoading(false);
+        }
+
+    }
+
+    const handleUpdateTypeClick = (asset_type_id, asset_type) => {
+        setSelectedAssetTypeId(asset_type_id);
+        setSelectedAssetType(asset_type);
+        setUpdateTypeModalOpen(true);
+    };
+    //----------------X------------------
+
+
+
+
 
 
 
@@ -264,10 +393,166 @@ const Assets = () => {
     //-------------X-------------
 
 
+    //-------------Assign To Location-------------
+    const [AssignLocmodalOpen, setLocModalOpen] = useState(false);
+    const [AssignLocmodalMessage, setLocModalMessage] = useState(null);
+    const [assignLoc, setassignLoc] = useState('');
+    const [currentLoc, setCurrentLoc] = useState('');
+    const [assignLocloading, setAssignLocLoading] = useState(false);
+    const [assignLocerror, setassignLocError] = useState(null);
+
+    const onCloseAssignLocModal = () => {
+        setLocModalMessage('')
+        setLocModalOpen(false);
+        setassignLoc('');
+        setassignLocError('');
+    }
+
+
+
+    const handleAssignLocSubmit = async () => {
+        setLocModalMessage('')
+        setAssignLocLoading(true)
+        setassignLocError(null)
+
+        try {
+
+            if (assignLoc === 'unassigned' || assignLoc === 'Select a location') {
+                setassignLocError('Please select a valid location');
+                return;
+            } else if (assignLoc === currentLoc) {
+                setassignLocError(`Location already assigned to ${currentLoc}`);
+                return;
+            }
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.put(
+                `http://localhost:3001/admin/dashboard/updateLocationAssetAssignment`,
+                {
+                    asset_no: selectedAsset.assetNo,
+                    asset_location: assignLoc,
+                    flag: 0
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setLocModalMessage("Location assigned successfully!");
+            setTimeout(() => {
+                setAssignLocLoading(false);
+                setLocModalOpen(false);
+                setLocModalMessage('')
+                fetchAssetDetails(selectedAsset); // Refresh asset types list
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setassignLocError(error.response.data.error);
+            } else {
+                setassignLocError("Failed to assign location. Please try again.");
+            }
+        } finally {
+            setAssignLocLoading(false);
+        }
+
+    }
+
+
+    const handleAssignLocInputChange = (input) => {
+        const { value } = input;
+        setassignLoc(value);
+    };
+
+    const handleAssignToLocClick = (assignLoc) => {
+        fetchLocationsAndSublocations();
+        setassignLoc(assignLoc);
+        setCurrentLoc(assignLoc)
+        setLocModalOpen(true);
+    };
+
+
+    //-------------X-------------
+
+
+    //-------------Unassign Location-------------
+    const [UnssignLocmodalOpen, setUnassignLocModalOpen] = useState(false);
+    const [UnassignLocmodalMessage, setUnassignLocModalMessage] = useState(null);
+    const [UnassignLocloading, setUnassignLocLoading] = useState(false);
+    const [UnassignLocerror, setUnassignLocError] = useState(null);
+
+    const onCloseUnassignLocModal = () => {
+        setUnassignLocModalMessage('')
+        setUnassignLocModalOpen(false);
+        setassignLoc('');
+        setUnassignLocError('');
+    }
+
+
+
+    const handleUnssignLocSubmit = async () => {
+        setUnassignLocModalMessage('')
+        setUnassignLocLoading(true)
+        setUnassignLocError(null)
+
+        try {
+
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.put(
+                `http://localhost:3001/admin/dashboard/updateLocationAssetAssignment`,
+                {
+                    asset_no: selectedAsset.assetNo,
+                    asset_location: assignLoc,
+                    flag: 1
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setUnassignLocModalMessage("Location assigned successfully!");
+            setTimeout(() => {
+                setUnassignLocLoading(false);
+                setUnassignLocModalOpen(false);
+                setUnassignLocModalMessage('')
+                fetchAssetDetails(selectedAsset); // Refresh asset types list
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setUnassignLocError(error.response.data.error);
+            } else {
+                setUnassignLocError("Failed to assign location. Please try again.");
+            }
+        } finally {
+            setUnassignLocLoading(false);
+        }
+
+    }
+
+
+
+    const handleUnassignToLocClick = (assignLoc) => {
+        setassignLoc(assignLoc);
+        setUnassignLocModalOpen(true);
+    };
+
+
+    //-------------X-------------
+
+
+
+
     //-------------Assign To User-------------
     const [AssignmodalOpen, setAssignModalOpen] = useState(false);
     const [AssignmodalMessage, setAssignModalMessage] = useState(null);
     const [assignTo, setassignTo] = useState('');
+    const [currentUser, setCurrentUser] = useState('');
     const [assignToloading, setAssignToLoading] = useState(false);
     const [assignToerror, setassignToError] = useState(null);
 
@@ -286,6 +571,15 @@ const Assets = () => {
         setassignToError(null)
 
         try {
+
+            if (assignTo === 'unassigned' || assignTo === 'Select a user')
+                {
+                setassignToError('Please select a valid user');
+                return;
+            } else if (assignTo === currentUser) {
+                setassignToError(`${assignTo} already assigned to this asset`);
+                return;
+            }
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.put(
                 `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
@@ -379,6 +673,7 @@ const Assets = () => {
     const handleAssignClick = (assignTo) => {
         fetchUsers();
         setassignTo(assignTo);
+        setCurrentUser(assignTo);
         setAssignModalOpen(true);
     };
 
@@ -433,12 +728,12 @@ const Assets = () => {
     };
 
 
-    const handleSublocationChange = (selectedSublocationId) => {
-        setFormData((prevData) => ({
-            ...prevData,
-            sublocation: selectedSublocationId,
-        }));
-    };
+    // const handleSublocationChange = (selectedSublocationId) => {
+    //     setFormData((prevData) => ({
+    //         ...prevData,
+    //         sublocation: selectedSublocationId,
+    //     }));
+    // };
 
 
 
@@ -468,6 +763,66 @@ const Assets = () => {
 
     //-------------X-------------
 
+    //DELETE Asset
+    const [DeletemodalOpen, setDeleteModalOpen] = useState(false);
+    const [DeletemodalMessage, setDeleteModalMessage] = useState(null);
+    const [Deleteloading, setDeleteLoading] = useState(false);
+    const [deleteInput, setDeleteInput] = useState("");
+    const [Deleterror, setDeleteError] = useState(null);
+
+    const onCloseDeleteModal = () => {
+        setDeleteModalMessage('')
+        setDeleteModalOpen(false);
+        setDeleteError('');
+        setDeleteInput('');
+    }
+
+
+
+
+    const handleDeleteSubmit = async () => {
+        setDeleteLoading(true);
+        setDeleteModalMessage('')
+        setDeleteError('');
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.delete(
+                `http://localhost:3001/admin/dashboard/deleteAsset/${selectedAsset}`,
+
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setDeleteModalMessage("Asset deleted successfully!");
+            setTimeout(() => {
+                setDeleteLoading(false);
+                setDeleteModalOpen(false);
+                setDeleteModalMessage('')
+                // fetchAssetDetails(selectedAsset); 
+                fetchAssetTypes();
+            }, 2000);
+
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setDeleteError(error.response.data.error);
+            } else {
+                setDeleteError("Failed to delete asset. Please try again.");
+            }
+        } finally {
+            setDeleteLoading(false);
+        }
+
+    }
+
+    const handleDeleteClick = (asset_no) => {
+        setSelectedAsset(asset_no);
+        setDeleteModalOpen(true);
+    };
+    //----------------X------------------
 
 
     //-------------Edit Asset Details
@@ -476,9 +831,6 @@ const Assets = () => {
         assetNo: "",
         assetName: "",
         assetDescription: "",
-        location: "",
-        sublocation: "",
-        sublocationId: "",
         status: "",
         assettypeId: "",
 
@@ -502,8 +854,6 @@ const Assets = () => {
             assetNo: asset.asset_no,
             assetName: asset.asset_name,
             assetDescription: asset.asset_desc,
-            location: asset.location_name,
-            sublocation: asset.asset_location || "",
             status: asset.status,
             assettypeId: asset.asset_type_id,
         });
@@ -534,7 +884,6 @@ const Assets = () => {
             asset_name: formData.assetName,
             asset_desc: formData.assetDescription,
             asset_type_id: formData.assettypeId || null,
-            asset_location: formData.sublocation,
             status: formData.asset_status || "available",
         };
 
@@ -558,7 +907,8 @@ const Assets = () => {
                     setModalOpen(false);
                     setModalMessage(null);
                     setModalErrorMessage(null);
-                    fetchAssetDetails(formData.assetNo); // Refresh the assets list
+                    fetchAssetDetails(formData.assetNo); // Refresh the assets details
+                    fetchAssetTypes(); // so if name changed, it is also reflected in Asset (middle) pane
                 }, 3000);
             } else {
                 setModalErrorMessage(`Error: ${response.status} - ${response.statusText}`);
@@ -623,7 +973,7 @@ const Assets = () => {
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleAssetTypeUpdate(type.assetTypeId);
+                                                    handleUpdateTypeClick(type.assetTypeId);
                                                     setActiveOptionsId(null); // Close menu
                                                 }}
                                                 className="block w-full text-center p-1 font-semibold text-sm text-gray-700 hover:bg-gray-100"
@@ -633,7 +983,7 @@ const Assets = () => {
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleAssetTypeDelete(type.assetTypeId);
+                                                    handleDeleteTypeClick(type.assetTypeId, type.assetTypeDesc);
                                                     setActiveOptionsId(null); // Close menu
                                                 }}
                                                 className="block w-full text-center p-1 font-semibold text-sm text-red-500 hover:bg-red-100"
@@ -727,6 +1077,15 @@ const Assets = () => {
                                     className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
                                 >
                                     <span>Dispose</span>
+                                    <FaRecycle className="text-sm" />
+                                </button>
+
+                                {/* Dispose Button */}
+                                <button
+                                    onClick={() => handleDeleteClick(assetDetails.asset_no)} // Add the appropriate handler function
+                                    className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                >
+                                    <span>Delete</span>
                                     <FaTrash className="text-sm" />
                                 </button>
                             </>
@@ -809,8 +1168,30 @@ const Assets = () => {
 
                             {/* Location */}
                             <strong className="text-gray-600 font-semibold text-sm">Location</strong>
-                            <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_location} {assetDetails.location_name != 'unassigned' ? ((`(${assetDetails.location_name})`)) : null}</span>
+                            <div className="flex items-center space-x-2">
 
+                                <span className="text-gray-800 text-sm font-medium">
+                                    {assetDetails.asset_location} {assetDetails.location_name !== 'unassigned' ? `(${assetDetails.location_name})` : null}
+                                </span>
+                                {(assetDetails.asset_location === 'unassigned') && (
+                                    <button
+                                        onClick={() => handleAssignToLocClick(assetDetails.location_name)}
+                                        className="px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-emerald-200 transition"
+                                    >
+                                        Assign
+                                    </button>
+                                )}
+                                {assetDetails.asset_location !== 'unassigned' && (
+                                    <button
+                                        // onClick={() => handleUnassign(assetDetails.asset_id)}
+                                        className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-red-200 transition"
+                                        onClick={() => handleUnassignToLocClick(assetDetails.asset_location_id)}
+
+                                    >
+                                        Unassign
+                                    </button>
+                                )}
+                            </div>
                             {/* Is Active */}
                             <strong className="text-gray-600 font-semibold text-sm">Is Active</strong>
                             <span className="text-gray-800 text-sm font-medium">
@@ -984,7 +1365,7 @@ const Assets = () => {
                                 />
                             </label>
 
-                            {/* Sublocation */}
+                            {/* Sublocation
                             <label className="block">
                                 <span className="text-gray-700 text-sm">Sublocation:</span>
                                 <LocationDropdown
@@ -992,7 +1373,7 @@ const Assets = () => {
                                     selectedValue={formData.sublocation}
                                     onChange={handleSublocationChange}
                                 />
-                            </label>
+                            </label> */}
 
                             {/* Action Buttons */}
                             <div className="flex justify-end space-x-2">
@@ -1073,7 +1454,123 @@ const Assets = () => {
                 </div>
             )}
 
+            {/* Delete Asset Modal */}
+            {DeletemodalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Delete Asset</h2>
+                        <p className="text-md mb-4">
+                            Are you sure you want to delete asset:
+                            <span className="font-semibold"> {assetDetails.asset_no}</span>
+                        </p>
+                        <form className="space-y-4">
+                            {Deleteloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {DeletemodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{DeletemodalMessage}</p>}
+                            {Deleterror && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{Deleterror}</p>}
 
+                            {/* Input Field for Confirmation */}
+                            <div>
+                                <label htmlFor="delete-confirm" className="block text-gray-700">
+                                    Type <strong className='text-red-500 font-semibold'>DELETE</strong> to confirm:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="delete-confirm"
+                                    value={deleteInput}
+                                    onChange={(e) => setDeleteInput(e.target.value)}
+                                    className="w-full border p-2 rounded mt-2"
+                                    placeholder="DELETE"
+                                />
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => onCloseDeleteModal()}
+                                    className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                >
+                                    No
+                                </button>
+                                {deleteInput === "DELETE" && (
+                                    <button
+                                        type="button"
+                                        onClick={handleDeleteSubmit}
+                                        disabled={Deleteloading}
+                                        className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${Deleteloading
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-gray-100 hover:bg-emerald-200"
+                                            }`}
+                                    >
+                                        Yes
+                                    </button>
+                                )}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Asset Type Modal */}
+            {DeleteTypeModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Delete Asset Type</h2>
+                        <p className="text-md mb-4">
+                            Are you sure you want to delete asset type:
+                            <span className="font-semibold"> {selectedAssetType}</span>
+                        </p>
+                        <form className="space-y-4">
+                            {DeleteTypeloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {DeleteTypemodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{DeleteTypemodalMessage}</p>}
+                            {DeletTypeError && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{DeletTypeError}</p>}
+
+                            {/* Input Field for Confirmation */}
+                            <div>
+                                <label htmlFor="delete-confirm" className="block text-gray-700">
+                                    Type <strong className='text-red-500 font-semibold'>DELETE</strong> to confirm:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="delete-confirm"
+                                    value={deleteTypeInput}
+                                    onChange={(e) => setDeleteTypeInput(e.target.value)}
+                                    className="w-full border p-2 rounded mt-2"
+                                    placeholder="DELETE"
+                                />
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => onCloseDeleteTypeModal()}
+                                    className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                >
+                                    No
+                                </button>
+                                {deleteTypeInput === "DELETE" && (
+                                    <button
+                                        type="button"
+                                        onClick={handleDeleteTypeSubmit}
+                                        disabled={DeleteTypeloading}
+                                        className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${Deleteloading
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-gray-100 hover:bg-emerald-200"
+                                            }`}
+                                    >
+                                        Yes
+                                    </button>
+                                )}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+
+
+            {/* Unassign user */}
             {UnAssignmodalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
@@ -1116,11 +1613,112 @@ const Assets = () => {
             )}
 
 
+            {/* Assign Location */}
+            {AssignLocmodalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Assign Location</h2>
+                        <form className="space-y-4">
+
+                            {assignLocloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {AssignLocmodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{AssignLocmodalMessage}</p>}
+                            {assignLocerror && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{assignLocerror}</p>}
+
+
+
+                            {/* Assign To Location*/}
+                            <label className="block">
+                                <span className="text-gray-700 text-sm">Assign To:</span>
+                                <LocationDropdown
+                                    options={filteredSublocations} // Array of users
+                                    selectedValue={assignLoc}
+                                    onChange={(id) => handleAssignLocInputChange({ value: id })}
+
+
+
+                                />
+                            </label>
+
+
+
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => onCloseAssignLocModal()}
+                                    className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleAssignLocSubmit}
+                                    disabled={assignLocloading}
+                                    className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${assignToloading
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-gray-100 hover:bg-emerald-200"
+                                        }`}
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+
+            {/* Unassign Location */}
+            {UnssignLocmodalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Unassign Location</h2>
+                        <p className="text-md mb-4">Are you sure you wan't to unassign this asset?</p>
+                        <form className="space-y-4">
+
+
+
+                            {UnassignLocloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {UnassignLocmodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{UnassignLocmodalMessage}</p>}
+                            {UnassignLocerror && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{UnassignLocerror}</p>}
+
+
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => onCloseUnassignLocModal()}
+                                    className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                >
+                                    No
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleUnssignLocSubmit}
+                                    disabled={UnassignToloading}
+                                    className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${UnassignToloading
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-gray-100 hover:bg-emerald-200"
+                                        }`}
+                                >
+                                    Yes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+
+
+
 
             {addTypeModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
-                        <h2 className="text-xl font-semibold mb-4">Add Asset Type</h2>
+                        <h2 className="text-xl font-semibold mb-4">Rename Asset Type</h2>
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
@@ -1128,13 +1726,13 @@ const Assets = () => {
                             }}
                         >
 
-                            {addTypeloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
-                            {addTypesuccessMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{addTypesuccessMessage}</p>}
-                            {addTypeerrorMessage && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{addTypeerrorMessage}</p>}
+                            {UpdateTypeloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {UpdateTypemodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{UpdateTypemodalMessage}</p>}
+                            {UpdateTypeError && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{UpdateTypeError}</p>}
 
 
                             <label className="block mb-4">
-                                <span className="text-gray-700 text-sm">Asset Type Description:</span>
+                                <span className="text-gray-700 text-sm">Name:</span>
                                 <input
                                     type="text"
                                     value={assetTypeDesc}
@@ -1167,6 +1765,60 @@ const Assets = () => {
                     </div>
                 </div>
             )}
+
+            {UpdateTypeModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Rename Asset Type</h2>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleUpdateTypeSubmit();
+                            }}
+                        >
+
+                            {UpdateTypeloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {UpdateTypemodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{UpdateTypemodalMessage}</p>}
+                            {UpdateTypeError && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{UpdateTypeError}</p>}
+
+
+                            <label className="block mb-4">
+                                <span className="text-gray-700 text-sm">Name:</span>
+                                <input
+                                    type="text"
+                                    value={assetTypeDesc}
+                                    onChange={(e) => setAssetTypeDesc(e.target.value)}
+                                    className="m-1 block w-full rounded-md border-b borequiredrder-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
+
+                                />
+                            </label>
+
+
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => onCloseUpdateTypeModal()}
+                                    className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                    disabled={UpdateTypeloading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${UpdateTypeloading ? "bg-gray-400 cursor-not-allowed" : "bg-gray-100 hover:bg-emerald-200"
+                                        }`}
+                                    disabled={UpdateTypeloading}
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+
+
 
             {addAssetModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

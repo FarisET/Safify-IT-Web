@@ -1,4 +1,4 @@
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 
 const SearchableDropdown = ({ options, selectedValue, onChange }) => {
@@ -22,8 +22,8 @@ const SearchableDropdown = ({ options, selectedValue, onChange }) => {
       >
         <span>
           {selectedOption
-            ? selectedOption.sub_location_name
-            : selectedValue}
+            ? selectedOption.sub_location_name // Show the current location name
+            : "Select a location"} {/* Default placeholder */}
         </span>
         <FaChevronDown />
       </div>
@@ -49,7 +49,7 @@ const SearchableDropdown = ({ options, selectedValue, onChange }) => {
                 <li
                   key={option.sub_location_id}
                   onClick={() => {
-                    onChange(option.sub_location_id);
+                    onChange(option.sub_location_id); // Pass the ID on selection
                     setIsDropdownOpen(false);
                   }}
                   className="p-2 hover:bg-gray-100 cursor-pointer"

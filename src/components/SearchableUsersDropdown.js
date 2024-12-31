@@ -18,7 +18,7 @@ const AssignToDropdown = ({ options, selectedValue, onChange }) => {
         className="border-b cursor-pointer shadow-sm flex justify-between items-center p-2"
         onClick={() => setIsDropdownOpen((prev) => !prev)}
       >
-        <span>{selectedOption ? selectedOption.name : selectedValue}</span>
+        <span>{selectedOption ? selectedOption.name : "Select a user"}</span>
         <FaChevronDown />
       </div>
 
