@@ -271,6 +271,15 @@ const Assets = () => {
     const [ticketHistory, setTicketHistory] = useState([]);
     const [AssetHistory, setAssetHistory] = useState([]);
     const [activeTab, setActiveTab] = useState('Ticket History'); // Default tab
+    const [searchTerm, setSearchTerm] = useState("");
+
+    // Filter assets based on the search term
+    const displayedAssets = filteredAssets.filter(
+        (asset) =>
+            (asset.assetNo && asset.assetNo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (asset.assetName && asset.assetName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (asset.assetIssueCount && asset.assetIssueCount.toString().includes(searchTerm))
+    );
 
 
     const fetchAssetDetails = async (assetNo) => {
@@ -999,61 +1008,58 @@ const Assets = () => {
                 </ul>
             </div>
             <div className="w-2/6 bg-white overflow-auto">
-                <div className="flex justify-between items-center p-4 border-b border-b bg-gray-50">
-                    <h2 className="text-lg font-semibold">Assets</h2>
-                    <button
-                        type="button"
-                        className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
-                        onClick={() => setaddAssetModalOpen(true)}
-
-                    >
-                        Add +
-                    </button>
-                </div>
-
-                {/* Search Bar */}
-                <div className="p-4">
-                    <input
-                        type="text"
-                        placeholder="🔍 Search assets..."
-                        className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none"
-                    // onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-
-
-                <ul className="p-4 space-y-2 overflow-y-auto"
-                    style={{
-                        maxHeight: '80vh',
-                    }}>
-
-                    {filteredAssets.filter(asset => asset.assetNo !== null || asset.assetName !== null || asset.assetIssueCount !== null).length > 0 ? (
-                        filteredAssets
-                            .filter(asset => asset.assetNo !== null || asset.assetName !== null || asset.assetIssueCount !== null)
-                            .map((asset) => (
-                                <li
-                                    key={asset.assetNo}
-                                    className={`p-3 border rounded-lg flex items-center gap-3 hover:bg-gray-100 ${selectedAsset?.assetNo === asset.assetNo ? 'bg-gray-100' : ''}`}
-                                    onClick={() => handleAssetClick(asset)}
-                                >
-                                    <div className="bg-gray-200 text-gray-700 flex items-center justify-center w-10 h-10 rounded-full">
-                                        💻
-                                    </div>
-                                    <div>
-                                        <p className="text-md font-semibold">{asset.assetNo}</p>
-                                        <p className="text-sm">{asset.assetName}</p>
-                                        <p className="text-sm text-gray-500">
-                                            Issue Count: {asset.assetIssueCount}
-                                        </p>
-                                    </div>
-                                </li>
-                            ))
-                    ) : (
-                        <p className="text-center text-gray-500">No assets available</p>
-                    )}
-
-                </ul>
+            <div className="flex justify-between items-center p-4 border-b border-b bg-gray-50">
+                <h2 className="text-lg font-semibold">Assets</h2>
+                <button
+                    type="button"
+                    className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                    onClick={() => setaddAssetModalOpen(true)}
+                >
+                    Add +
+                </button>
             </div>
+
+            {/* Search Bar */}
+            <div className="p-4">
+                <input
+                    type="text"
+                    placeholder="🔍 Search assets..."
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            <ul
+                className="p-4 space-y-2 overflow-y-auto"
+                style={{
+                    maxHeight: "80vh",
+                }}
+            >
+                {displayedAssets.length > 0 ? (
+                    displayedAssets.map((asset) => (
+                        <li
+                            key={asset.assetNo}
+                            className={`p-3 border rounded-lg flex items-center gap-3 hover:bg-gray-100 ${
+                                selectedAsset?.assetNo === asset.assetNo ? "bg-gray-100" : ""
+                            }`}
+                            onClick={() => handleAssetClick(asset)}
+                        >
+                            <div className="bg-gray-200 text-gray-700 flex items-center justify-center w-10 h-10 rounded-full">
+                                💻
+                            </div>
+                            <div>
+                                <p className="text-md font-semibold">{asset.assetNo}</p>
+                                <p className="text-sm">{asset.assetName}</p>
+                                <p className="text-sm text-gray-500">Issue Count: {asset.assetIssueCount}</p>
+                            </div>
+                        </li>
+                    ))
+                ) : (
+                    <p className="text-center text-gray-500">No assets available</p>
+                )}
+            </ul>
+        </div>
 
             <div className="w-4/6 bg-gray-50 overflow-hidden border-l flex flex-col">
 
