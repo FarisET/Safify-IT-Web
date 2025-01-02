@@ -14,25 +14,31 @@ const LoginPage = () => {
     if (loading) return; // Prevent re-execution if already loading
     setLoading(true);
     setError('');
-  
+
     console.log('Login function triggered'); // Debugging log
-  
+
     try {
       const deviceToken = "webapp";
-  
+
       const response = await axios.post('http://localhost:3001/user/login', {
         user_id: userId,
         user_pass: password,
         device_token: deviceToken
       });
-  
+
       const { status, token, error: responseError } = response.data;
-  
+
       if (response.status === 200 && token) {
         const decodedToken = parseJwt(token);
         const role = decodedToken.role_name;
         const userName = decodedToken.user_name;
-  
+
+        // Check if the role is not 'admin'
+        if (role !== 'admin') {
+          setError('You are not authorized');
+          return; // Exit the function if not authorized
+        }
+
         sessionStorage.setItem('jwt', token);
         sessionStorage.setItem('role', role);
         sessionStorage.setItem('deviceToken', deviceToken);
@@ -54,9 +60,10 @@ const LoginPage = () => {
     } finally {
       setLoading(false);
     }
+
   };
-  
-    
+
+
 
   const handleServerError = (errorMessage) => {
     if (errorMessage.includes("Already logged in from another device")) {
