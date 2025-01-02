@@ -1,31 +1,31 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  FaClipboardList,
-  FaCalendarAlt,
-  FaBell,
   FaChevronLeft,
   FaBookOpen,
   FaChartBar,
   FaUsers,
   FaMapMarkerAlt,
   FaBox,
-  FaIdBadge,
   FaCheckCircle,
-  FaCheckDouble,
-  FaCheck,
+  FaPowerOff,
   FaSign,
-  FaSignature,
-  FaRProject,
-  FaRegCheckCircle,
-  FaClipboardCheck,
-  FaRegClipboard,
+
   FaTicketAlt,
 } from 'react-icons/fa';
 import { ReactComponent as SafifyIcon } from '../assets/images/safify_it_icon.svg';
+import useLogout from '../services/logout';
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(true); // Default state is now collapsed
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  // Use the custom hook inside the component
+  const logout = useLogout();
+
+  const handleLogout = async () => {
+    await logout(); // Call the logout function from the custom hook
+  };
 
   return (
     <>
@@ -57,7 +57,7 @@ const Sidebar = () => {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-200 my-2"></div>
+        <div className="border-t border-gray-200 my-1"></div>
 
         {/* Sections */}
         <SidebarSection
@@ -68,7 +68,7 @@ const Sidebar = () => {
             { to: '/incidents', icon: FaTicketAlt, label: 'Critical Tickets' },
           ]}
         />
-        <div className="border-t border-gray-200 my-2"></div>
+        <div className="border-t border-gray-200 my-1"></div>
 
 
         <SidebarSection
@@ -84,7 +84,7 @@ const Sidebar = () => {
           ]}
         />
 
-        <div className="border-t border-gray-200 my-2"></div>
+        <div className="border-t border-gray-200 my-1"></div>
 
         <SidebarSection
           isCollapsed={isCollapsed}
@@ -95,7 +95,7 @@ const Sidebar = () => {
           ]}
         />
 
-        <div className="border-t border-gray-200 my-2"></div>
+        <div className="border-t border-gray-200 my-1"></div>
 
         <SidebarSection
           isCollapsed={isCollapsed}
@@ -106,7 +106,47 @@ const Sidebar = () => {
             { to: '/assets', icon: FaBox, label: 'Assets' },
           ]}
         />
+        <div className="border-t border-gray-200 my-1"></div>
+
+
+        {/* Logout Button */}
+        <div className="fixed bottom-2 px-3"> {/* Add bottom margin */}
+          <button
+            onClick={() => setShowLogoutConfirm(true)}
+            className="flex items-center gap-2 text-red-600 p-2 rounded hover:text-gray-700 transition-all"
+          >
+            <FaPowerOff />
+            {!isCollapsed && <span>Logout</span>}
+          </button>
+        </div>
+
+
+
       </div>
+      {/* Logout Confirmation Dialog */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded shadow-lg">
+            <h3 className="text-lg font-semibold mb-2">Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-sky-200 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </>
   );
 };

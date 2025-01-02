@@ -37,6 +37,8 @@ const LoginPage = () => {
         sessionStorage.setItem('role', role);
         sessionStorage.setItem('deviceToken', deviceToken);
         sessionStorage.setItem('userName', userName);
+        sessionStorage.setItem('userId', userId);
+
         navigate('/incidents');
       } else if (response.status === 401) {
         setError("Incorrect credentials, please try again.");
