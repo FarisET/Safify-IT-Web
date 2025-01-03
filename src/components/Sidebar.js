@@ -57,7 +57,7 @@ const Sidebar = () => {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-200 my-1"></div>
+        <div className="border-b border-gray-200 my-3"></div>
 
         {/* Sections */}
         <SidebarSection

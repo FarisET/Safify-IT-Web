@@ -1069,7 +1069,7 @@ const Assets = () => {
                 </ul>
             </div>
             <div className="w-2/6 bg-white overflow-auto">
-                <div className="flex justify-between items-center p-4 border-b border-b bg-gray-50">
+                <div className="flex justify-between items-center p-4 border-b bg-gray-50">
                     <h2 className="text-lg font-semibold">Assets</h2>
                     <button
                         type="button"
