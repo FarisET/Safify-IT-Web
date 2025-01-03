@@ -10,6 +10,8 @@ import AssetPage from './pages/Assets';
 import Approvals from './pages/Approvals';
 import SolutionForum from './pages/SolutionForum';
 import UsersDirectory from './pages/UserDirectory';
+import LocationsDirectory from './pages/LocationsDirectory';
+import Help from './pages/Admin/Help';
 
 const AppLayout = () => {
   const location = useLocation(); // Hook called within a Router context
@@ -62,6 +64,24 @@ const AppLayout = () => {
             element={
               <ProtectedRoute>
                 <UsersDirectory />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/locations-directory"
+            element={
+              <ProtectedRoute>
+                <LocationsDirectory />
+              </ProtectedRoute>
+            }
+          />
+
+<Route
+            path="/help"
+            element={
+              <ProtectedRoute>
+                <Help />
               </ProtectedRoute>
             }
           />

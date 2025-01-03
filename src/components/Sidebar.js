@@ -79,7 +79,7 @@ const Sidebar = () => {
             {
               to: '/approvals',
               icon: FaCheckCircle,
-              label: 'Approved Reports (last 30)',
+              label: 'Approved Tasks (last 30)',
             },
           ]}
         />
@@ -91,7 +91,7 @@ const Sidebar = () => {
           title="Knowledge Base"
           links={[
             { to: '/solution-forum', icon: FaBookOpen, label: 'Solution Forum' },
-            { to: '/reports', icon: FaChartBar, label: 'Reports' },
+            { to: '/dashboard', icon: FaChartBar, label: 'Dashboard' },
           ]}
         />
 
@@ -102,7 +102,7 @@ const Sidebar = () => {
           title="Resource Directory"
           links={[
             { to: '/users-directory', icon: FaUsers, label: 'Users' },
-            { to: '/locations', icon: FaMapMarkerAlt, label: 'Locations' },
+            { to: '/locations-directory', icon: FaMapMarkerAlt, label: 'Locations' },
             { to: '/assets', icon: FaBox, label: 'Assets' },
           ]}
         />

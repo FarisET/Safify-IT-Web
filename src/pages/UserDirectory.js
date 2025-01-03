@@ -66,7 +66,7 @@ const UsersDirectory = () => {
         sizes={[15, 85]} // Initial pane sizes (in percentage)
         minSize={150}
         expandToMin={true}
-        gutterSize={10}
+        gutterSize={7}
         gutterAlign="center"
         snapOffset={30}
         dragInterval={1}

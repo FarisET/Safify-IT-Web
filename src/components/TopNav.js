@@ -82,7 +82,7 @@ const TopNav = ({ teams, fetchTeams }) => {
       </div>
 
       <div className="hidden md:flex items-center gap-4 w-[38.2%] justify-end">
-        <span
+        {/* <span
           className="relative cursor-pointer hover:bg-gray-200 p-2 rounded-full transition"
           onClick={toggleNotifications}
         >
@@ -92,13 +92,16 @@ const TopNav = ({ teams, fetchTeams }) => {
               <Notifications />
             </div>
           )}
-        </span>
-        <span className="cursor-pointer hover:bg-gray-200 p-2 rounded-full">
+        </span> */}
+        <span className="cursor-pointer hover:bg-gray-200 p-2 rounded-full"
+                  onClick={() => navigate('/help')}
+
+        >
           <FaQuestionCircle />
         </span>
-        <span className="cursor-pointer hover:bg-gray-200 p-2 rounded-full">
+        {/* <span className="cursor-pointer hover:bg-gray-200 p-2 rounded-full">
           <FaCog />
-        </span>
+        </span> */}
         <div className="bg-green-600 text-white w-8 h-8 flex items-center justify-center rounded-full font-bold">
           FE
         </div>
@@ -148,21 +151,21 @@ const TopNav = ({ teams, fetchTeams }) => {
 </nav>
 
           <div className="mt-auto flex flex-col gap-4">
-            <button
+            {/* <button
               className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded"
               onClick={toggleNotifications}
             >
               <FaBell />
               <span>Notifications</span>
-            </button>
+            </button> */}
             <button className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded">
               <FaQuestionCircle />
               <span>Help</span>
             </button>
-            <button className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded">
+            {/* <button className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded">
               <FaCog />
               <span>Settings</span>
-            </button>
+            </button> */}
           </div>
         </div>
       )}
