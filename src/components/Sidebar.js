@@ -19,13 +19,23 @@ import useLogout from '../services/logout';
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(true); // Default state is now collapsed
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   // Use the custom hook inside the component
   const logout = useLogout();
 
   const handleLogout = async () => {
-    await logout(); // Call the logout function from the custom hook
+    setLogoutLoading(true);
+    await logout();
+    setLogoutLoading(false);
   };
+
+  const onCloseLogoutModal = async () => {
+    setLogoutLoading(false);
+    setShowLogoutConfirm(false)
+  };
+
+
 
   return (
     <>
@@ -128,11 +138,15 @@ const Sidebar = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded shadow-lg">
             <h3 className="text-lg font-semibold mb-2">Confirm Logout</h3>
+
             <p>Are you sure you want to logout?</p>
+
+            {logoutLoading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => setShowLogoutConfirm(false)}
-                className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-sky-200 transition"
+                onClick={() => onCloseLogoutModal()}
+                className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-sky-200 transition"
               >
                 Cancel
               </button>
