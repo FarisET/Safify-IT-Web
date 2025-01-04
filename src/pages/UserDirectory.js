@@ -58,6 +58,66 @@ const UsersDirectory = () => {
     fetchUsers();
   }, []);
 
+  // Add User
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    password: "",
+    role: "user",
+    email:""
+  });
+  const [addError, setAddError] = useState("");
+  const [isAddLoading, setisAddLoading] = useState("");
+  const [isAddSuccess, setisAddSuccess] = useState("");
+  const [email, setEmail] = useState("");
+
+
+  const handleOpenModal = () => {
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsAddModalOpen(false);
+    setFormData({ name: "", password: "", role: "user", email: "" });
+    setAddError("");
+    setisAddLoading(false);
+    setisAddSuccess("");
+  };
+
+  // Handle form submission
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    const { name, password, role, email } = formData;
+
+    if (!name || !role) {
+      setAddError("Name and Role are required.");
+      return;
+    }
+
+    try {
+      setisAddLoading(true);
+      const jwtToken = sessionStorage.getItem("jwt");
+      await axios.post(
+        "http://localhost:3001/admin/dashboard/createUser",
+        {
+          user_name: name,
+          user_pass: password,
+          role_name: role,
+          user_id: email,
+        },
+        {
+          headers: { Authorization: `Bearer ${jwtToken}` },
+        }
+      );
+      fetchUsers();
+      handleCloseModal();
+    } catch (error) {
+      setAddError("Failed to create user. Please try again.");
+    } finally {
+      setisAddLoading(false);
+    }
+  };
+
   return (
     <div className="h-screen overflow-hidden border-x bg-gray-100">
       {/* Using Split for resizable panes */}
@@ -73,16 +133,15 @@ const UsersDirectory = () => {
       >
         {/* Left Pane: Role Types */}
         <div className="h-screen border-r border-gray-200 bg-white overflow-y-auto">
-        <h2 className="text-lg font-semibold p-4 border-b">User Types</h2>
+          <h2 className="text-lg font-semibold p-4 border-b">User Types</h2>
           <ul className="p-4 space-y-2">
             {["admin", "user", "action team"].map((role) => (
               <li
                 key={role}
-                className={`px-3 py-1 rounded flex items-center justify-between gap-2 cursor-pointer transition ${
-                  selectedRole === role
-                    ? "bg-gray-100 shadow"
-                    : "bg-white hover:bg-gray-100"
-                }`}
+                className={`px-3 py-1 rounded flex items-center justify-between gap-2 cursor-pointer transition ${selectedRole === role
+                  ? "bg-gray-100 shadow"
+                  : "bg-white hover:bg-gray-100"
+                  }`}
                 onClick={() => handleRoleChange(role)}
               >
                 {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -107,7 +166,10 @@ const UsersDirectory = () => {
               className="border rounded px-4 py-2 w-1/3"
             />
             {/* Add User Button */}
-            <button className="px-3 py-1 bg-gray-100 text-md text-gray-700 font-semibold rounded hover:bg-emerald-200 transition">
+            <button
+              onClick={handleOpenModal}
+
+              className="px-3 py-1 bg-gray-100 text-md text-gray-700 font-semibold rounded hover:bg-emerald-200 transition">
               Add +
             </button>
           </div>
@@ -173,6 +235,87 @@ const UsersDirectory = () => {
           </div>
         </div>
       </Split>
+
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded shadow-md w-1/3">
+            <h2 className="text-lg font-semibold mb-4">Add New User</h2>
+
+            {isAddLoading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+            {isAddSuccess && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{isAddSuccess}</p>}
+            {addError && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{addError}</p>}
+
+            <form onSubmit={handleFormSubmit}>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">User Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  className="border rounded px-4 py-2 w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">Email</label>
+                <input
+                  type="text"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="border rounded px-4 py-2 w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">Password (Optional)</label>
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className="border rounded px-4 py-2 w-full"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">Role</label>
+                <select
+                  value={formData.role}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value })
+                  }
+                  className="border rounded px-4 py-2 w-full"
+                  required
+                >
+                  <option value="admin">Admin</option>
+                  <option value="user">User</option>
+                  <option value="action_team">Action Team</option>
+                </select>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                >
+                  Add User
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

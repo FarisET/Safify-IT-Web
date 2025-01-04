@@ -482,7 +482,7 @@ const LocationsDirectory = () => {
         <div className="h-screen overflow-hidden border-x bg-gray-100">
             <Split
                 className="flex"
-                sizes={[25, 75]}
+                sizes={[15, 85]}
                 minSize={150}
                 expandToMin={true}
                 gutterSize={7}
@@ -660,7 +660,7 @@ const LocationsDirectory = () => {
                                     value={locName}
                                     onChange={(e) => setLocName(e.target.value)}
                                     className="m-1 block w-full rounded-md border-b borequiredrder-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
-
+                                    required
                                 />
                             </label>
 
@@ -710,7 +710,7 @@ const LocationsDirectory = () => {
                                     value={subLocName}
                                     onChange={(e) => setSubLocName(e.target.value)}
                                     className="m-1 block w-full rounded-md border-b borequiredrder-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
-
+                                    required
                                 />
                             </label>
 
@@ -762,7 +762,7 @@ const LocationsDirectory = () => {
                                     value={newlocName}
                                     onChange={(e) => setnewlocName(e.target.value)}
                                     className="m-1 block w-full rounded-md border-b borequiredrder-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
-
+                                    required
                                 />
                             </label>
 
@@ -813,7 +813,7 @@ const LocationsDirectory = () => {
                                     value={newSubLocName}
                                     onChange={(e) => setnewSubLocName(e.target.value)}
                                     className="m-1 block w-full rounded-md border-b borequiredrder-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
-
+                                    required
                                 />
                             </label>
 
@@ -907,7 +907,7 @@ const LocationsDirectory = () => {
                         <h2 className="text-xl font-semibold mb-4">Delete Sub Location</h2>
                         <p className="text-md mb-4">
                             Are you sure you want to delete sub location:
-                            <span className="font-semibold"> {selectedLocation.location_name}</span>
+                            <span className="font-semibold"> {selectedSubLocation.sub_location_name}</span>
                         </p>
                         <form className="space-y-4">
                             {deleteSubLocloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
