@@ -106,7 +106,8 @@ const UsersDirectory = () => {
           user_id: email,
         },
         {
-          headers: { Authorization: `Bearer ${jwtToken}` },
+          headers: { 
+            Authorization: `Bearer ${jwtToken}` },
         }
       );
       fetchUsers();

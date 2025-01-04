@@ -171,6 +171,23 @@ const Incidents = () => {
   if (loading) return <div className="text-center py-8">Loading...</div>;
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
 
+  //Ticket Escalate
+  // const [isModalVisible, setIsModalVisible] = useState(false);
+  // const [selectedTicket, setSelectedTicket] = useState(null);
+  // const [comment, setComment] = useState('');
+
+  // const showModal = (ticket) => {
+  //   setSelectedTicket(ticket);
+  //   setIsModalVisible(true);
+  // };
+
+  // const handleCancel = () => {
+  //   setIsModalVisible(false);
+  //   setComment('');
+  // };
+
+  
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-semibold mb-4 text-left">Tickets</h2>
@@ -329,7 +346,7 @@ const Incidents = () => {
               </td>
 
               <td className="px-4 py-2 border-b font-semibold">
-                {new Date(report.dateTime).toLocaleDateString('en-GB')}
+                {report.dateTime ? formatDistanceToNow(new Date(report.dateTime), { addSuffix: true }) : <span className="text-gray-700 font-bold">X</span>}
               </td>
             </tr>
           ))}

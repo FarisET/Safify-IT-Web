@@ -24,7 +24,13 @@ const LoginPage = () => {
         user_id: userId,
         user_pass: password,
         device_token: deviceToken
-      });
+      },
+        {
+          headers: {
+            'x-clientType': 'webapp',
+          },
+        }
+      );
 
       const { status, token, error: responseError } = response.data;
 

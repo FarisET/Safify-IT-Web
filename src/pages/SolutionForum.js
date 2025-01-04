@@ -92,12 +92,16 @@ const SolutionForum = () => {
             <th className="px-4 py-2 border-b">Reported Time</th>
             <th className="px-4 py-2 border-b flex items-center">
               Steps
-              <span className="ml-2 relative group">
-                <FaQuestionCircle className="fas fa-question-circle text-gray-500 text-sm hover:text-sky-500 cursor-pointer"/>
-                <div className="absolute right-0 mt-2 w-64 p-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                  Steps taken by the investigator to solve the issue
-                </div>
+              <span className="ml-2 relative">
+                <label className="group inline-block">
+                  <FaQuestionCircle className="fas fa-question-circle text-gray-500 text-sm hover:text-sky-500 cursor-pointer" />
+                  <div className="absolute right-0 mt-2 w-64 p-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    Steps taken by the investigator to solve the issue
+                  </div>
+                </label>
               </span>
+
+
             </th>
           </tr>
         </thead>
