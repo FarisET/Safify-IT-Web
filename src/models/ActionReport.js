@@ -13,7 +13,7 @@ class ActionReport {
       this.reportedBy = data['reported_by'];
       this.surroundingImage = data['surrounding_image'];
       this.proofImage = data['proof_image'];
-      this.dateTime = data['date_time'];
+      this.dateTime = data['atr.date_time'];
       this.status = data['status'];
       this.incidentSubtypeDescription = data['incident_subtype_description'];
       this.assetName = data['asset_name'];
