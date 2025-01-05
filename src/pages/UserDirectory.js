@@ -64,7 +64,7 @@ const UsersDirectory = () => {
     name: "",
     password: "",
     role: "user",
-    email:""
+    email: ""
   });
   const [addError, setAddError] = useState("");
   const [isAddLoading, setisAddLoading] = useState("");
@@ -106,8 +106,9 @@ const UsersDirectory = () => {
           user_id: email,
         },
         {
-          headers: { 
-            Authorization: `Bearer ${jwtToken}` },
+          headers: {
+            Authorization: `Bearer ${jwtToken}`
+          },
         }
       );
       fetchUsers();
@@ -118,6 +119,73 @@ const UsersDirectory = () => {
       setisAddLoading(false);
     }
   };
+
+  // DELETE USER
+  const [DeleteUserModalOpen, setDeleteUserModalOpen] = useState(false);
+  const [DeleteUsermodalMessage, setDeleteUserModalMessage] = useState(null);
+  const [DeleteUserloading, setDeleteUserLoading] = useState(false);
+  const [deleteUserInput, setDeleteUserInput] = useState("");
+  const [userId, setuserId] = useState("");
+  const [DeletUserError, setDeleteUserError] = useState(null);
+
+
+
+  const onCloseDeleteUser = () => {
+    setDeleteUserModalMessage('')
+    setDeleteUserModalOpen(false);
+    setDeleteUserError('');
+    setDeleteUserInput('');
+  }
+
+
+
+
+  const handleDeleteUserSubmit = async () => {
+    setDeleteUserLoading(true);
+    setDeleteUserModalMessage('')
+    setDeleteUserError('');
+
+    try {
+      const jwtToken = sessionStorage.getItem('jwt');
+      const response = await axios.delete(
+        `http://localhost:3001/admin/dashboard/deleteUser/${userId}`,
+
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setDeleteUserModalMessage("User deleted successfully!");
+      setTimeout(() => {
+        setDeleteUserLoading(false);
+        setDeleteUserModalOpen(false);
+        setDeleteUserModalMessage('');
+        setDeleteUserError('');
+        setDeleteUserInput('');
+        fetchUsers();
+      }, 2000);
+
+    } catch (error) {
+      if (error.response && error.response.data.error) {
+        setDeleteUserError(error.response.data.error);
+      } else {
+        setDeleteUserError("Failed to delete user. Please try again.");
+      }
+    } finally {
+      setDeleteUserLoading(false);
+    }
+
+  }
+
+  const handleDeleteUserClick = (user_id) => {
+    setuserId(user_id);
+    setDeleteUserModalOpen(true);
+  };
+
+  //----------------X------------------
 
   return (
     <div className="h-screen overflow-hidden border-x bg-gray-100">
@@ -221,7 +289,7 @@ const UsersDirectory = () => {
                           <FaEdit className="text-sm" />
                         </button>
                         <button
-                          onClick={() => console.log("Delete user", user.id)}
+                          onClick={() => handleDeleteUserClick(user.id)}
                           className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
                         >
                           <span>Disable</span>
@@ -316,6 +384,75 @@ const UsersDirectory = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Asset Type Modal */}
+      {DeleteUserModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Disable User</h2>
+            <div className="space-y-2 mb-4">
+              <p className="text-md">
+                Are you sure you want to disable user:
+                <span className="font-semibold"> {userId}</span>
+              </p>
+              <p className="text-sm text-red-600 font-semibold">
+                Warning: All assets assigned to this user will be forcibly
+                unassigned.
+              </p>
+
+            </div>
+
+
+            <form className="space-y-4">
+              {DeleteUserloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+              {DeleteUsermodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{DeleteUsermodalMessage}</p>}
+              {DeletUserError && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{DeletUserError}</p>}
+
+              {/* Input Field for Confirmation */}
+              <div>
+                <label htmlFor="delete-confirm" className="block text-gray-700">
+                  Type <strong className='text-red-500 font-semibold'>DISABLE</strong> to confirm:
+                </label>
+                <input
+                  type="text"
+                  id="delete-confirm"
+                  value={deleteUserInput}
+                  onChange={(e) => setDeleteUserInput(e.target.value)}
+                  className="w-full border p-2 rounded mt-2"
+                  placeholder="DISABLE"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => onCloseDeleteUser()}
+                  className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                >
+                  No
+                </button>
+                {deleteUserInput === "DISABLE" && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteUserSubmit}
+                    disabled={DeleteUserloading}
+                    className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${DeleteUserloading
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-gray-100 hover:bg-emerald-200"
+                      }`}
+                  >
+                    Yes
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+
+
 
     </div>
   );

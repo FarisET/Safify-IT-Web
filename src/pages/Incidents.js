@@ -349,6 +349,7 @@ const Incidents = () => {
                 {report.dateTime ? formatDistanceToNow(new Date(report.dateTime), { addSuffix: true }) : <span className="text-gray-700 font-bold">X</span>}
               </td>
             </tr>
+            
           ))}
         </tbody>
 
