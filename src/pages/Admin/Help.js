@@ -97,7 +97,7 @@ const Help = () => {
         className="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition focus:outline-none focus:ring focus:ring-blue-300"
         aria-label="Back to top"
       >
-        <FaArrowUp size={20} />
+        <FaArrowUp size={20} className='text-black'/>
       </button>
     </div>
   );

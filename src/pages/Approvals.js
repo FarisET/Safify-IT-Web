@@ -200,7 +200,7 @@ const Approvals = () => {
                   {report.status}
                 </span>
               </td>
-<td className="px-4 py-2 border-b font-semibold">
+              <td className="px-4 py-2 border-b font-semibold">
                 {report.dateTime
                   ? formatDate(report.dateTime).date // Display formatted date
                   : <span className="text-gray-700 font-bold">X</span>}
@@ -208,8 +208,8 @@ const Approvals = () => {
               <td className="px-4 py-2 border-b font-semibold">
                 {report.dateTime ? (
                   <>
-                    {formatDate(report.dateTime).time}{' '}
-                    {/* <p className="text-[0.7rem] font-semibold align-top">({formatDate(report.dateTime).period})</p> */}
+                    {formatDate(report.dateTime).time.split(' ')[0]}
+                    <span className="text-[0.7rem] font-semibold align-top">({formatDate(report.dateTime).period})</span>
                   </>
                 ) : (
                   <span className="text-gray-700 font-bold">X</span>

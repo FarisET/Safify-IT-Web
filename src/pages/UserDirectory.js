@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaIdCard, FaMailBulk, FaTrash } from "react-icons/fa";
 import Split from "react-split";
+import { Modal, Input, Button } from 'antd';
+
 
 const UsersDirectory = () => {
   const [users, setUsers] = useState([]);
@@ -84,7 +86,6 @@ const UsersDirectory = () => {
     setisAddSuccess("");
   };
 
-  // Handle form submission
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const { name, password, role, email } = formData;
@@ -140,7 +141,8 @@ const UsersDirectory = () => {
 
 
 
-  const handleDeleteUserSubmit = async () => {
+  const handleDeleteUserSubmit = async (e) => {
+    e.preventDefault();
     setDeleteUserLoading(true);
     setDeleteUserModalMessage('')
     setDeleteUserError('');
@@ -186,6 +188,100 @@ const UsersDirectory = () => {
   };
 
   //----------------X------------------
+
+  const [editUserModalOpen, setEditUserModalOpen] = useState(false);
+  const [editUserModalMessage, setEditUserModalMessage] = useState(null);
+  const [editUserLoading, setEditUserLoading] = useState(false);
+  const [editUserInput, setEditUserInput] = useState({ userId: "", userName: "", roleName: "" });
+  const [editUserError, setEditUserError] = useState(null);
+
+  const handleEditUser = async (e) => {
+    e.preventDefault();
+    setEditUserLoading(true);
+    try {
+      const jwtToken = sessionStorage.getItem('jwt');
+
+      const response = await axios.put(
+        'http://localhost:3001/admin/dashboard/updateUser',
+        {
+          user_id: editUserInput.userId,
+          user_name: editUserInput.userName,
+          role_name: editUserInput.roleName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+
+      setEditUserModalMessage("User updated successfully");
+      fetchUsers();
+      handleCloseEditUserModal();
+    } catch (error) {
+      // Set error message
+      setEditUserError("Failed to update user. Please try again.");
+    } finally {
+      // Stop the loading spinner
+      setEditUserLoading(false);
+    }
+  };
+
+
+  const handleCloseEditUserModal = (e) => {
+    e.preventDefault();
+    setEditUserModalOpen(false);
+    setEditUserInput({ userId: "", userName: "", roleName: "" });
+    setEditUserError(null);
+    setEditUserModalMessage('');
+  };
+
+  //Update User ID
+  const [changeEmailModalOpen, setChangeEmailModalOpen] = useState(false);
+  const [changeEmailInput, setChangeEmailInput] = useState({ userId: "", newEmail: "" });
+  const [changeEmailLoading, setChangeEmailLoading] = useState(false);
+  const [changeEmailError, setChangeEmailError] = useState(null);
+  const [changeEmailMessage, setChangeEmailMessage] = useState(null);
+
+  const handleChangeEmail = async (e) => {
+    e.preventDefault();
+    if (changeEmailInput.userId == changeEmailInput.newEmail) {
+      setChangeEmailError("New email cannot be the same as the old email.");
+      return;
+    }
+
+    setChangeEmailLoading(true);
+    try {
+      const jwtToken = sessionStorage.getItem('jwt');
+      const response = await axios.put(
+        'http://localhost:3001/admin/dashboard/updateUserID',
+        {
+          user_id_old: changeEmailInput.userId,
+          user_id_new: changeEmailInput.newEmail,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+      setChangeEmailMessage("Email updated successfully");
+      fetchUsers();
+      handleCloseChangeEmailModal();
+    } catch (error) {
+      setChangeEmailError("Failed to update email. Please try again.");
+    } finally {
+      setChangeEmailLoading(false);
+    }
+  };
+
+  const handleCloseChangeEmailModal = () => {
+    setChangeEmailModalOpen(false);
+    setChangeEmailInput({ userId: "", newEmail: "" });
+    setChangeEmailError(null);
+  };
+
+
 
   return (
     <div className="h-screen overflow-hidden border-x bg-gray-100">
@@ -282,7 +378,22 @@ const UsersDirectory = () => {
                       </td>
                       <td className="px-6 py-3 border-b flex justify-end space-x-2">
                         <button
-                          onClick={() => console.log("Edit user", user.id)}
+                          onClick={() => {
+                            setChangeEmailInput({ userId: user.id, newEmail: "" });
+                            setChangeEmailModalOpen(true);
+                          }
+                          }
+                          className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition whitespace-nowrap"
+                        >
+                          <span>Change email</span>
+                          <FaIdCard className="text-sm" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditUserInput({ userId: user.id, userName: user.name, roleName: user.role });
+                            setEditUserModalOpen(true);
+
+                          }}
                           className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
                         >
                           <span>Edit</span>
@@ -451,8 +562,115 @@ const UsersDirectory = () => {
         </div>
       )}
 
+      {editUserModalOpen && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded shadow-md w-1/3">
+            <h2 className="text-lg font-semibold mb-4">Edit User</h2>
+
+            {editUserLoading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+            {editUserModalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{editUserModalMessage}</p>}
+            {editUserError && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{editUserError}</p>}
+
+            <form onSubmit={handleEditUser}>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">New Username</label>
+                <input
+                  type="text"
+                  value={editUserInput.userName}
+                  onChange={(e) => setEditUserInput({ ...editUserInput, userName: e.target.value })
+                  }
+                  className="border rounded px-4 py-2 w-full"
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">Role</label>
+                <select
+                  value={editUserInput.roleName}
+                  onChange={(e) => setEditUserInput({ ...editUserInput, roleName: e.target.value })}
+                  className="border rounded px-4 py-2 w-full"
+                  required
+                >
+                  <option value="admin">Admin</option>
+                  <option value="user">User</option>
+                  <option value="action team">Action Team</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={handleCloseEditUserModal}
+                  className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                >
+                  Edit User
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {changeEmailModalOpen && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded shadow-md w-1/3">
+            <h2 className="text-lg font-semibold mb-4">Change Email</h2>
+
+            {changeEmailLoading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+            {changeEmailMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{changeEmailMessage}</p>}
+            {changeEmailError && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{changeEmailError}</p>}
+
+            <form onSubmit={handleChangeEmail}>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">Old Email</label>
+                <input
+                  type="text"
+                  value={changeEmailInput.userId}
+                  onChange={(e) => setChangeEmailInput({ ...changeEmailInput, userId: e.target.value })}
+                  className="border rounded px-4 py-2 w-full bg-gray-200 text-gray-700 cursor-not-allowed"
+                  readOnly
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">New Email</label>
+                <input
+                  type="text"
+                  value={changeEmailInput.newEmail}
+                  onChange={(e) => setChangeEmailInput({ ...changeEmailInput, newEmail: e.target.value })
+                  }
+                  className="border rounded px-4 py-2 w-full"
+                  required
+                />
+              </div>
 
 
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={handleCloseChangeEmailModal}
+                  className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                >
+                  Change Email
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

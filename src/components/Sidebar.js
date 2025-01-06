@@ -120,7 +120,8 @@ const Sidebar = () => {
 
 
         {/* Logout Button */}
-        <div className="fixed bottom-0 px-3"> {/* Add bottom margin */}
+        <div className={`fixed ${isCollapsed ? 'bottom-8' : 'bottom-0'} px-3`}>
+
           <button
             onClick={() => setShowLogoutConfirm(true)}
             className="flex items-center gap-2 text-red-600 p-2 rounded hover:text-gray-700 transition-all"

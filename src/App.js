@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import LoginPage from './pages/login';
@@ -14,8 +13,11 @@ import LocationsDirectory from './pages/LocationsDirectory';
 import Help from './pages/Admin/Help';
 
 const AppLayout = () => {
+
   const location = useLocation(); // Hook called within a Router context
   const isLoginScreen = location.pathname === "/login";
+  
+
 
   return (
     <div className="flex h-screen">
@@ -26,7 +28,7 @@ const AppLayout = () => {
       {/* Page Content */}
       <div className={`flex-1 ${isLoginScreen ? "" : "mt-12 p-4 ml-12"}`}>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage/>} />
           <Route
             path="/incidents"
             element={

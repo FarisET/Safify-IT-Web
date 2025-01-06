@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -50,6 +50,8 @@ const LoginPage = () => {
         sessionStorage.setItem('deviceToken', deviceToken);
         sessionStorage.setItem('userName', userName);
         sessionStorage.setItem('userId', userId);
+
+        localStorage.setItem('jwtToken', token);
 
         navigate('/incidents');
       } else if (response.status === 401) {
