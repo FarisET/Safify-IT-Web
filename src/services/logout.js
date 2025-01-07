@@ -15,6 +15,8 @@ const useLogout = () => {
 
       if (response.ok) {
         sessionStorage.clear();
+        localStorage.clear();
+
         navigate('/login');
       } else {
         const errorData = await response.json();

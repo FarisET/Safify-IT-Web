@@ -11,16 +11,40 @@ import SolutionForum from './pages/SolutionForum';
 import UsersDirectory from './pages/UserDirectory';
 import LocationsDirectory from './pages/LocationsDirectory';
 import Help from './pages/Admin/Help';
+import useTokenMonitor from './hooks/useTokenMoniter';
+import { useNavigate } from 'react-router-dom';
+import useLogout from './services/logout';
+import Modal from './components/SessionModal';
+import { useState } from 'react';
 
 const AppLayout = () => {
-
   const location = useLocation(); // Hook called within a Router context
   const isLoginScreen = location.pathname === "/login";
-  
+  const navigate = useNavigate();
+  const logout = useLogout(); // Call the hook, do not invoke it
+  const [logoutLoading, setLogoutLoading] = useState(false);
+  const { showModal, setShowModal } = useTokenMonitor(logout);
+
+  const handleModalClose = async () => {
+    setLogoutLoading(true);
+    await logout(); // Logout handles navigation to /login
+    setLogoutLoading(false);
+    setShowModal(false);
+  };
+
+
 
 
   return (
+
     <div className="flex h-screen">
+      {showModal && (
+        <Modal
+          message="Your session has expired."
+          onClose={handleModalClose}
+          loading={logoutLoading}
+        />
+      )}
       {/* Conditionally render Sidebar and TopNavWrapper */}
       {!isLoginScreen && <Sidebar />}
       {!isLoginScreen && <TopNavWrapper />}
@@ -28,7 +52,7 @@ const AppLayout = () => {
       {/* Page Content */}
       <div className={`flex-1 ${isLoginScreen ? "" : "mt-12 p-4 ml-12"}`}>
         <Routes>
-          <Route path="/login" element={<LoginPage/>} />
+          <Route path="/login" element={<LoginPage />} />
           <Route
             path="/incidents"
             element={
@@ -79,7 +103,7 @@ const AppLayout = () => {
             }
           />
 
-<Route
+          <Route
             path="/help"
             element={
               <ProtectedRoute>

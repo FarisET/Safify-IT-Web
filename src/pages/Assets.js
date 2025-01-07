@@ -271,7 +271,7 @@ const Assets = () => {
     const [assetDetails, setAssetDetails] = useState(null);
     const [ticketHistory, setTicketHistory] = useState([]);
     const [AssetHistory, setAssetHistory] = useState([]);
-    const [activeTab, setActiveTab] = useState('Ticket History'); // Default tab
+    const [activeTab, setActiveTab] = useState('Asset History'); // Default tab
     const [searchTerm, setSearchTerm] = useState("");
 
     // Filter assets based on the search term
