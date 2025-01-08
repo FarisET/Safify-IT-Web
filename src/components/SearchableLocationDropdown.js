@@ -6,9 +6,10 @@ const SearchableDropdown = ({ options, selectedValue, onChange }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const filteredOptions = options.filter((option) =>
+    option.sub_location_name &&
     option.sub_location_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  
   const selectedOption = options.find(
     (opt) => opt.sub_location_id === selectedValue
   );

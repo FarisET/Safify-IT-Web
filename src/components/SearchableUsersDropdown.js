@@ -6,6 +6,7 @@ const AssignToDropdown = ({ options, selectedValue, onChange }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const filteredOptions = options.filter((option) =>
+    option.name &&
     option.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
