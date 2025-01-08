@@ -3,6 +3,7 @@ import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import Report from '../../models/UserReport';  // Adjust path as necessary
 import { FaUser, FaTrash, FaArrowRight, FaImage } from 'react-icons/fa';
+import { formatDate } from '../../utils/date';
 
 const Incidents = () => {
   const [userReports, setUserReports] = useState([]);
@@ -10,6 +11,7 @@ const Incidents = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [critFilter, setcritFilter] = useState('All');
   const [requestTypeFilter, setRequestTypeFilter] = useState('All');
   const [selectedReports, setSelectedReports] = useState([]); // State to track selected rows
   const [selectedImage, setSelectedImage] = useState(null); // State to handle modal image
@@ -160,20 +162,45 @@ const Incidents = () => {
       || (report.status && report.status.toLowerCase().includes(searchTerm.toLowerCase()))
       || (formatDistanceToNow(new Date(report.dateTime), { addSuffix: true }) && formatDistanceToNow(new Date(report.dateTime), { addSuffix: true }).toLowerCase().includes(searchTerm.toLowerCase()))
       || (report.incidentCriticalityLevel && report.incidentCriticalityLevel.toLowerCase().includes(searchTerm.toLowerCase()))
-      || (report.userReportId==searchTerm)
+      || (report.userReportId == searchTerm)
     )
     .filter(report => (statusFilter === 'All' || report.status.toLowerCase() === statusFilter.toLowerCase()))
+    .filter(report => (critFilter === 'All' || report.incidentCriticalityLevel.toLowerCase() === critFilter.toLowerCase()));
+
 
   useEffect(() => {
-  }, [searchTerm, statusFilter, requestTypeFilter, userReports]);
+  }, [searchTerm, statusFilter, critFilter, requestTypeFilter, userReports]);
 
 
-  if (loading) return <div className="text-center py-8">Loading...</div>;
+  if (loading) return <div className="text-center py-8">
+            <div className="fixed inset-0 flex items-center justify-center">
+          <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-16 h-16 animate-spin"></div>
+        </div>
+
+  </div>;
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
+
+  //Ticket Escalate
+  // const [isModalVisible, setIsModalVisible] = useState(false);
+  // const [selectedTicket, setSelectedTicket] = useState(null);
+  // const [comment, setComment] = useState('');
+
+  // const showModal = (ticket) => {
+  //   setSelectedTicket(ticket);
+  //   setIsModalVisible(true);
+  // };
+
+  // const handleCancel = () => {
+  //   setIsModalVisible(false);
+  //   setComment('');
+  // };
+
+
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-semibold mb-4 text-left">Tickets</h2>
+
 
       <div className="flex items-center justify-between mb-4">
         {/* Search and Filter Section */}
@@ -186,20 +213,43 @@ const Incidents = () => {
         />
 
 
-        <div className="flex space-x-4">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="font-semibold text-gray-700 rounded px-2 py-2 border"
-          >
-            <option value="All">All</option>
-            <option value="Open">Open</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
 
-          </select>
+        <div className="flex space-x-4 items-center">
+          {/* Criticality Dropdown */}
+          <div className="flex flex-col space-y-1">
+            <label htmlFor="criticality" className="text-sm font-medium text-gray-600">Criticality</label>
+            <select
+              id="criticality"
+              value={critFilter}
+              onChange={(e) => setcritFilter(e.target.value)}
+              className="font-semibold text-gray-700 rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="All">All</option>
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
 
+          {/* Status Dropdown */}
+          <div className="flex flex-col space-y-1">
+            <label htmlFor="status" className="text-sm font-medium text-gray-600">Status</label>
+            <select
+              id="status"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="font-semibold text-gray-700 rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="All">All</option>
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
         </div>
+
+
+
       </div>
 
       <div className="mb-4 text-gray-700">{filteredReports.length} ticket{filteredReports.length !== 1 ? 's' : ''}</div>
@@ -240,7 +290,9 @@ const Incidents = () => {
             <th className="px-4 py-2 border-b">Assignee</th>
             <th className="px-4 py-2 border-b">Image</th>
             <th className="px-4 py-2 border-b">Status</th>
-            <th className="px-4 py-2 border-b">Created</th>
+            <th className="px-4 py-2 border-b">Date</th>
+            <th className="px-4 py-2 border-b">Time</th>
+
             {/* <th className="px-4 py-2 border-b">Urgency</th> */}
           </tr>
         </thead>
@@ -329,9 +381,27 @@ const Incidents = () => {
               </td>
 
               <td className="px-4 py-2 border-b font-semibold">
-                {new Date(report.dateTime).toLocaleDateString('en-GB')}
+                {report.dateTime
+                  ? formatDate(report.dateTime).date // Display formatted date
+                  : <span className="text-gray-700 font-bold">X</span>}
               </td>
+              <td className="px-4 py-2 border-b font-semibold">
+                {report.dateTime ? (
+                  <>
+                    {formatDate(report.dateTime).time}{' '}
+                    <span className="text-[0.7rem] font-semibold align-top">({formatDate(report.dateTime).period})</span>
+                  </>
+                ) : (
+                  <span className="text-gray-700 font-bold">X</span>
+                )}
+              </td>
+
+
+
+
+
             </tr>
+
           ))}
         </tbody>
 

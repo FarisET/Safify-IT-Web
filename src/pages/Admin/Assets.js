@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { FaUser, FaTrash, FaArrowRight, FaImage, FaEdit, FaEllipsisV, FaRecycle } from 'react-icons/fa';
 import LocationDropdown from "../../components/SearchableLocationDropdown";
 import AssignToDropdown from "../../components/SearchableUsersDropdown";
+import Split from "react-split";
 
 
 const Assets = () => {
@@ -270,7 +271,7 @@ const Assets = () => {
     const [assetDetails, setAssetDetails] = useState(null);
     const [ticketHistory, setTicketHistory] = useState([]);
     const [AssetHistory, setAssetHistory] = useState([]);
-    const [activeTab, setActiveTab] = useState('Ticket History'); // Default tab
+    const [activeTab, setActiveTab] = useState('Asset History'); // Default tab
     const [searchTerm, setSearchTerm] = useState("");
 
     // Filter assets based on the search term
@@ -713,7 +714,7 @@ const Assets = () => {
         try {
             const jwtToken = sessionStorage.getItem("jwt");
             const response = await axios.get(
-                "http://localhost:3001/helper/getLocationsAndSubLocations",
+                "http://localhost:3001/admin/dashboard/getLocationsAndSubLocationsAdmin",
                 {
                     headers: { Authorization: `Bearer ${jwtToken}` },
                 }
@@ -994,410 +995,427 @@ const Assets = () => {
 
 
     return (
-        <div className="flex">
-            <div className="w-1/6 overflow-auto border-x">
-                <div className="flex justify-between items-center p-4 border-b bg-white">
-                    <h2 className="text-lg font-semibold">Asset Types</h2>
-                    <button
-                        type="button"
-                        className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
-                        onClick={() => setaddTypeModalOpen(true)}
-                    >
-                        Add +
-                    </button>
-                </div>
-                <ul className="p-4 space-y-2 overflow-y-auto"
-                    style={{
-                        maxHeight: '80vh',
-                    }}>                    {assetTypes.map((type) => (
-                        <li
-                            key={type.assetTypeId}
-                            className={`px-3 py-1 rounded flex items-center justify-between gap-2 cursor-pointer transition ${selectedAssetTypeId === type.assetTypeId ? "bg-gray-100 shadow" : "bg-white hover:bg-gray-100"
-                                }`}
-                            onClick={() => setSelectedAssetTypeId(type.assetTypeId)}
+        <div className="bg-gray-100">
+            <Split
+                className="flex"
+                sizes={[15, 25, 60]} // Adjust pane sizes
+                minSize={150}
+                expandToMin={true}
+                gutterSize={7}
+                gutterAlign="center"
+                snapOffset={30}
+                dragInterval={1}
+                gutter={(index, direction) => {
+                    const gutter = document.createElement('div');
+                    gutter.className = `gutter ${direction === 'horizontal' ? 'cursor-ew-resize' : 'cursor-ns-resize'}`;
+                    return gutter;
+                  }}
+                
+            >
+                <div className="h-screen border-r border-gray-200 overflow-auto border-x bg-white">
+                    <div className=" flex justify-between items-center p-4 border-b bg-white">
+                        <h2 className="text-lg font-semibold">Asset Types</h2>
+                        <button
+                            type="button"
+                            className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                            onClick={() => setaddTypeModalOpen(true)}
                         >
-                            {/* Asset Type Details */}
-                            <div>
-                                <p className="text-sm font-medium">
-                                    {type.assetTypeDesc}
-                                    <span className="text-sm text-gray-500"> ({type.assets.length})</span>
-                                </p>
-                            </div>
+                            Add +
+                        </button>
+                    </div>
+                    <ul className="p-4 space-y-2 overflow-y-auto"
+                        style={{
+                            maxHeight: '80vh',
+                        }}>                    {assetTypes.map((type) => (
+                            <li
+                                key={type.assetTypeId}
+                                className={`px-3 py-1 rounded flex items-center justify-between gap-2 cursor-pointer transition ${selectedAssetTypeId === type.assetTypeId ? "bg-gray-100 shadow" : "bg-white hover:bg-gray-100"
+                                    }`}
+                                onClick={() => setSelectedAssetTypeId(type.assetTypeId)}
+                            >
+                                {/* Asset Type Details */}
+                                <div>
+                                    <p className="text-sm font-medium">
+                                        {type.assetTypeDesc}
+                                        <span className="text-sm text-gray-500"> ({type.assets.filter(asset => asset.assetNo != null).length})</span>
+                                    </p>
+                                </div>
 
-                            {/* More Options Icon */}
-                            {selectedAssetTypeId === type.assetTypeId && (
-                                <div className="relative">
+                                {/* More Options Icon */}
+                                {selectedAssetTypeId === type.assetTypeId && (
+                                    <div className="relative">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Prevent parent click event
+                                                toggleOptions(type.assetTypeId);
+                                            }}
+                                            className="p-1 transition text-sm text-gray-700"
+                                        >
+                                            <FaEllipsisV />
+                                        </button>
+
+                                        {/* Options Card */}
+                                        {activeOptionsId === type.assetTypeId && (
+                                            <div className="absolute right-0 mt-2 w-20 bg-white shadow-md border rounded-md z-10">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleUpdateTypeClick(type.assetTypeId);
+                                                        setActiveOptionsId(null); // Close menu
+                                                    }}
+                                                    className="block w-full text-center p-1 font-semibold text-sm text-gray-700 hover:bg-gray-100"
+                                                >
+                                                    Rename
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteTypeClick(type.assetTypeId, type.assetTypeDesc);
+                                                        setActiveOptionsId(null); // Close menu
+                                                    }}
+                                                    className="block w-full text-center p-1 font-semibold text-sm text-red-500 hover:bg-red-100"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="h-screen border-x border-gray-200 bg-white overflow-auto">
+                    <div className="flex justify-between items-center p-4 border-b bg-gray-50">
+                        <h2 className="text-lg font-semibold">Assets</h2>
+                        <button
+                            type="button"
+                            className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                            onClick={() => setaddAssetModalOpen(true)}
+                        >
+                            Add +
+                        </button>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="p-4">
+                        <input
+                            type="text"
+                            placeholder="🔍 Search assets..."
+                            className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+
+                    <ul
+                        className="p-4 space-y-2 overflow-y-auto"
+                        style={{
+                            maxHeight: "80vh",
+                        }}
+                    >
+                        {displayedAssets.length > 0 || displayedAssets.assetNo != null ? (
+                            displayedAssets.map((asset) => (
+                                <li
+                                    key={asset.assetNo}
+                                    className={`p-3 border rounded-lg flex items-center gap-3 hover:bg-gray-100 ${selectedAsset?.assetNo === asset.assetNo ? "bg-gray-100" : ""
+                                        }`}
+                                    onClick={() => handleAssetClick(asset)}
+                                >
+                                    <div className="bg-gray-200 text-gray-700 flex items-center justify-center w-10 h-10 rounded-full">
+                                        💻
+                                    </div>
+                                    <div>
+                                        <p className="text-md font-semibold">{asset.assetNo}</p>
+                                        <p className="text-sm">{asset.assetName}</p>
+                                        <p className="text-sm text-gray-500">Issue Count: {asset.assetIssueCount}</p>
+                                    </div>
+                                </li>
+                            ))
+                        ) : (
+                            <p className="text-center text-gray-500">No assets available</p>
+                        )}
+                    </ul>
+                </div>
+
+                <div className="h-screen border-l border-gray-200 bg-white overflow-auto flex flex-col">
+
+                    <span className='bg-gray-50 flex justify-between items-left p-4 border-b bg-white'>
+                        <h2 className="text-lg font-semibold bg-white">Asset Details</h2>
+                        <div className="flex space-x-4">
+                            {assetDetails ? (
+                                <>
+                                    {/* Edit Button */}
                                     <button
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // Prevent parent click event
-                                            toggleOptions(type.assetTypeId);
-                                        }}
-                                        className="p-1 transition text-sm text-gray-700"
+                                        onClick={() => handleEditClick(assetDetails)}
+                                        className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
                                     >
-                                        <FaEllipsisV />
+                                        <span>Edit</span>
+                                        <FaEdit className="text-sm" />
                                     </button>
 
-                                    {/* Options Card */}
-                                    {activeOptionsId === type.assetTypeId && (
-                                        <div className="absolute right-0 mt-2 w-20 bg-white shadow-md border rounded-md z-10">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleUpdateTypeClick(type.assetTypeId);
-                                                    setActiveOptionsId(null); // Close menu
-                                                }}
-                                                className="block w-full text-center p-1 font-semibold text-sm text-gray-700 hover:bg-gray-100"
-                                            >
-                                                Rename
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteTypeClick(type.assetTypeId, type.assetTypeDesc);
-                                                    setActiveOptionsId(null); // Close menu
-                                                }}
-                                                className="block w-full text-center p-1 font-semibold text-sm text-red-500 hover:bg-red-100"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <div className="w-2/6 bg-white overflow-auto">
-                <div className="flex justify-between items-center p-4 border-b border-b bg-gray-50">
-                    <h2 className="text-lg font-semibold">Assets</h2>
-                    <button
-                        type="button"
-                        className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
-                        onClick={() => setaddAssetModalOpen(true)}
-                    >
-                        Add +
-                    </button>
-                </div>
+                                    {/* Dispose Button */}
+                                    {assetDetails.asset_status === 'available' && (
 
-                {/* Search Bar */}
-                <div className="p-4">
-                    <input
-                        type="text"
-                        placeholder="🔍 Search assets..."
-                        className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
+                                        <button
+                                            onClick={() => handleDisposeClick(assetDetails.asset_no)} // Add the appropriate handler function
+                                            className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                        >
+                                            <span>Dispose</span>
+                                            <FaRecycle className="text-sm" />
+                                        </button>)}
 
-                <ul
-                    className="p-4 space-y-2 overflow-y-auto"
-                    style={{
-                        maxHeight: "80vh",
-                    }}
-                >
-                    {displayedAssets.length > 0 ? (
-                        displayedAssets.map((asset) => (
-                            <li
-                                key={asset.assetNo}
-                                className={`p-3 border rounded-lg flex items-center gap-3 hover:bg-gray-100 ${selectedAsset?.assetNo === asset.assetNo ? "bg-gray-100" : ""
-                                    }`}
-                                onClick={() => handleAssetClick(asset)}
-                            >
-                                <div className="bg-gray-200 text-gray-700 flex items-center justify-center w-10 h-10 rounded-full">
-                                    💻
-                                </div>
-                                <div>
-                                    <p className="text-md font-semibold">{asset.assetNo}</p>
-                                    <p className="text-sm">{asset.assetName}</p>
-                                    <p className="text-sm text-gray-500">Issue Count: {asset.assetIssueCount}</p>
-                                </div>
-                            </li>
-                        ))
-                    ) : (
-                        <p className="text-center text-gray-500">No assets available</p>
-                    )}
-                </ul>
-            </div>
-
-            <div className="w-4/6 bg-gray-50 overflow-hidden border-l flex flex-col">
-
-                <span className='flex justify-between items-left p-4 border-b bg-white'>
-                    <h2 className="text-lg font-semibold bg-white">Asset Details</h2>
-                    <div className="flex space-x-4">
-                        {assetDetails ? (
-                            <>
-                                {/* Edit Button */}
-                                <button
-                                    onClick={() => handleEditClick(assetDetails)}
-                                    className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
-                                >
-                                    <span>Edit</span>
-                                    <FaEdit className="text-sm" />
-                                </button>
-
-                                {/* Dispose Button */}
-                                {assetDetails.asset_status === 'available' && (
-
+                                    {/* Delete Button */}
                                     <button
-                                        onClick={() => handleDisposeClick(assetDetails.asset_no)} // Add the appropriate handler function
+                                        onClick={() => handleDeleteClick(assetDetails.asset_no)} // Add the appropriate handler function
                                         className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
                                     >
-                                        <span>Dispose</span>
-                                        <FaRecycle className="text-sm" />
-                                    </button>)}
+                                        <span>Delete</span>
+                                        <FaTrash className="text-sm" />
+                                    </button>
+                                </>
+                            ) : null}
+                        </div>
 
-                                {/* Delete Button */}
-                                <button
-                                    onClick={() => handleDeleteClick(assetDetails.asset_no)} // Add the appropriate handler function
-                                    className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+
+                    </span>
+                    {loading ? (
+                        <p className="p-4 text-gray-500">Loading...</p>
+                    ) : error ? (
+                        <p className="p-4 text-red-500">{error}</p>
+                    ) : assetDetails ? (
+                        <div className="h-screen p-6 bg-white space-y-6">
+
+                            {/* Asset Details Grid */}
+                            <div className="grid grid-cols-2 gap-3">
+                                {/* Asset Number */}
+                                <strong className="text-gray-600 font-semibold text-sm">Asset Number</strong>
+                                <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_no}</span>
+
+                                {/* Asset Name */}
+                                <strong className="text-gray-600 font-semibold text-sm">Asset Name</strong>
+                                <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_name}</span>
+
+                                {/* Description */}
+                                <strong className="text-gray-600 font-semibold text-sm">Description</strong>
+                                <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_desc}</span>
+
+                                {/* Status */}
+                                <strong className="text-gray-600 font-semibold text-sm">Status</strong>
+                                <span
+                                    className={`text-sm font-medium ${assetDetails.asset_status === "available"
+                                        ? "text-emerald-600"
+                                        : assetDetails.asset_status === "under repair"
+                                            ? "text-yellow-600"
+                                            : assetDetails.asset_status === "disposed"
+                                                ? "text-red-600"
+                                                : assetDetails.asset_status === "in use"
+                                                    ? "text-sky-600"
+                                                    : "text-gray-800"
+                                        }`}
+
                                 >
-                                    <span>Delete</span>
-                                    <FaTrash className="text-sm" />
-                                </button>
-                            </>
-                        ) : null}
-                    </div>
-
-
-                </span>
-                {loading ? (
-                    <p className="p-4 text-gray-500">Loading...</p>
-                ) : error ? (
-                    <p className="p-4 text-red-500">{error}</p>
-                ) : assetDetails ? (
-                    <div className="p-6 bg-white rounded-md shadow-md space-y-6">
-
-                        {/* Asset Details Grid */}
-                        <div className="grid grid-cols-2 gap-3">
-                            {/* Asset Number */}
-                            <strong className="text-gray-600 font-semibold text-sm">Asset Number</strong>
-                            <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_no}</span>
-
-                            {/* Asset Name */}
-                            <strong className="text-gray-600 font-semibold text-sm">Asset Name</strong>
-                            <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_name}</span>
-
-                            {/* Description */}
-                            <strong className="text-gray-600 font-semibold text-sm">Description</strong>
-                            <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_desc}</span>
-
-                            {/* Status */}
-                            <strong className="text-gray-600 font-semibold text-sm">Status</strong>
-                            <span
-                                className={`text-sm font-medium ${assetDetails.asset_status === "available"
-                                    ? "text-emerald-600"
-                                    : assetDetails.asset_status === "under repair"
-                                        ? "text-yellow-600"
-                                        : assetDetails.asset_status === "disposed"
-                                            ? "text-red-600"
-                                            : assetDetails.asset_status === "in use"
-                                                ? "text-sky-600"
-                                                : "text-gray-800"
-                                    }`}
-
-                            >
-                                {assetDetails.asset_status.charAt(0).toUpperCase() + assetDetails.asset_status.slice(1)}
-                            </span>
-
-                            {/* Creation Date */}
-                            <strong className="text-gray-600 font-semibold text-sm">Creation Date</strong>
-                            <span className="text-gray-800 text-sm font-medium">
-                                {format(assetDetails.asset_creation_date, "MMM dd, yyyy")}
-                            </span>
-
-                            {/* Assigned To */}
-                            <strong className="text-gray-600 font-semibold text-sm">Assigned To</strong>
-                            <span className="text-gray-800 text-sm font-medium">
-                                {assetDetails.assigned_to}
-
-                                {(assetDetails.asset_status === 'available' && assetDetails.asset_status !== 'disposed') && (
-                                    <button
-                                        onClick={() => handleAssignClick(assetDetails.assigned_to)}
-                                        className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-emerald-200 transition"
-
-                                    >
-                                        Assign
-                                    </button>
-                                )}
-
-                                {assetDetails.asset_status === 'in use' && (
-                                    <button
-                                        // onClick={() => handleUnassign(assetDetails.asset_id)}
-                                        className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-red-200 transition"
-                                        onClick={() => handleUnAssignClick(assetDetails.assigned_to)}
-
-                                    >
-                                        Unassign
-                                    </button>
-                                )}
-                            </span>
-
-                            {/* Location */}
-                            <strong className="text-gray-600 font-semibold text-sm">Location</strong>
-                            <div className="flex items-center space-x-2">
-
-                                <span className="text-gray-800 text-sm font-medium">
-                                    {assetDetails.asset_location} {assetDetails.location_name !== 'unassigned' ? `(${assetDetails.location_name})` : null}
+                                    {assetDetails.asset_status.charAt(0).toUpperCase() + assetDetails.asset_status.slice(1)}
                                 </span>
-                                {(assetDetails.asset_location === 'unassigned' && assetDetails.asset_status !== 'disposed') && (
-                                    <button
-                                        onClick={() => handleAssignToLocClick(assetDetails.location_name)}
-                                        className="px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-emerald-200 transition"
-                                    >
-                                        Assign
-                                    </button>
-                                )}
-                                {assetDetails.asset_location !== 'unassigned' && (
-                                    <button
-                                        // onClick={() => handleUnassign(assetDetails.asset_id)}
-                                        className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-red-200 transition"
-                                        onClick={() => handleUnassignToLocClick(assetDetails.asset_location_id)}
 
-                                    >
-                                        Unassign
-                                    </button>
-                                )}
+                                {/* Creation Date */}
+                                <strong className="text-gray-600 font-semibold text-sm">Creation Date</strong>
+                                <span className="text-gray-800 text-sm font-medium">
+                                    {format(assetDetails.asset_creation_date, "MMM dd, yyyy")}
+                                </span>
+
+                                {/* Assigned To */}
+                                <strong className="text-gray-600 font-semibold text-sm">Assigned To</strong>
+                                <span className="text-gray-800 text-sm font-medium">
+                                    {assetDetails.assigned_to}
+
+                                    {(assetDetails.asset_status === 'available' && assetDetails.asset_status !== 'disposed') && (
+                                        <button
+                                            onClick={() => handleAssignClick(assetDetails.assigned_to)}
+                                            className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-emerald-200 transition"
+
+                                        >
+                                            Assign
+                                        </button>
+                                    )}
+
+                                    {assetDetails.asset_status === 'in use' && (
+                                        <button
+                                            // onClick={() => handleUnassign(assetDetails.asset_id)}
+                                            className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-red-200 transition"
+                                            onClick={() => handleUnAssignClick(assetDetails.assigned_to)}
+
+                                        >
+                                            Unassign
+                                        </button>
+                                    )}
+                                </span>
+
+                                {/* Location */}
+                                <strong className="text-gray-600 font-semibold text-sm">Location</strong>
+                                <div className="flex items-center space-x-2">
+
+                                    <span className="text-gray-800 text-sm font-medium">
+                                        {assetDetails.asset_location} {assetDetails.location_name !== 'unassigned' ? `(${assetDetails.location_name})` : null}
+                                    </span>
+                                    {(assetDetails.asset_location === 'unassigned' && assetDetails.asset_status !== 'disposed') && (
+                                        <button
+                                            onClick={() => handleAssignToLocClick(assetDetails.location_name)}
+                                            className="px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-emerald-200 transition"
+                                        >
+                                            Assign
+                                        </button>
+                                    )}
+                                    {assetDetails.asset_location !== 'unassigned' && (
+                                        <button
+                                            // onClick={() => handleUnassign(assetDetails.asset_id)}
+                                            className="ml-2 px-2 py-1 bg-gray-100 font-semibold text-gray-700 text-xs rounded hover:bg-red-200 transition"
+                                            onClick={() => handleUnassignToLocClick(assetDetails.asset_location_id)}
+
+                                        >
+                                            Unassign
+                                        </button>
+                                    )}
+                                </div>
+                                {/* Is Active */}
+                                <strong className="text-gray-600 font-semibold text-sm">Is Active</strong>
+                                <span className="text-gray-800 text-sm font-medium">
+                                    {assetDetails.is_active ? "Yes" : "No"}
+                                </span>
                             </div>
-                            {/* Is Active */}
-                            <strong className="text-gray-600 font-semibold text-sm">Is Active</strong>
-                            <span className="text-gray-800 text-sm font-medium">
-                                {assetDetails.is_active ? "Yes" : "No"}
-                            </span>
-                        </div>
 
 
-                        {/* Tabs Section */}
-                        <div className="mt-6">
-                            <ul className="flex border-b text-sm font-medium">
-                                <li
-                                    className={`p-3 cursor-pointer transition-all ${activeTab === "Asset History"
-                                        ? "border-b-2 border-blue-500 text-blue-600"
-                                        : "hover:text-blue-600"
-                                        }`}
-                                    onClick={() => setActiveTab("Asset History")}
-                                >
-                                    Asset History
-                                </li>
-                                <li
-                                    className={`p-3 cursor-pointer transition-all ${activeTab === "Ticket History"
-                                        ? "border-b-2 border-blue-500 text-blue-600"
-                                        : "hover:text-blue-600"
-                                        }`}
-                                    onClick={() => setActiveTab("Ticket History")}
-                                >
-                                    Ticket History
-                                </li>
-                            </ul>
+                            {/* Tabs Section */}
+                            <div className="mt-6">
+                                <ul className="flex border-b text-sm font-medium">
+                                    <li
+                                        className={`p-3 cursor-pointer transition-all ${activeTab === "Asset History"
+                                            ? "border-b-2"
+                                            : "hover:text-blue-600"
+                                            }`}
+                                        onClick={() => setActiveTab("Asset History")}
+                                    >
+                                        Asset History
+                                    </li>
+                                    <li
+                                        className={`p-3 cursor-pointer transition-all ${activeTab === "Ticket History"
+                                            ? "border-b-2 border-blue-500 text-blue-600"
+                                            : "hover:text-blue-600"
+                                            }`}
+                                        onClick={() => setActiveTab("Ticket History")}
+                                    >
+                                        Ticket History
+                                    </li>
+                                </ul>
 
-                            {/* Content Section */}
-                            <div className="mt-4">
-                                {activeTab === "Asset History" && (
-                                    <div>
+                                {/* Content Section */}
+                                <div className="mt-4">
+                                    {activeTab === "Asset History" && (
+                                        <div>
 
-                                        <div className="overflow-auto max-h-64 border rounded-lg">
-                                            <table className="w-full text-left">
-                                                <thead className="sticky top-0 bg-gray-100">
-                                                    <tr>
-                                                        <th className="p-3 text-sm text-gray-600">
-                                                            ID
-                                                        </th>
-                                                        <th className="p-3 text-sm text-gray-600">
-                                                            Action
-                                                        </th>
-                                                        <th className="p-3 text-sm text-gray-600">
-                                                            Status
-                                                        </th>
-                                                        <th className="p-3 text-sm text-gray-600">
-                                                            Date
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {ticketHistory.map((ticket) => (
-                                                        <tr
-                                                            key={ticket.asset_log_id}
-                                                            className="hover:bg-gray-50"
-                                                        >
-                                                            <td className="p-3 text-sm">
-                                                                {ticket.asset_log_id}
-                                                            </td>
-                                                            <td className="p-3 text-sm">
-                                                                {ticket.action_performed}
-                                                            </td>
-                                                            <td className="p-3 text-sm">
-                                                                {ticket.action_status}
-                                                            </td>
-                                                            <td className="p-3 text-sm">
-                                                                {format(
-                                                                    ticket.action_datetime,
-                                                                    "MMM dd, yyyy HH:mm:ss"
-                                                                )}
-                                                            </td>
+                                            <div className="overflow-auto max-h-64 border rounded-lg">
+                                                <table className="w-full text-left">
+                                                    <thead className="sticky top-0 bg-gray-100">
+                                                        <tr>
+                                                            <th className="p-3 text-sm text-gray-600">
+                                                                ID
+                                                            </th>
+                                                            <th className="p-3 text-sm text-gray-600">
+                                                                Action
+                                                            </th>
+                                                            <th className="p-3 text-sm text-gray-600">
+                                                                Status
+                                                            </th>
+                                                            <th className="p-3 text-sm text-gray-600">
+                                                                Date
+                                                            </th>
                                                         </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
-                                {activeTab === "Ticket History" && (
-                                    <div>
-                                        <div className="overflow-auto max-h-64 border rounded-lg">
-                                            <table className="w-full text-left">
-                                                <thead className="sticky top-0 bg-gray-100">
-                                                    <tr>
-                                                        <th className="p-3 text-sm text-gray-600">ID</th>
-                                                        <th className="p-3 text-sm text-gray-600">Reported By</th>
-                                                        <th className="p-3 text-sm text-gray-600">Problem</th>
-                                                        <th className="p-3 text-sm text-gray-600">Status</th>
-                                                        <th className="p-3 text-sm text-gray-600">Date</th>
-                                                        <th className="p-3 text-sm text-gray-600">Location</th>
-                                                        <th className="p-3 text-sm text-gray-600">Criticality</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {AssetHistory.map((history, index) => (
-                                                        <tr key={index} className="hover:bg-gray-50">
-                                                            <td className="p-3 text-sm">{history['Report ID']}</td>
-                                                            <td className="p-3 text-sm">{history['Reported by']}</td>
-                                                            <td
-                                                                className="p-3 text-sm overflow-hidden whitespace-nowrap max-w-[200px] cursor-pointer"
-                                                                onClick={(e) => {
-                                                                    const target = e.currentTarget;
-                                                                    if (target.style.whiteSpace === "normal") {
-                                                                        target.style.maxWidth = "200px";
-                                                                    } else {
-                                                                        target.style.whiteSpace = "normal";
-                                                                        target.style.maxWidth = "none";
-                                                                    }
-                                                                }}
+                                                    </thead>
+                                                    <tbody>
+                                                        {ticketHistory.map((ticket) => (
+                                                            <tr
+                                                                key={ticket.asset_log_id}
+                                                                className="hover:bg-gray-50"
                                                             >
-                                                                {history['Problem']}
-                                                            </td>
-                                                            <td className="p-3 text-sm">{history['Problem status']}</td>
-                                                            <td className="p-3 text-sm">
-                                                                {format(new Date(history['Datetime']), "MMM dd, yyyy HH:mm:ss")}
-                                                            </td>
-                                                            <td className="p-3 text-sm">{history['Location']}</td>
-                                                            <td className="p-3 text-sm">{history['Problem Criticality']}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-
+                                                                <td className="p-3 text-sm">
+                                                                    {ticket.asset_log_id}
+                                                                </td>
+                                                                <td className="p-3 text-sm">
+                                                                    {ticket.action_performed}
+                                                                </td>
+                                                                <td className="p-3 text-sm">
+                                                                    {ticket.action_status}
+                                                                </td>
+                                                                <td className="p-3 text-sm">
+                                                                    {format(
+                                                                        ticket.action_datetime,
+                                                                        "MMM dd, yyyy HH:mm:ss"
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+                                    {activeTab === "Ticket History" && (
+                                        <div>
+                                            <div className="overflow-auto max-h-64 border rounded-lg">
+                                                <table className="w-full text-left">
+                                                    <thead className="sticky top-0 bg-gray-100">
+                                                        <tr>
+                                                            <th className="p-3 text-sm text-gray-600">ID</th>
+                                                            <th className="p-3 text-sm text-gray-600">Reported By</th>
+                                                            <th className="p-3 text-sm text-gray-600">Problem</th>
+                                                            <th className="p-3 text-sm text-gray-600">Status</th>
+                                                            <th className="p-3 text-sm text-gray-600">Date</th>
+                                                            <th className="p-3 text-sm text-gray-600">Location</th>
+                                                            <th className="p-3 text-sm text-gray-600">Criticality</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {AssetHistory.map((history, index) => (
+                                                            <tr key={index} className="hover:bg-gray-50">
+                                                                <td className="p-3 text-sm">{history['Report ID']}</td>
+                                                                <td className="p-3 text-sm">{history['Reported by']}</td>
+                                                                <td
+                                                                    className="p-3 text-sm overflow-hidden whitespace-nowrap max-w-[200px] cursor-pointer"
+                                                                    onClick={(e) => {
+                                                                        const target = e.currentTarget;
+                                                                        if (target.style.whiteSpace === "normal") {
+                                                                            target.style.maxWidth = "200px";
+                                                                        } else {
+                                                                            target.style.whiteSpace = "normal";
+                                                                            target.style.maxWidth = "none";
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {history['Problem']}
+                                                                </td>
+                                                                <td className="p-3 text-sm">{history['Problem status']}</td>
+                                                                <td className="p-3 text-sm">
+                                                                    {format(new Date(history['Datetime']), "MMM dd, yyyy HH:mm:ss")}
+                                                                </td>
+                                                                <td className="p-3 text-sm">{history['Location']}</td>
+                                                                <td className="p-3 text-sm">{history['Problem Criticality']}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
 
+                                            </div>
+                                        </div>
+                                    )}
+
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ) : (
-                    <p className="p-4 text-gray-500">Select an asset to view details.</p>
-                )}
-            </div>
+                    ) : (
+                        <p className="p-4 text-gray-500">Select an asset to view details.</p>
+                    )}
+                </div>
+            </Split>
 
             {modalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -1844,7 +1862,7 @@ const Assets = () => {
             {addTypeModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
-                        <h2 className="text-xl font-semibold mb-4">Rename Asset Type</h2>
+                        <h2 className="text-xl font-semibold mb-4">Add Asset Type</h2>
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
@@ -1852,9 +1870,9 @@ const Assets = () => {
                             }}
                         >
 
-                            {UpdateTypeloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
-                            {UpdateTypemodalMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{UpdateTypemodalMessage}</p>}
-                            {UpdateTypeError && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{UpdateTypeError}</p>}
+                            {addTypeloading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+                            {addTypesuccessMessage && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{addTypesuccessMessage}</p>}
+                            {addTypeerrorMessage && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{addTypeerrorMessage}</p>}
 
 
                             <label className="block mb-4">

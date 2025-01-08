@@ -1,15 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
-import LoginPage from './pages/login';
-import Incidents from './pages/Incidents';
+import LoginPage from './pages/Admin/login';
+import Incidents from './pages/Admin/Incidents';
 import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
 import TopNavWrapper from './components/TopNavWrapper';
-import AssetPage from './pages/Assets';
-import Approvals from './pages/Approvals';
-import SolutionForum from './pages/SolutionForum';
-import UsersDirectory from './pages/UserDirectory';
-import LocationsDirectory from './pages/LocationsDirectory';
+import AssetPage from './pages/Admin/Assets';
+import Approvals from './pages/Admin/Approvals';
+import SolutionForum from './pages/Admin/SolutionForum';
+import UsersDirectory from './pages/Admin/UserDirectory';
+import LocationsDirectory from './pages/Admin/LocationsDirectory';
 import Help from './pages/Admin/Help';
 import useTokenMonitor from './hooks/useTokenMoniter';
 import { useNavigate } from 'react-router-dom';

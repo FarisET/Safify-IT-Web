@@ -489,6 +489,11 @@ const LocationsDirectory = () => {
                 gutterAlign="center"
                 snapOffset={30}
                 dragInterval={1}
+                gutter={(index, direction) => {
+                    const gutter = document.createElement('div');
+                    gutter.className = `gutter ${direction === 'horizontal' ? 'cursor-ew-resize' : 'cursor-ns-resize'}`;
+                    return gutter;
+                  }}
             >
                 <div className="h-screen border-r border-gray-200 bg-white overflow-y-auto">
                     <div className="flex justify-between items-center p-4 border-b bg-white">

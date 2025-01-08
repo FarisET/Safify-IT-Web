@@ -142,7 +142,12 @@ const Sidebar = () => {
 
             <p>Are you sure you want to logout?</p>
 
-            {logoutLoading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+            {logoutLoading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">
+              <div className="fixed inset-0 flex items-center justify-center">
+                <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-6 h-6 animate-spin"></div>
+              </div>
+
+            </p>}
 
             <div className="flex justify-end gap-2 mt-4">
               <button

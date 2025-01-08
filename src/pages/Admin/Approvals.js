@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import Report from '../../models/ActionReport';  // Adjust path as necessary
+import { formatDate } from '../../utils/date';
 import { FaChevronDown, FaCheck, FaTrash } from 'react-icons/fa';
 
 const Approvals = () => {
@@ -136,7 +137,12 @@ const Approvals = () => {
   useEffect(() => {
   }, [searchTerm, statusFilter, requestTypeFilter, actionReports]);
 
-  if (loading) return <div className="text-center py-8">Loading...</div>;
+  if (loading) return <div className="text-center py-8">
+    <div className="fixed inset-0 flex items-center justify-center">
+      <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-16 h-16 animate-spin"></div>
+    </div>
+
+  </div>;
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
 
   return (
@@ -177,7 +183,8 @@ const Approvals = () => {
             <th className="px-4 py-2 border-b">Assignee</th>
             <th className="px-4 py-2 border-b">Action Team</th>
             <th className="px-4 py-2 border-b">Status</th>
-            <th className="px-4 py-2 border-b">Created</th>
+            <th className="px-4 py-2 border-b">Date</th>
+            <th className="px-4 py-2 border-b">Time</th>
             <th className="px-4 py-2 border-b">Action</th>
           </tr>
         </thead>
@@ -198,10 +205,21 @@ const Approvals = () => {
                   {report.status}
                 </span>
               </td>
-              <td className="px-4 py-2 border-b">
-                <div>{new Date(report.dateTime).toLocaleDateString('en-GB')}</div>
+              <td className="px-4 py-2 border-b font-semibold">
+                {report.dateTime
+                  ? formatDate(report.dateTime).date // Display formatted date
+                  : <span className="text-gray-700 font-bold">X</span>}
               </td>
-              <td className="px-4 py-2 border-b">
+              <td className="px-4 py-2 border-b font-semibold">
+                {report.dateTime ? (
+                  <>
+                    {formatDate(report.dateTime).time.split(' ')[0]}
+                    <span className="text-[0.7rem] font-semibold align-top">({formatDate(report.dateTime).period})</span>
+                  </>
+                ) : (
+                  <span className="text-gray-700 font-bold">X</span>
+                )}
+              </td>              <td className="px-4 py-2 border-b">
                 {report.status.toLowerCase() === 'approval pending' && (
                   <div className="relative">
                     <button

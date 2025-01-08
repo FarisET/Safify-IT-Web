@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Pie, PieChart, BarChart, Bar, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Pie, PieChart, BarChart, Bar, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
 // import { Card } from '@mui/material';
 import Split from "react-split";
 
@@ -10,16 +10,27 @@ const Dashboard = () => {
   // State for analytics data
   const [timeBoundData, setTimeBoundData] = useState({});
   const [nonTimeBoundData, setNonTimeBoundData] = useState({});
-  const [selectedDateRange, setSelectedDateRange] = useState('today');
 
   // Date filter options
   const today = new Date();
+  const [selectedDateRange, setSelectedDateRange] = useState(today.toISOString().split('T')[0]);
+
+  const last7Days = new Date();
+  const last15Days = new Date();
   const last30Days = new Date();
-  last30Days.setDate(today.getDate() - 30); // Subtract 30 days from today
-  
+  const last365Days = new Date();
+
+  last7Days.setDate(today.getDate() - 7);
+  last15Days.setDate(today.getDate() - 15);
+  last30Days.setDate(today.getDate() - 30);
+  last365Days.setDate(today.getDate() - 365);
+
   const dateOptions = [
     { text: 'Today', value: today.toISOString().split('T')[0] },
-    { text: 'Last 30 Days', value: last30Days.toISOString().split('T')[0] },
+    { text: 'Last 7 Days', value: last7Days.toISOString().split('T')[0] },
+    { text: 'Last 15 Days', value: last15Days.toISOString().split('T')[0] },
+    { text: 'Last Month', value: last30Days.toISOString().split('T')[0] },
+    { text: 'Last Year', value: last365Days.toISOString().split('T')[0] },
   ];
 
   // Fetch Time-Bound Analytics
@@ -27,12 +38,10 @@ const Dashboard = () => {
     try {
       const jwtToken = sessionStorage.getItem('jwt');
 
-      let timestamp =
-        dateRange === 'today'
-          ? new Date().toISOString().split('T')[0]
-          : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+     let dataRange = dateRange;
+
       const response = await axios.get(
-        `http://localhost:3001/analytics/fetchAnalyticsTimeBound?timestamp=${timestamp}`,
+        `http://localhost:3001/analytics/fetchAnalyticsTimeBound?timestamp=${dataRange}`,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
@@ -79,7 +88,85 @@ const Dashboard = () => {
   }, []);
 
   const [activeTab, setActiveTab] = useState("timeBound");
-  const COLORS = ['#4b5563', '#0284c7'];
+  const COLORS = [
+    '#0284c7', // Original blue color
+    '#22d3ee', // Cyan 400
+    '#06b6d4', // Cyan 500
+    '#0891b2', // Cyan 600
+    '#0e7490', // Cyan 700
+    '#155e75', // Cyan 800
+    '#164e63', // Cyan 900
+    '#083344', // Cyan 950
+    '#38bdf8', // Sky 400
+    '#0ea5e9', // Sky 500
+    '#0369a1', // Sky 600
+    '#075985', // Sky 700
+    '#0c4a6e'  // Sky 900
+  ];
+
+
+  const COLORS_NEEDLE = ['#10b981', '#f59e0b', '#ef4444'];
+
+
+  const RADIAN = Math.PI / 180;
+
+  const cx = 180;
+  const cy = 100;
+  const iR = 50;
+  const oR = 100;
+  const value = 50;
+
+  const needle = (data, cx, cy, iR, oR, color) => {
+    // Ensure data is valid
+    if (!Array.isArray(data) || data.length === 0) return null;
+
+    // Calculate total tickets
+    const total = data.reduce((sum, entry) => sum + entry["Ticket Count"], 0);
+
+    // Find the criticality with the highest count
+    const maxEntry = data.reduce((max, entry) =>
+      entry["Ticket Count"] > max["Ticket Count"] ? entry : max
+    );
+
+    // Calculate the cumulative sum up to the midpoint of the largest segment
+    let cumulativeSum = 0;
+    for (const entry of data) {
+      if (entry === maxEntry) {
+        cumulativeSum += entry["Ticket Count"] / 2;
+        break;
+      }
+      cumulativeSum += entry["Ticket Count"];
+    }
+
+    // Calculate the angle for the needle
+    const ang = 180.0 * (1 - cumulativeSum / total);
+    const length = (iR + 2 * oR) / 3;
+    const sin = Math.sin(-RADIAN * ang);
+    const cos = Math.cos(-RADIAN * ang);
+    const r = 5;
+
+    // Calculate needle points
+    const x0 = cx;
+    const y0 = cy;
+    const xba = x0 + r * sin;
+    const yba = y0 - r * cos;
+    const xbb = x0 - r * sin;
+    const ybb = y0 + r * cos;
+    const xp = x0 + length * cos;
+    const yp = y0 + length * sin;
+
+    return [
+      <circle key="circle" cx={x0} cy={y0} r={r} fill={color} stroke="none" />,
+      <path
+        key="path"
+        d={`M${xba},${yba} L${xbb},${ybb} L${xp},${yp} Z`}
+        fill={color}
+        stroke="none"
+      />,
+    ];
+  };
+
+
 
 
   return (
@@ -112,7 +199,7 @@ const Dashboard = () => {
           {/* Tab Content */}
           <div>
             {activeTab === "timeBound" && (
-              <div className="p-4">
+              <div className="p-4 mb-2">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-semibold">Statistics</h3>
                   <select
@@ -128,62 +215,113 @@ const Dashboard = () => {
                   </select>
                 </div>
 
-                {/* Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                  <Card title="Total Tickets">
-                    <p className="text-lg font-bold">{timeBoundData.incidentsReported || 0}</p>
-                  </Card>
-                  <Card title="Tickets Resolved">
-                    <p className="text-lg font-bold">{timeBoundData.incidentsResolved || 0}</p>
-                  </Card>
-                </div>
+                <div className='max-h-[60vh] overflow-y-auto overflow-x-auto max-w-[90vw]'>
 
-                {/* Charts */}
-                <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Assets by Status Bar Chart */}
-                  <Card title="Assets by Status">
-                    {timeBoundData.assetsByStatus && (
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={timeBoundData.assetsByStatus}>
-                          <XAxis dataKey="status" />
-                          <YAxis />
-                          <Tooltip />
-                          <Legend />
-                          <Bar dataKey="count" fill="#4b5563">
-                          {timeBoundData.assetsByStatus.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                              ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    )}
-                  </Card>
+                  {/* Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <Card title="Total Tickets">
+                      <p className="text-lg font-bold">{timeBoundData.incidentsReported || 0}</p>
+                    </Card>
+                    <Card title="Tickets Resolved">
+                      <p className="text-lg font-bold">{timeBoundData.incidentsResolved || 0}</p>
+                    </Card>
 
-                  {/* Total Incidents on Locations Pie Chart */}
-                  <Card title="Total Incidents on Locations">
-                    {timeBoundData.totalIncidentsOnLocations && (
-                      <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                          <Pie
-                            data={timeBoundData.totalIncidentsOnLocations}
-                            dataKey="incident_count"
-                            nameKey="location_name"
-                            innerRadius={80}
-                            outerRadius={100}
-                            paddingAngle={5}
-                            fill="#4b5563"
-                            label
-                          >
-                          {timeBoundData.totalIncidentsOnLocations.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {timeBoundData.totalTicketsByIncidentCriticality && (
+                      <div className=''>
+                        <ResponsiveContainer width="100%" height={140}>
+
+                          <PieChart >
+                            <Pie
+                              dataKey="Ticket Count"
+                              nameKey="Criticality Level"
+                              startAngle={180}
+                              endAngle={0}
+                              data={timeBoundData.totalTicketsByIncidentCriticality}
+                              cx={cx}
+                              cy={cy}
+                              innerRadius={iR}
+                              outerRadius={oR}
+                              fill="#8884d8"
+                              stroke="none"
+                              label
+
+                            >
+                              {timeBoundData.totalTicketsByIncidentCriticality.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS_NEEDLE[index % COLORS_NEEDLE.length]} />
                               ))}
-                          </Pie>
-                          <Tooltip />
-                          <Legend/>
+                            </Pie>
+                            {needle(
+                              timeBoundData?.totalTicketsByIncidentCriticality || [],
+                              cx,
+                              cy,
+                              iR,
+                              oR,
+                              '#000'
+                            )}
+                            <Legend />
+
                           </PieChart>
-                      </ResponsiveContainer>
+                        </ResponsiveContainer>
+                      </div>
+
                     )}
-                  </Card>
+
+                  </div>
+
+
+
+
+                  {/* Charts */}
+                  <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Assets by Status Bar Chart */}
+                    <Card title="Assets by Status">
+                      {timeBoundData.assetsByStatus && (
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={timeBoundData.assetsByStatus}>
+                            <XAxis dataKey="status" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="count" fill="#4b5563">
+                              {timeBoundData.assetsByStatus.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      )}
+                    </Card>
+
+
+
+
+                    {/* Total Incidents on Locations Pie Chart */}
+                    <Card title="Total Incidents on Locations">
+                      {timeBoundData.totalIncidentsOnLocations && (
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={timeBoundData.totalIncidentsOnLocations}
+                              dataKey="incident_count"
+                              nameKey="location_name"
+                              outerRadius={100}
+                              fill="#4b5563"
+                              label
+                            >
+                              {timeBoundData.totalIncidentsOnLocations.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      )}
+                    </Card>
+
+
+                  </div>
+
                 </div>
 
               </div>
@@ -193,51 +331,55 @@ const Dashboard = () => {
               <div className="p-4">
                 <h3 className="text-xl font-semibold mb-4">Efficiency</h3>
 
-                {/* Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                  <Card title="Average Response Time (hrs)">
-                    <p className="text-lg font-bold">
-                      {nonTimeBoundData.averageResponseTime?.[0]?.["time (hrs)"] || 0}
-                    </p>
-                  </Card>
-                  <Card title="Average Ticket Closing Time (hrs)">
-                    <p className="text-lg font-bold">
-                      {nonTimeBoundData.averageTicketClosingTime?.[0]?.["time (hrs)"] || 0}
-                    </p>
-                  </Card>
-                  <Card title="Average Ticket Lifecycle (hrs)">
-                    <p className="text-lg font-bold">
-                      {nonTimeBoundData.averageTicketLifecycle?.[0]?.["time (hrs)"] || 0}
-                    </p>
-                  </Card>
-                </div>
+                <div className='max-h-[60vh] overflow-y-auto'>
 
-                {/* Charts */}
-                <div>
-                  <Card title="Efficiency by Team">
-                    {nonTimeBoundData.efficiency && (
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={nonTimeBoundData.efficiency}>
-                          <XAxis dataKey="action_team_name" />
-                          <YAxis />
-                          <Tooltip />
-                          <Legend />
-                          <Bar
-                            dataKey="efficiency_value"
-                            fill="#4b5563"
-                            // Disable hover effect
-                            isAnimationActive={false} // Prevents hover animation
-                            activeDot={false} // Removes active dot hover effect
-                            onMouseEnter={() => { }} // Prevent hover color change
-                          >
-                            {nonTimeBoundData.efficiency.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+
+                  {/* Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <Card title="Average Response Time (hrs)">
+                      <p className="text-lg font-bold">
+                        {nonTimeBoundData.averageResponseTime?.[0]?.["time (hrs)"] || 0}
+                      </p>
+                    </Card>
+                    <Card title="Average Ticket Closing Time (hrs)">
+                      <p className="text-lg font-bold">
+                        {nonTimeBoundData.averageTicketClosingTime?.[0]?.["time (hrs)"] || 0}
+                      </p>
+                    </Card>
+                    <Card title="Average Ticket Lifecycle (hrs)">
+                      <p className="text-lg font-bold">
+                        {nonTimeBoundData.averageTicketLifecycle?.[0]?.["time (hrs)"] || 0}
+                      </p>
+                    </Card>
+                  </div>
+
+                  {/* Charts */}
+                  <div>
+                    <Card title="Efficiency by Team">
+                      {nonTimeBoundData.efficiency && (
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={nonTimeBoundData.efficiency}>
+                            <XAxis dataKey="action_team_name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar
+                              dataKey="efficiency_value"
+                              fill="#4b5563"
+                              // Disable hover effect
+                              isAnimationActive={false} // Prevents hover animation
+                              activeDot={false} // Removes active dot hover effect
+                              onMouseEnter={() => { }} // Prevent hover color change
+                            >
+                              {nonTimeBoundData.efficiency.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                               ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    )}
-                  </Card>
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      )}
+                    </Card>
+                  </div>
                 </div>
               </div>
             )}
