@@ -72,7 +72,7 @@ const Help = () => {
       <section id="roles" className="mb-12">
         <h2 className="text-lg font-semibold mb-4 text-gray-800">User Roles</h2>
         {[
-          { title: 'Action Teams', description: 'Support persons who resolve tickets assigned to them, update statuses, and close resolved tickets.' },
+          { title: 'Action Teams', description: 'Support persons who resolve tickets assigned to them, update statuses, and submit reports for approval.' },
           { title: 'Admins', description: 'Monitor and assign tickets, manage assets, and oversee platform operations.' },
           { title: 'Users', description: 'Create tickets, view statuses, and interact with support persons for issue resolution.' },
         ].map((role, index) => (

@@ -199,7 +199,7 @@ const IncidentsCompleted = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-semibold mb-4 text-left">Tickets</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-left">Closed Tickets</h2>
 
 
       <div className="flex items-center justify-between mb-4">
@@ -231,21 +231,7 @@ const IncidentsCompleted = () => {
             </select>
           </div>
 
-          {/* Status Dropdown */}
-          <div className="flex flex-col space-y-1">
-            <label htmlFor="status" className="text-sm font-medium text-gray-600">Status</label>
-            <select
-              id="status"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="font-semibold text-gray-700 rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="All">All</option>
-              <option value="Open">Open</option>
-              <option value="assigned">Assigned</option>
-              <option value="Completed">Completed</option>
-            </select>
-          </div>
+
         </div>
 
 

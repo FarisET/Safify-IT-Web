@@ -148,7 +148,6 @@ const Incidents = () => {
     const normalizedStatus = status.trim().toLowerCase();
     if (normalizedStatus === 'open') return 'bg-red-100';
     if (normalizedStatus === 'assigned') return 'bg-gray-100 text-gray-700';
-    if (normalizedStatus === 'completed') return 'bg-emerald-100';
     return '';
   };
 
@@ -164,8 +163,20 @@ const Incidents = () => {
       || (report.incidentCriticalityLevel && report.incidentCriticalityLevel.toLowerCase().includes(searchTerm.toLowerCase()))
       || (report.userReportId == searchTerm)
     )
-    .filter(report => (statusFilter === 'All' || report.status.toLowerCase() === statusFilter.toLowerCase()))
-    .filter(report => (critFilter === 'All' || report.incidentCriticalityLevel.toLowerCase() === critFilter.toLowerCase()));
+    ?.filter((report) => {
+      if (statusFilter !== 'All') {
+        return report.status.toLowerCase() === statusFilter.toLowerCase();
+      }
+      return true;
+    })
+    ?.filter((report) => {
+      if (critFilter !== 'All') {
+        return report.incidentCriticalityLevel?.toLowerCase() === critFilter.toLowerCase();
+      }
+      return true;
+    });
+    // .filter(report => (statusFilter === 'All' || report.status.toLowerCase() === statusFilter.toLowerCase()))
+    // .filter(report => (critFilter === 'All' || report.incidentCriticalityLevel.toLowerCase() === critFilter.toLowerCase()));
 
 
   useEffect(() => {
@@ -243,19 +254,15 @@ const Incidents = () => {
               <option value="All">All</option>
               <option value="Open">Open</option>
               <option value="assigned">Assigned</option>
-              <option value="Completed">Completed</option>
             </select>
           </div>
         </div>
-
-
-
       </div>
 
       <div className="mb-4 text-gray-700">{filteredReports.length} ticket{filteredReports.length !== 1 ? 's' : ''}</div>
 
       {/* Action Buttons - Shown when any checkbox is selected */}
-      {selectedReports.length > 0 && (
+      {selectedReports.length > 0 ? (
         <div className="flex gap-6 items-center p-2 mb-4 rounded">
           <span>{selectedReports.length} selected</span>
           <div className="flex gap-2">
@@ -267,7 +274,7 @@ const Incidents = () => {
             </button>
           </div>
         </div>
-      )}
+      ) : []}
 
 
       {/* Table to display reports */}
@@ -280,8 +287,8 @@ const Incidents = () => {
                 <input
                   type="checkbox"
                   onChange={(e) => setSelectedReports(e.target.checked ? filteredReports.map(r => r.userReportId) : [])}
-                  checked={selectedReports.length === filteredReports.length}
-                />
+                  checked={selectedReports.length === filteredReports.length && filteredReports.length > 0}
+                  />
               </th>
               <th className="px-4 py-2 border-b">Ticket</th>
               <th className="px-4 py-2 border-b">Asset</th>

@@ -159,17 +159,6 @@ const Approvals = () => {
           className="border rounded px-4 py-2 w-1/3"
         />
 
-        <div className="flex space-x-4">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="font-semibold text-gray-700 rounded px-2 py-2 border"
-          >
-            <option value="All">All</option>
-            <option value="approved">Approved</option>
-            <option value="approval pending">Pending</option>
-          </select>
-        </div>
       </div>
 
       <div className="mb-4 text-gray-700">{filteredReports.length} report{filteredReports.length !== 1 ? 's' : ''}</div>

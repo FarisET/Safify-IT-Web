@@ -1202,7 +1202,9 @@ const Assets = () => {
 
                     </span>
                     {loading ? (
-                        <p className="p-4 text-gray-500">Loading...</p>
+                        <div className="fixed inset-0 left-[45vw] flex items-center justify-center">
+                            <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-6 h-6 animate-spin"></div>
+                        </div>
                     ) : error ? (
                         <p className="p-4 text-red-500">{error}</p>
                     ) : assetDetails ? (
@@ -1434,7 +1436,21 @@ const Assets = () => {
                             </div>
                         </div>
                     ) : (
-                        <p className="fixed text-center  item-center justify-center p-4 text-gray-500">Select an asset to view details.</p>
+                        <div className="flex flex-col items-center justify-center h-[70vh] text-center">
+                            <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-gray-100 text-gray-500 rounded-full">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-8 w-8"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-label="Asset Icon"
+                                >
+                                    <path d="M13 7H7v6h6V7z" />
+                                    <path fillRule="evenodd" d="M5 4a2 2 0 00-2 2v8a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2H5zm1 2a1 1 0 000 2h8a1 1 0 000-2H6zm0 4a1 1 0 000 2h4a1 1 0 000-2H6z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                            <p className="text-md font-semibold text-gray-700">Select an asset to view details.</p>
+                        </div>
                     )}
                 </div>
             </Split>
