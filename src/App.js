@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import useLogout from './services/logout';
 import Modal from './components/SessionModal';
 import { useState } from 'react';
+import Dashboard from './pages/Admin/Dashboard';
 
 const AppLayout = () => {
   const location = useLocation(); // Hook called within a Router context
@@ -111,6 +112,16 @@ const AppLayout = () => {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard/>
+              </ProtectedRoute>
+            }
+          />
+
           {/* Default route to redirect to login */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>

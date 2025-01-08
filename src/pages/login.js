@@ -38,12 +38,16 @@ const LoginPage = () => {
         const decodedToken = parseJwt(token);
         const role = decodedToken.role_name;
         const userName = decodedToken.user_name;
+        
 
         // Check if the role is not 'admin'
         if (role !== 'admin') {
           setError('You are not authorized');
           return; // Exit the function if not authorized
         }
+
+        const currentTime = Date.now() / 1000;
+        const timeToExpire = decodedToken.exp - currentTime;
 
         sessionStorage.setItem('jwt', token);
         sessionStorage.setItem('role', role);
@@ -52,6 +56,8 @@ const LoginPage = () => {
         sessionStorage.setItem('userId', userId);
 
         localStorage.setItem('jwtToken', token);
+        localStorage.setItem('timeToExpire', timeToExpire);
+
 
         navigate('/incidents');
       } else if (response.status === 401) {

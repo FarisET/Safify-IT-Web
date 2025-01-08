@@ -714,7 +714,7 @@ const Assets = () => {
         try {
             const jwtToken = sessionStorage.getItem("jwt");
             const response = await axios.get(
-                "http://localhost:3001/helper/getLocationsAndSubLocations",
+                "http://localhost:3001/admin/dashboard/getLocationsAndSubLocationsAdmin",
                 {
                     headers: { Authorization: `Bearer ${jwtToken}` },
                 }
@@ -1005,6 +1005,12 @@ const Assets = () => {
                 gutterAlign="center"
                 snapOffset={30}
                 dragInterval={1}
+                gutter={(index, direction) => {
+                    const gutter = document.createElement('div');
+                    gutter.className = `gutter ${direction === 'horizontal' ? 'cursor-ew-resize' : 'cursor-ns-resize'}`;
+                    return gutter;
+                  }}
+                
             >
                 <div className="h-screen border-r border-gray-200 overflow-auto border-x bg-white">
                     <div className=" flex justify-between items-center p-4 border-b bg-white">

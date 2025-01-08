@@ -78,7 +78,7 @@ const TopNav = ({ teams, fetchTeams }) => {
           <div className="absolute top-full mt-1 right-0 w-72 bg-white border border-gray-200 shadow-lg rounded-lg z-50">
             <TeamsCard teams={teams} />
           </div>
-        )}
+        )} 
       </div>
 
       <div className="hidden md:flex items-center gap-4 w-[38.2%] justify-end">

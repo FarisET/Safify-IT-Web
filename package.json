@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.3.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "antd": "^5.22.7",
-    "axios": "^1.7.7",
+    "axios": "^1.7.9",
     "date-fns": "^4.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -15,6 +18,7 @@
     "react-router-dom": "^6.28.0",
     "react-scripts": "5.0.1",
     "react-split": "^2.0.14",
+    "recharts": "^2.15.0",
     "styled-components": "^6.1.13",
     "web-vitals": "^2.1.4"
   },
