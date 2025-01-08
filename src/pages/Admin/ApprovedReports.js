@@ -5,7 +5,7 @@ import Report from '../../models/ActionReport';  // Adjust path as necessary
 import { formatDate } from '../../utils/date';
 import { FaChevronDown, FaCheck, FaTrash } from 'react-icons/fa';
 
-const Approvals = () => {
+const ApprovedReports = () => {
   const [actionReports, setactionReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,7 +31,7 @@ const Approvals = () => {
     setError(null);
     try {
       const jwtToken = sessionStorage.getItem('jwt');
-      const response = await axios.get('http://localhost:3001/admin/dashboard/fetchAllActionReports', {
+      const response = await axios.get('http://localhost:3001/admin/dashboard/Fetchallactionreportsapproved', {
         headers: {
           'Authorization': `Bearer ${jwtToken}`,
         },
@@ -272,9 +272,9 @@ const Approvals = () => {
                 />
               </svg>
             </div>
-            <p className="text-2xl font-semibold text-emerald-500">No Pending Approvals</p>
+            <p className="text-2xl font-semibold text-emerald-500">No Approved Reports</p>
             <p className="text-sm text-gray-500 mt-2">
-              You're all caught up! No pending approvals.
+              Great! Seems like there are no approved reports.
             </p>
           </div>
         </div>
@@ -302,4 +302,4 @@ const Approvals = () => {
   );
 };
 
-export default Approvals;
+export default ApprovedReports;

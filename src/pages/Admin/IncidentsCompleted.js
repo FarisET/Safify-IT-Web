@@ -5,7 +5,7 @@ import Report from '../../models/UserReport';  // Adjust path as necessary
 import { FaUser, FaTrash, FaArrowRight, FaImage } from 'react-icons/fa';
 import { formatDate } from '../../utils/date';
 
-const Incidents = () => {
+const IncidentsCompleted = () => {
   const [userReports, setUserReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -75,7 +75,7 @@ const Incidents = () => {
     try {
       const jwtToken = sessionStorage.getItem('jwt');
       const response = await axios.get(
-        'http://localhost:3001/admin/dashboard/fetchAllUserReports',
+        'http://localhost:3001/admin/dashboard/Fetchalluserreportscompleted',
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
@@ -424,7 +424,7 @@ const Incidents = () => {
                 <path d="M3 14a1 1 0 011-1h10a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3z" />
               </svg>
             </div>
-            <p className="text-2xl font-semibold text-sky-500">No Tickets</p>
+            <p className="text-2xl font-semibold text-sky-500">No Ticket Closed</p>
             <p className="text-sm text-gray-500 mt-2">No issues in your company. All systems are running smoothly!</p>
           </div>
         </div>
@@ -546,4 +546,4 @@ const Incidents = () => {
   );
 };
 
-export default Incidents;
+export default IncidentsCompleted;

@@ -75,7 +75,7 @@ const Sidebar = () => {
           title="Tickets"
           links={[
             { to: '/incidents', icon: FaTicketAlt, label: 'Open Tickets' },
-            { to: '/incidents', icon: FaTicketAlt, label: 'Critical Tickets' },
+            { to: '/incidents-completed', icon: FaTicketAlt, label: 'Closed Tickets' },
           ]}
         />
         <div className="border-t border-gray-200 my-1"></div>
@@ -87,9 +87,9 @@ const Sidebar = () => {
           links={[
             { to: '/approvals', icon: FaSign, label: 'Pending Approvals' },
             {
-              to: '/approvals',
+              to: '/approved-reports',
               icon: FaCheckCircle,
-              label: 'Approved Tasks (last 30)',
+              label: 'Approved Tasks',
             },
           ]}
         />

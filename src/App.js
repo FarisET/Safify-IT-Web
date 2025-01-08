@@ -18,6 +18,8 @@ import Modal from './components/SessionModal';
 import { useState } from 'react';
 import Dashboard from './pages/Admin/Dashboard';
 import NotFound from './pages/shared/NotFound';
+import IncidentsCompleted from './pages/Admin/IncidentsCompleted';
+import ApprovedReports from './pages/Admin/ApprovedReports';
 
 const AppLayout = () => {
   const location = useLocation(); // Hook called within a Router context
@@ -72,6 +74,14 @@ const AppLayout = () => {
               </ProtectedRoute>
             }
           />
+                    <Route
+            path="/incidents-completed"
+            element={
+              <ProtectedRoute>
+                <IncidentsCompleted />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/assets"
             element={
@@ -85,6 +95,14 @@ const AppLayout = () => {
             element={
               <ProtectedRoute>
                 <Approvals />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/approved-reports"
+            element={
+              <ProtectedRoute>
+                <ApprovedReports />
               </ProtectedRoute>
             }
           />
