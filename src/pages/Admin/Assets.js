@@ -24,10 +24,13 @@ const Assets = () => {
     const [assetTypes, setAssetTypes] = useState([]);
     const [selectedAssetTypeId, setSelectedAssetTypeId] = useState(null);
     const [selectedAssetType, setSelectedAssetType] = useState(null);
+    const [initLoading, setinitLoading] = useState(false);
+
 
 
     const fetchAssetTypes = async () => {
         try {
+            setinitLoading(true);
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.get(
                 'http://localhost:3001/admin/dashboard/getAssetsandAssetTypes',
@@ -48,6 +51,8 @@ const Assets = () => {
             }
         } catch (error) {
             console.error('Error fetching asset types:', error);
+        } finally {
+            setinitLoading();
         }
     };
 
@@ -1009,8 +1014,8 @@ const Assets = () => {
                     const gutter = document.createElement('div');
                     gutter.className = `gutter ${direction === 'horizontal' ? 'cursor-ew-resize' : 'cursor-ns-resize'}`;
                     return gutter;
-                  }}
-                
+                }}
+
             >
                 <div className="h-screen border-r border-gray-200 overflow-auto border-x bg-white">
                     <div className=" flex justify-between items-center p-4 border-b bg-white">
@@ -1023,67 +1028,75 @@ const Assets = () => {
                             Add +
                         </button>
                     </div>
-                    <ul className="p-4 space-y-2 overflow-y-auto"
-                        style={{
-                            maxHeight: '80vh',
-                        }}>                    {assetTypes.map((type) => (
-                            <li
-                                key={type.assetTypeId}
-                                className={`px-3 py-1 rounded flex items-center justify-between gap-2 cursor-pointer transition ${selectedAssetTypeId === type.assetTypeId ? "bg-gray-100 shadow" : "bg-white hover:bg-gray-100"
-                                    }`}
-                                onClick={() => setSelectedAssetTypeId(type.assetTypeId)}
-                            >
-                                {/* Asset Type Details */}
-                                <div>
-                                    <p className="text-sm font-medium">
-                                        {type.assetTypeDesc}
-                                        <span className="text-sm text-gray-500"> ({type.assets.filter(asset => asset.assetNo != null).length})</span>
-                                    </p>
-                                </div>
+                    {!initLoading ? (
 
-                                {/* More Options Icon */}
-                                {selectedAssetTypeId === type.assetTypeId && (
-                                    <div className="relative">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation(); // Prevent parent click event
-                                                toggleOptions(type.assetTypeId);
-                                            }}
-                                            className="p-1 transition text-sm text-gray-700"
-                                        >
-                                            <FaEllipsisV />
-                                        </button>
-
-                                        {/* Options Card */}
-                                        {activeOptionsId === type.assetTypeId && (
-                                            <div className="absolute right-0 mt-2 w-20 bg-white shadow-md border rounded-md z-10">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleUpdateTypeClick(type.assetTypeId);
-                                                        setActiveOptionsId(null); // Close menu
-                                                    }}
-                                                    className="block w-full text-center p-1 font-semibold text-sm text-gray-700 hover:bg-gray-100"
-                                                >
-                                                    Rename
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleDeleteTypeClick(type.assetTypeId, type.assetTypeDesc);
-                                                        setActiveOptionsId(null); // Close menu
-                                                    }}
-                                                    className="block w-full text-center p-1 font-semibold text-sm text-red-500 hover:bg-red-100"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        )}
+                        <ul className="p-4 space-y-2 overflow-y-auto"
+                            style={{
+                                maxHeight: '80vh',
+                            }}>                    {assetTypes.map((type) => (
+                                <li
+                                    key={type.assetTypeId}
+                                    className={`px-3 py-1 rounded flex items-center justify-between gap-2 cursor-pointer transition ${selectedAssetTypeId === type.assetTypeId ? "bg-gray-100 shadow" : "bg-white hover:bg-gray-100"
+                                        }`}
+                                    onClick={() => setSelectedAssetTypeId(type.assetTypeId)}
+                                >
+                                    {/* Asset Type Details */}
+                                    <div>
+                                        <p className="text-sm font-medium">
+                                            {type.assetTypeDesc}
+                                            <span className="text-sm text-gray-500"> ({type.assets.filter(asset => asset.assetNo != null).length})</span>
+                                        </p>
                                     </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
+
+                                    {/* More Options Icon */}
+                                    {selectedAssetTypeId === type.assetTypeId && (
+                                        <div className="relative">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Prevent parent click event
+                                                    toggleOptions(type.assetTypeId);
+                                                }}
+                                                className="p-1 transition text-sm text-gray-700"
+                                            >
+                                                <FaEllipsisV />
+                                            </button>
+
+                                            {/* Options Card */}
+                                            {activeOptionsId === type.assetTypeId && (
+                                                <div className="absolute right-0 mt-2 w-20 bg-white shadow-md border rounded-md z-10">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleUpdateTypeClick(type.assetTypeId);
+                                                            setActiveOptionsId(null); // Close menu
+                                                        }}
+                                                        className="block w-full text-center p-1 font-semibold text-sm text-gray-700 hover:bg-gray-100"
+                                                    >
+                                                        Rename
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteTypeClick(type.assetTypeId, type.assetTypeDesc);
+                                                            setActiveOptionsId(null); // Close menu
+                                                        }}
+                                                        className="block w-full text-center p-1 font-semibold text-sm text-red-500 hover:bg-red-100"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <div className="inset-0 mt-[40vh] flex items-center justify-center">
+                            <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-6 h-6 animate-spin"></div>
+                        </div>
+                    )}
+
                 </div>
                 <div className="h-screen border-x border-gray-200 bg-white overflow-auto">
                     <div className="flex justify-between items-center p-4 border-b bg-gray-50">
@@ -1108,34 +1121,43 @@ const Assets = () => {
                         />
                     </div>
 
-                    <ul
-                        className="p-4 space-y-2 overflow-y-auto"
-                        style={{
-                            maxHeight: "80vh",
-                        }}
-                    >
-                        {displayedAssets.length > 0 || displayedAssets.assetNo != null ? (
-                            displayedAssets.map((asset) => (
-                                <li
-                                    key={asset.assetNo}
-                                    className={`p-3 border rounded-lg flex items-center gap-3 hover:bg-gray-100 ${selectedAsset?.assetNo === asset.assetNo ? "bg-gray-100" : ""
-                                        }`}
-                                    onClick={() => handleAssetClick(asset)}
-                                >
-                                    <div className="bg-gray-200 text-gray-700 flex items-center justify-center w-10 h-10 rounded-full">
-                                        💻
-                                    </div>
-                                    <div>
-                                        <p className="text-md font-semibold">{asset.assetNo}</p>
-                                        <p className="text-sm">{asset.assetName}</p>
-                                        <p className="text-sm text-gray-500">Issue Count: {asset.assetIssueCount}</p>
-                                    </div>
-                                </li>
-                            ))
-                        ) : (
-                            <p className="text-center text-gray-500">No assets available</p>
-                        )}
-                    </ul>
+                    {!initLoading ? (
+
+                        <ul
+                            className="p-4 space-y-2 overflow-y-auto"
+                            style={{
+                                maxHeight: "80vh",
+                            }}
+                        >
+                            {displayedAssets.length > 0 || displayedAssets.assetNo != null ? (
+                                displayedAssets.map((asset) => (
+                                    <li
+                                        key={asset.assetNo}
+                                        className={`p-3 border rounded-lg flex items-center gap-3 hover:bg-gray-100 ${selectedAsset?.assetNo === asset.assetNo ? "bg-gray-100" : ""
+                                            }`}
+                                        onClick={() => handleAssetClick(asset)}
+                                    >
+                                        <div className="bg-gray-200 text-gray-700 flex items-center justify-center w-10 h-10 rounded-full">
+                                            💻
+                                        </div>
+                                        <div>
+                                            <p className="text-md font-semibold">{asset.assetNo}</p>
+                                            <p className="text-sm">{asset.assetName}</p>
+                                            <p className="text-sm text-gray-500">Issue Count: {asset.assetIssueCount}</p>
+                                        </div>
+                                    </li>
+                                ))
+                            ) : (
+                                <p className="text-center text-gray-500">No assets available</p>
+                            )}
+                        </ul>
+                    ) : (
+                        <div className="inset-0 mt-[40vh] flex items-center justify-center">
+                            <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-6 h-6 animate-spin"></div>
+                        </div>
+                    )}
+
+
                 </div>
 
                 <div className="h-screen border-l border-gray-200 bg-white overflow-auto flex flex-col">
@@ -1412,7 +1434,7 @@ const Assets = () => {
                             </div>
                         </div>
                     ) : (
-                        <p className="p-4 text-gray-500">Select an asset to view details.</p>
+                        <p className="fixed text-center  item-center justify-center p-4 text-gray-500">Select an asset to view details.</p>
                     )}
                 </div>
             </Split>

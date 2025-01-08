@@ -17,10 +17,12 @@ import useLogout from './services/logout';
 import Modal from './components/SessionModal';
 import { useState } from 'react';
 import Dashboard from './pages/Admin/Dashboard';
+import NotFound from './pages/shared/NotFound';
 
 const AppLayout = () => {
   const location = useLocation(); // Hook called within a Router context
   const isLoginScreen = location.pathname === "/login";
+  const isNotFoundPage = location.pathname === "/404";
   const navigate = useNavigate();
   const logout = useLogout(); // Call the hook, do not invoke it
   const [logoutLoading, setLogoutLoading] = useState(false);
@@ -47,12 +49,20 @@ const AppLayout = () => {
         />
       )}
       {/* Conditionally render Sidebar and TopNavWrapper */}
-      {!isLoginScreen && <Sidebar />}
-      {!isLoginScreen && <TopNavWrapper />}
+      {!isLoginScreen && !isNotFoundPage && <Sidebar />}
+      {!isLoginScreen && !isNotFoundPage && <TopNavWrapper />}
 
       {/* Page Content */}
-      <div className={`flex-1 ${isLoginScreen ? "" : "mt-12 p-4 ml-12"}`}>
+      <div className={`flex-1 ${isLoginScreen || isNotFoundPage ? "" : "mt-12 p-4 ml-12"}`}>
         <Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/login" />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<LoginPage />} />
           <Route
             path="/incidents"
@@ -117,14 +127,15 @@ const AppLayout = () => {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard/>
+                <Dashboard />
               </ProtectedRoute>
             }
           />
 
-          {/* Default route to redirect to login */}
-          <Route path="*" element={<Navigate to="/login" />} />
-        </Routes>
+          {/* Default route to redirect to 404 */}
+          <Route path="/404" element={<NotFound />} />
+          <Route path="*" element={<Navigate to="/404" />} />
+          </Routes>
       </div>
     </div>
   );

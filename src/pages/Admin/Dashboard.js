@@ -388,7 +388,8 @@ const Dashboard = () => {
       ) : (
         <div className="fixed inset-0 flex items-center justify-center">
           <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-16 h-16 animate-spin"></div>
-        </div>)}
+        </div>
+      )}
 
     </div>
   );

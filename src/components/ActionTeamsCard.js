@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const getRandomColor = () => {
-  const colors = ['bg-gray-500','bg-red-500', 'bg-purple-500', 'bg-yellow-500'];
+  const colors = ['bg-gray-500', 'bg-red-500', 'bg-purple-500', 'bg-yellow-500'];
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
-const TeamsCard = ({teams}) => {
+const TeamsCard = ({ teams }) => {
 
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+
 
   const filteredTeams = Array.isArray(teams)
-  ? teams.filter((team) =>
+    ? teams.filter((team) =>
       team.action_team_name.toLowerCase().includes(searchTerm.toLowerCase())
     )
-  : [];
+    : [];
   return (
     <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden z-50">
       {/* Search Bar */}
@@ -51,13 +54,14 @@ const TeamsCard = ({teams}) => {
       </div>
 
       {/* Add New Team Button */}
-      <div
-        className="flex items-center justify-center gap-2 p-4 border-t cursor-pointer hover:bg-gray-100 transition duration-200 ease-in-out"
-        onClick={() => alert('Add new team')}
+      <button
+        className="flex items-center justify-center w-full gap-2 py-4 border-t cursor-pointer hover:bg-gray-100 transition duration-200 ease-in-out"
+        onClick={() =>
+          navigate("/users-directory", { state: { role: "action team" } })
+        }
       >
-        <FaPlus className="text-blue-500" />
-        <span className="text-blue-500 font-semibold">Add New Team</span>
-      </div>
+        Add New Team +
+      </button>
     </div>
   );
 };

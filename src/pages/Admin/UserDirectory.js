@@ -3,13 +3,17 @@ import axios from "axios";
 import { FaEdit, FaIdCard, FaMailBulk, FaTrash } from "react-icons/fa";
 import Split from "react-split";
 import { Modal, Input, Button } from 'antd';
+import { useLocation } from "react-router-dom";
 
 
 const UsersDirectory = () => {
+  const location = useLocation();
+  const { role = "user" } = location.state || {};
+  
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [selectedRole, setSelectedRole] = useState("user");
+  const [selectedRole, setSelectedRole] = useState(role);
 
   // Fetch users on component mount
   const fetchUsers = async () => {
