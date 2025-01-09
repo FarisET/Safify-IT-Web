@@ -4,6 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import Report from '../../models/UserReport';  // Adjust path as necessary
 import { FaUser, FaTrash, FaArrowRight, FaImage } from 'react-icons/fa';
 import { formatDate } from '../../utils/date';
+import { FaCircleExclamation } from 'react-icons/fa6';
 
 const Incidents = () => {
   const [userReports, setUserReports] = useState([]);
@@ -25,6 +26,17 @@ const Incidents = () => {
   const [responseMessage, setResponseMessage] = useState('');
   const [responseStatus, setResponseStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedRowToggle, setSelectedRowToggle] = useState(false);
+
+
+  //Escalate Ticket
+  const [isEscalateModalVisible, setIsEscalateModalVisible] = useState(false);
+  const [isEscalateLoading, setisEscalateLoading] = useState(false);
+  const [escalateMsg, setEscalateMsg] = useState('');
+  const [escalateError, setEscalateError] = useState('');
+  const [comment, setComment] = useState('');
 
 
 
@@ -53,6 +65,19 @@ const Incidents = () => {
       fetchActionTeams();
     }
   }, [isModalOpen]);
+
+  const handleRowDoubleClick = (row) => {
+    if (selectedRow?.userReportId === row.userReportId) {
+      // Deselect if the same row is clicked
+      setSelectedRow(null);
+      setSelectedRowToggle(false);
+    } else {
+      // Select a new row
+      setSelectedRow(row);
+      setSelectedRowToggle(true);
+    }
+  };
+
 
   const handleAssignClick = (reportId, userId) => {
     setSelectedReportId(reportId);
@@ -175,8 +200,8 @@ const Incidents = () => {
       }
       return true;
     });
-    // .filter(report => (statusFilter === 'All' || report.status.toLowerCase() === statusFilter.toLowerCase()))
-    // .filter(report => (critFilter === 'All' || report.incidentCriticalityLevel.toLowerCase() === critFilter.toLowerCase()));
+  // .filter(report => (statusFilter === 'All' || report.status.toLowerCase() === statusFilter.toLowerCase()))
+  // .filter(report => (critFilter === 'All' || report.incidentCriticalityLevel.toLowerCase() === critFilter.toLowerCase()));
 
 
   useEffect(() => {
@@ -191,20 +216,58 @@ const Incidents = () => {
   </div>;
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
 
-  //Ticket Escalate
-  // const [isModalVisible, setIsModalVisible] = useState(false);
-  // const [selectedTicket, setSelectedTicket] = useState(null);
-  // const [comment, setComment] = useState('');
+  // Ticket Escalate
 
-  // const showModal = (ticket) => {
-  //   setSelectedTicket(ticket);
-  //   setIsModalVisible(true);
-  // };
 
-  // const handleCancel = () => {
-  //   setIsModalVisible(false);
-  //   setComment('');
-  // };
+  const showEscalateModal = () => {
+    setIsEscalateModalVisible(true);
+  };
+
+  const handleEscalateCancel = () => {
+    setIsEscalateModalVisible(false);
+    setComment('');
+    setEscalateMsg('');
+    setEscalateError('');
+  };
+
+  const handleEscalate = async () => {
+    try {
+      setisEscalateLoading(true);
+      const jwtToken = sessionStorage.getItem('jwt');
+
+      const response = await axios.post('http://localhost:3001/admin/dashboard/escalateReport',
+        {
+          user_report_id: selectedRow.userReportId,
+          user_report_desc: selectedRow.reportDescription,
+          user_report_criticality: selectedRow.incidentCriticalityLevel,
+          asset_name: selectedRow.assetName,
+          additional_comment: comment,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+
+      setEscalateMsg('Ticket escalated successfully')
+
+      setTimeout(() => {
+        handleEscalateCancel();
+        setComment('');
+      }, 2000);
+
+    } catch (error) {
+      setEscalateError('Failed to send message. Please try again');
+    } finally {
+      setisEscalateLoading(false); // Hide loading indicator
+    }
+  };
+
+
+
+
+
 
 
 
@@ -262,15 +325,21 @@ const Incidents = () => {
       <div className="mb-4 text-gray-700">{filteredReports.length} ticket{filteredReports.length !== 1 ? 's' : ''}</div>
 
       {/* Action Buttons - Shown when any checkbox is selected */}
-      {selectedReports.length > 0 ? (
-        <div className="flex gap-6 items-center p-2 mb-4 rounded">
-          <span>{selectedReports.length} selected</span>
+      {(selectedRowToggle && selectedRow.Assignee != 'Unassigned') ? (
+        <div className="flex gap-6 items-center p-1 mb-1 rounded">
           <div className="flex gap-2">
+            <button className="flex items-center bg-gray-100 hover:bg-amber-200 px-3 py-1 rounded"
+              onClick={() => showEscalateModal()}
+            >
+              <FaCircleExclamation className="text-sm" />
+              <p className=' text-sm ml-1'>Escalate Ticket</p>
+            </button>
+          </div>
 
-
-            <button className="flex items-center bg-gray-100 hover:bg-red-200 px-4 py-2 rounded">
-              <FaTrash className="mr-2" />
-              Delete
+          <div className="flex gap-2">
+            <button className="flex items-center bg-gray-100 hover:bg-red-200 px-3 py-1 rounded">
+              <FaTrash className="text-sm" />
+              <p className=' text-sm ml-1'>Delete Ticket</p>
             </button>
           </div>
         </div>
@@ -283,13 +352,13 @@ const Incidents = () => {
         <table className="table-auto w-full border-collapse shadow-lg rounded-md">
           <thead className="text-black text-left">
             <tr>
-              <th className="px-4 py-2 border-b">
+              {/* <th className="px-4 py-2 border-b">
                 <input
                   type="checkbox"
                   onChange={(e) => setSelectedReports(e.target.checked ? filteredReports.map(r => r.userReportId) : [])}
                   checked={selectedReports.length === filteredReports.length && filteredReports.length > 0}
                   />
-              </th>
+              </th> */}
               <th className="px-4 py-2 border-b">Ticket</th>
               <th className="px-4 py-2 border-b">Asset</th>
               {/* <th className="px-4 py-2 border-b">Asset.No</th> */}
@@ -307,14 +376,19 @@ const Incidents = () => {
           </thead>
           <tbody className="text-left">
             {filteredReports.map((report) => (
-              <tr key={report.userReportId} className="bg-white hover:bg-gray-100">
-                <td className="px-4 py-2 border-b">
+              <tr
+                key={report.userReportId}
+                className={`hover:bg-gray-100 cursor-pointer ${selectedRow && selectedRow.userReportId === report.userReportId ? 'bg-gray-200' : ''}`}
+                onDoubleClick={() => handleRowDoubleClick(report)}
+              >
+
+                {/* <td className="px-4 py-2 border-b">
                   <input
                     type="checkbox"
                     checked={selectedReports.includes(report.userReportId)}
                     onChange={() => toggleReportSelection(report.userReportId)}
                   />
-                </td>
+                </td> */}
                 <td className="px-4 py-2 border-b">
                   <div className="font-semibold text-gray-700 cursor-pointer hover:underline transition">
                     {report.userReportId}
@@ -543,6 +617,61 @@ const Incidents = () => {
                 disabled={isLoading} // Disable button while loading
               >
                 Assign
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {isEscalateModalVisible && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          onClick={() => handleCloseModal()} // Close modal and reset form on background click
+        >
+          <div
+            className="bg-white rounded-lg shadow-lg w-1/3 p-6"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+          >
+            <h3 className="text-xl font-semibold mb-4">Escalate Ticket</h3>
+
+            {isEscalateLoading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+            {escalateMsg && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{escalateMsg}</p>}
+            {escalateError && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{escalateError}</p>}
+
+            {/* Comment Field */}
+            <div className="mb-4">
+              <label htmlFor="comment" className="block text-gray-700 font-semibold mb-2">
+                Optional Message:
+              </label>
+              <textarea
+                id="comment"
+                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Send a message to the assigned action team"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows="3"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-2">
+              <button
+                className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                onClick={() => handleEscalateCancel()}
+                disabled={isEscalateLoading} // Disable button while loading
+              >
+                Cancel
+              </button>
+              <button
+                className="px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 hover:bg-emerald-200 transition"
+                onClick={async () => {
+                  handleEscalate();
+
+                }}
+                disabled={isEscalateLoading} // Disable button while loading
+              >
+                Send
               </button>
             </div>
           </div>

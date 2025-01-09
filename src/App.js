@@ -20,6 +20,7 @@ import Dashboard from './pages/Admin/Dashboard';
 import NotFound from './pages/shared/NotFound';
 import IncidentsCompleted from './pages/Admin/IncidentsCompleted';
 import ApprovedReports from './pages/Admin/ApprovedReports';
+import BulkUpload from './pages/Admin/BulkUpload';
 
 const AppLayout = () => {
   const location = useLocation(); // Hook called within a Router context
@@ -74,7 +75,7 @@ const AppLayout = () => {
               </ProtectedRoute>
             }
           />
-                    <Route
+          <Route
             path="/incidents-completed"
             element={
               <ProtectedRoute>
@@ -98,7 +99,7 @@ const AppLayout = () => {
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="/approved-reports"
             element={
               <ProtectedRoute>
@@ -150,10 +151,19 @@ const AppLayout = () => {
             }
           />
 
+          <Route
+            path="/bulk-upload-assets"
+            element={
+              <ProtectedRoute>
+                <BulkUpload />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Default route to redirect to 404 */}
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<Navigate to="/404" />} />
-          </Routes>
+        </Routes>
       </div>
     </div>
   );

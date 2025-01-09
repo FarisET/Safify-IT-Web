@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { AssetType } from '../../models/AssetType';
 import { format } from 'date-fns';
-import { FaUser, FaTrash, FaArrowRight, FaImage, FaEdit, FaEllipsisV, FaRecycle } from 'react-icons/fa';
+import { FaUser, FaTrash, FaArrowRight, FaImage, FaEdit, FaEllipsisV, FaRecycle, FaLink, FaDownload, FaArrowDown } from 'react-icons/fa';
 import LocationDropdown from "../../components/SearchableLocationDropdown";
 import AssignToDropdown from "../../components/SearchableUsersDropdown";
 import Split from "react-split";
+import { Modal, Upload } from 'antd';
+import { useNavigate } from 'react-router-dom';
+
 
 
 const Assets = () => {
@@ -17,6 +20,8 @@ const Assets = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(null);
     const [modalErrorMessage, setModalErrorMessage] = useState(null);
+    const navigate = useNavigate();
+
 
 
 
@@ -998,6 +1003,51 @@ const Assets = () => {
 
     //-------------X-------------
 
+    //Bulk Upload Assets
+    const [bulkUploadModalOpen, setBulkUploadModalOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [uploadLoading, setUploadLoading] = useState(false);
+    const [uploadMsg, setUploadMsg] = useState('');
+    const [uploadError, setUploadError] = useState('');
+
+    const handleBulkUpload = async () => {
+        if (!selectedFile) {
+            setUploadError("Please select a file to upload.");
+            return;
+        }
+
+        setUploadLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            const jwtToken = sessionStorage.getItem("jwt");
+            const response = await axios.post(
+                'http://localhost:3001/admin/bulkUpload/uploadAssetSheet',
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+
+            setUploadMsg('Uploaded Successfully')
+            handleCloseBulkUploadModal();
+        } catch (error) {
+            setUploadError("Failed to upload file. Please try again.");
+        } finally {
+            setUploadLoading(false);
+        }
+    };
+
+    const handleCloseBulkUploadModal = () => {
+        setBulkUploadModalOpen(false);
+        setSelectedFile(null);
+        setUploadError(null);
+    };
+
 
     return (
         <div className="bg-gray-100">
@@ -1101,13 +1151,23 @@ const Assets = () => {
                 <div className="h-screen border-x border-gray-200 bg-white overflow-auto">
                     <div className="flex justify-between items-center p-4 border-b bg-gray-50">
                         <h2 className="text-lg font-semibold">Assets</h2>
-                        <button
-                            type="button"
-                            className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
-                            onClick={() => setaddAssetModalOpen(true)}
-                        >
-                            Add +
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                                onClick={() => navigate('/bulk-upload-assets')}
+                            >
+                                Bulk Upload
+                            </button>
+                            <button
+                                type="button"
+                                className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                                onClick={() => setaddAssetModalOpen(true)}
+                            >
+                                Add +
+                            </button>
+                        </div>
+
                     </div>
 
                     {/* Search Bar */}
@@ -2063,8 +2123,91 @@ const Assets = () => {
                 </div>
             )}
 
+            <Modal
+                title="Bulk Upload Assets"
+                visible={bulkUploadModalOpen}
+                onCancel={handleCloseBulkUploadModal}
+                footer={[
+                    <div className="flex justify-end space-x-3">
+                        <button
+                            type="button"
+                            onClick={handleCloseBulkUploadModal}
+                            className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${uploadLoading ? "bg-gray-400 cursor-not-allowed" : "hover:bg-red-200"
+                                }`}
+                            disabled={uploadLoading}
+                        >
+                            Cancel
+                        </button>,
+                        <button
+                            type="submit"
+                            loading={uploadLoading}
+                            onClick={handleBulkUpload}
+                            disabled={uploadLoading}
+                            className={`px-3 py-1 bg-gray-100 rounded font-semibold text-gray-700 transition ${uploadLoading
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "hover:bg-emerald-200"
+                                }`}
+                        >
+                            {uploadLoading ? "Uploading..." : "Submit"}
+                        </button>,
+                    </div>,
+                ]}
+            >
+                <div className="flex flex-col h-full space-y-4">
+                    {/* Loading / Success / Error Messages */}
+                    {uploadLoading && (
+                        <p className="p-3 rounded-lg text-sky-700 bg-sky-100 text-sm flex items-center">
+                            <div className="w-6 h-6 mr-2 animate-spin"></div>
+                            Loading...
+                        </p>
+                    )}
+                    {uploadMsg && (
+                        <p className="p-3 rounded-lg text-emerald-700 bg-emerald-100 text-sm">
+                            {uploadMsg}
+                        </p>
+                    )}
+                    {uploadError && (
+                        <p className="p-3 rounded-lg text-red-700 bg-red-100 text-sm">
+                            {uploadError}
+                        </p>
+                    )}
 
-        </div>
+                    {/* Instruction Text */}
+                    <p className="text-sm font-semibold text-gray-700">
+                        Download the template file and insert your assets.
+                    </p>
+
+                    {/* Bottom Buttons Section */}
+                    <div className="flex-grow flex flex-col justify-end space-y-2">
+                        {/* File Upload Button */}
+                        <Upload
+                            beforeUpload={(file) => {
+                                setSelectedFile(file);
+                                return false;
+                            }}
+                            accept=".xlsx"
+                        >
+                            <button className="px-4 py-2 bg-sky-100 text-sky-700 font-medium rounded-lg hover:bg-blue-200 transition">
+                                Browse File
+                            </button>
+                        </Upload>
+
+                        {/* Download Template Link */}
+                        <div className="flex items-center">
+                            <a
+                                href="/files/assets.xlsx" download
+                                className="text-sky-600 text-xs font-medium underline"
+                            >
+                                Download Template
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
+
+
+
+        </div >
     );
 };
 

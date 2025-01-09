@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+thead tr.sticky {
+  position: sticky;
+  top: 0;
+  background-color: #f3f4f6; /* Match your table's header color */
+}
