@@ -118,8 +118,8 @@ const BulkUpload = () => {
         try {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.post(
-                'http://localhost:3001/admin/bulkUpload/uploadAssetSheet',
-                { assets: data },
+                'http://localhost:3001/admin/bulkUpload/uploadAssetJson',
+                { jsonAssetData: data },
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -132,17 +132,38 @@ const BulkUpload = () => {
             setData([]);
             setShowFinishButton(false);
         } catch (error) {
-            setUploadError('Failed to upload file. Please try again.');
-        } finally {
+            if (error.response && error.response.data && error.response.data.error) {
+                // Capture backend error message
+                setUploadError(`Failed to upload file. ${error.response.data.error}`);
+            } else {
+                // Fallback for unexpected errors
+                setUploadError(`Failed to upload file. ${error.message}`);
+            }
+        }
+        finally {
             setUploadLoading(false);
         }
     };
 
-    const columns = Object.keys(data[0] || {}).map((key) => ({
-        title: key,
-        dataIndex: key,
-        key,
-    }));
+    // const columns = Object.keys(data[0] || {}).map((key) => ({
+    //     title: key,
+    //     dataIndex: key,
+    //     key,
+    // }));
+
+    const columns = [
+        {
+            title: '#', // Row number column
+            dataIndex: 'rowNumber',
+            key: 'rowNumber',
+            render: (text, record, index) => index + 1, // Display row number
+        },
+        ...Object.keys(data[0] || {}).map((key) => ({
+            title: key,
+            dataIndex: key,
+            key,
+        })),
+    ];
 
     // if (loading) return <div className="">
     //     <div className="fixed inset-0 flex items-center justify-center">
@@ -194,7 +215,7 @@ const BulkUpload = () => {
                 />
             ) :
                 <div className="text-center text-gray-500 py-8">Please Upload a file</div>
-        }
+            }
 
             {showFinishButton && (
                 <button

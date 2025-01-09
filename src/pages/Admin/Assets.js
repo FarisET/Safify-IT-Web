@@ -116,6 +116,7 @@ const Assets = () => {
             setTimeout(() => {
                 setaddTypeModalOpen(false);
                 fetchAssetTypes(); // Refresh asset types list
+                setAssetTypeDesc('');
             }, 2000);
 
         } catch (error) {
@@ -822,6 +823,9 @@ const Assets = () => {
                 setDeleteModalOpen(false);
                 setDeleteModalMessage('')
                 // fetchAssetDetails(selectedAsset); 
+                setDeleteInput('');
+                setSelectedAsset(null);
+                fetchAssetDetails(null);
                 fetchAssetTypes();
             }, 2000);
 
@@ -843,7 +847,7 @@ const Assets = () => {
     };
     //----------------X------------------
 
-    //DELETE Asset
+    //Dispose Asset
     const [DisposemodalOpen, setDisposeModalOpen] = useState(false);
     const [DisposemodalMessage, setDisposeModalMessage] = useState(null);
     const [Disposeloading, setDisposeLoading] = useState(false);

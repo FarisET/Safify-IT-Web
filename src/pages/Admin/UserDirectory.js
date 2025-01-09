@@ -9,7 +9,7 @@ import { useLocation } from "react-router-dom";
 const UsersDirectory = () => {
   const location = useLocation();
   const { role = "user" } = location.state || {};
-  
+
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -271,9 +271,19 @@ const UsersDirectory = () => {
       );
       setChangeEmailMessage("Email updated successfully");
       fetchUsers();
-      handleCloseChangeEmailModal();
+      setTimeout(() => {
+        handleCloseChangeEmailModal();
+      }, 2000);
+
     } catch (error) {
-      setChangeEmailError("Failed to update email. Please try again.");
+      if (error.response && error.response.data && error.response.data.error) {
+        // Capture backend error message
+        setChangeEmailError(`Failed to update email. ${error.response.data.error}`);
+      } else {
+        // Fallback for unexpected errors
+        setChangeEmailError(`Failed to update email. ${error.message}`);
+      }
+
     } finally {
       setChangeEmailLoading(false);
     }
@@ -281,6 +291,7 @@ const UsersDirectory = () => {
 
   const handleCloseChangeEmailModal = () => {
     setChangeEmailModalOpen(false);
+    setChangeEmailMessage('')
     setChangeEmailInput({ userId: "", newEmail: "" });
     setChangeEmailError(null);
   };
@@ -383,38 +394,42 @@ const UsersDirectory = () => {
                       <td className="px-6 py-3 border-b">{user.name}</td>
                       <td className="px-6 py-3 border-b">{user.id}</td>
                       <td className="px-6 py-3 border-b">
-                        {user.isActive ? "Inactive" : "Active"}
+                        {user.isActive}
                       </td>
-                      <td className="px-6 py-3 border-b flex justify-end space-x-2">
-                        <button
-                          onClick={() => {
-                            setChangeEmailInput({ userId: user.id, newEmail: "" });
-                            setChangeEmailModalOpen(true);
-                          }
-                          }
-                          className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition whitespace-nowrap"
-                        >
-                          <span>Change email</span>
-                          <FaIdCard className="text-sm" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setEditUserInput({ userId: user.id, userName: user.name, roleName: user.role });
-                            setEditUserModalOpen(true);
+                      <td className="">
+                        {user.isActive !== 'Disabled' && (
+                          <div className="px-6 py-3 border-b flex justify-end space-x-2">
+                            <button
+                              onClick={() => {
+                                setChangeEmailInput({ userId: user.id, newEmail: "" });
+                                setChangeEmailModalOpen(true);
+                              }}
+                              className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition whitespace-nowrap"
+                            >
+                              <span>Change email</span>
+                              <FaIdCard className="text-sm" />
+                            </button>
 
-                          }}
-                          className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
-                        >
-                          <span>Edit</span>
-                          <FaEdit className="text-sm" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUserClick(user.id)}
-                          className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
-                        >
-                          <span>Disable</span>
-                          <FaTrash className="text-sm" />
-                        </button>
+                            <button
+                              onClick={() => {
+                                setEditUserInput({ userId: user.id, userName: user.name, roleName: user.role });
+                                setEditUserModalOpen(true);
+                              }}
+                              className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                            >
+                              <span>Edit</span>
+                              <FaEdit className="text-sm" />
+                            </button>
+
+                            <button
+                              onClick={() => handleDeleteUserClick(user.id)}
+                              className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                            >
+                              <span>Disable</span>
+                              <FaTrash className="text-sm" />
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))

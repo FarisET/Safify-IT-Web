@@ -340,7 +340,7 @@ const LocationsDirectory = () => {
 
     const onCloseUpdateSubLocModal = () => {
         setupdateSubLocationModalOpen(false);
-        updateSubLocloading(false);
+        setupdateSubLocLoading(false);
         setSubLocName('');
         setnewSubLocName('');
         setupdateSubLocErrorMessage('');
