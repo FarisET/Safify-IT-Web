@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { ReactComponent as SafifyIcon } from '../../assets/images/safify_it_icon.svg';
+
 
 const LoginPage = () => {
   const [userId, setUserId] = useState('');
@@ -38,7 +40,7 @@ const LoginPage = () => {
         const decodedToken = parseJwt(token);
         const role = decodedToken.role_name;
         const userName = decodedToken.user_name;
-        
+
 
         // Check if the role is not 'admin'
         if (role !== 'admin') {
@@ -107,6 +109,15 @@ const LoginPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-4 bg-white shadow-md rounded-lg">
+        <div
+          className="flex flex-col items-center justify-center gap-3 w-full h-full cursor-pointer"
+        >
+          <SafifyIcon className="w-16 h-16" />
+          <h1 className="text-lg lg:text-xl px-3 py-1 bg-sky-100 text-gray-700 font-semibold rounded">
+            SAFIFY IT Service Management
+          </h1>
+        </div>
+
         <h2 className="text-2xl font-bold text-center">Login</h2>
 
         {error && <p className="text-red-500 text-center">{error}</p>}

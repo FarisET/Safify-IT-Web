@@ -43,7 +43,7 @@ const AppLayout = () => {
   return (
 
     <div className="flex h-screen">
-      {showModal && (
+      {(showModal && !isLoginScreen) && (
         <Modal
           message="Your session has expired."
           onClose={handleModalClose}
