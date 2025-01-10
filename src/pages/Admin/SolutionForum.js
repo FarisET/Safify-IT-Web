@@ -37,9 +37,8 @@ const SolutionForum = () => {
   const filteredEntries = forumEntries.filter(
     (item) =>
       item.Problem.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.Solution.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (categoryFilter === 'All' || item.category === categoryFilter)
-  );
+      item.Solution.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   const handleStepsClick = (steps) => {
     setSelectedSteps(steps);
@@ -71,16 +70,6 @@ const SolutionForum = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border rounded px-4 py-2 w-1/3"
         />
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          className="font-semibold text-gray-700 rounded px-2 py-2 border"
-        >
-          <option value="All">All</option>
-          <option value="Safety">Safety</option>
-          <option value="Maintenance">Maintenance</option>
-          <option value="Compliance">Compliance</option>
-        </select>
       </div>
 
       <div className="mb-4 text-gray-700">

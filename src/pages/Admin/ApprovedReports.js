@@ -131,6 +131,8 @@ const ApprovedReports = () => {
       || (report.status && report.status.toLowerCase().includes(searchTerm.toLowerCase()))
       || (formatDistanceToNow(new Date(report.dateTime), { addSuffix: true }) && formatDistanceToNow(new Date(report.dateTime), { addSuffix: true }).toLowerCase().includes(searchTerm.toLowerCase()))
       || (report.incidentCriticalityLevel && report.incidentCriticalityLevel.toLowerCase().includes(searchTerm.toLowerCase()))
+      || (report.userReportId == searchTerm)
+
     )
     .filter(report => (statusFilter === 'All' || report.status.toLowerCase() === statusFilter.toLowerCase()))
 
@@ -159,7 +161,7 @@ const ApprovedReports = () => {
           className="border rounded px-4 py-2 w-1/3"
         />
 
-      
+
       </div>
 
       <div className="mb-4 text-gray-700">{filteredReports.length} report{filteredReports.length !== 1 ? 's' : ''}</div>
@@ -169,6 +171,7 @@ const ApprovedReports = () => {
         <table className="table-auto w-full border-collapse shadow-lg rounded-md">
           <thead className="bg-blue-600 text-black text-left">
             <tr>
+              <th className="px-4 py-2 border-b">Ticket</th>
               <th className="px-4 py-2 border-b">Asset</th>
               <th className="px-4 py-2 border-b">Summary</th>
               <th className="px-4 py-2 border-b">Assignee</th>
@@ -182,6 +185,7 @@ const ApprovedReports = () => {
           <tbody className="text-left">
             {filteredReports.map((report) => (
               <tr key={report.userReportId} className="bg-white hover:bg-gray-100">
+                <td className="px-4 py-2 border-b">{report.userReportId}</td>
                 <td className="px-4 py-2 border-b">{report.assetName}</td>
                 <td className="px-4 py-2 border-b font-semibold text-gray-700">
                   <span className="block text-gray-800">⚠️ {report.reportDescription}</span>

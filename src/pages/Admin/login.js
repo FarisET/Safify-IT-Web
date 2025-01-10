@@ -61,7 +61,7 @@ const LoginPage = () => {
         localStorage.setItem('timeToExpire', timeToExpire);
 
 
-        navigate('/incidents');
+        navigate('/tickets');
       } else if (response.status === 401) {
         setError("Incorrect credentials, please try again.");
       } else if (response.status === 500 && responseError) {

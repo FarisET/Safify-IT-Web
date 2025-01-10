@@ -97,7 +97,7 @@ const TopNav = ({ teams, fetchTeams }) => {
       {/* Logo Section */}
       <div
         className="flex items-center gap-3 w-[38.2%] flex-grow cursor-pointer"
-        onClick={() => navigate('/incidents')}
+        onClick={() => navigate('/tickets')}
       >
         <SafifyIcon className="w-8 h-8" />
         <h1 className="hidden lg:block text-md lg:text-lg font-semibold text-gray-900">

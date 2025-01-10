@@ -68,7 +68,7 @@ const AppLayout = () => {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route
-            path="/incidents"
+            path="/tickets"
             element={
               <ProtectedRoute>
                 <Incidents />
@@ -76,7 +76,7 @@ const AppLayout = () => {
             }
           />
           <Route
-            path="/incidents-completed"
+            path="/tickets-closed"
             element={
               <ProtectedRoute>
                 <IncidentsCompleted />

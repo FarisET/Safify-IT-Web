@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Pie, PieChart, BarChart, Bar, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
-// import { Card } from '@mui/material';
-import Split from "react-split";
-
+import { Table, Select, Typography } from "antd";
 import axios from 'axios';
 import { Divider } from 'antd';
+import { FaQuestionCircle } from 'react-icons/fa';
+
+const { Option } = Select;
+
+
 
 const Dashboard = () => {
   // State for analytics data
@@ -13,7 +16,9 @@ const Dashboard = () => {
 
   // Date filter options
   const today = new Date();
-  const [selectedDateRange, setSelectedDateRange] = useState(today.toISOString().split('T')[0]);
+  const [selectedDateRange, setSelectedDateRange] = useState('All');
+  const [selectedUserDateRange, setSelectedUserDateRange] = useState('All');
+
 
   const last7Days = new Date();
   const last15Days = new Date();
@@ -26,6 +31,7 @@ const Dashboard = () => {
   last365Days.setDate(today.getDate() - 365);
 
   const dateOptions = [
+    { text: 'All', value: 'All' },
     { text: 'Today', value: today.toISOString().split('T')[0] },
     { text: 'Last 7 Days', value: last7Days.toISOString().split('T')[0] },
     { text: 'Last 15 Days', value: last15Days.toISOString().split('T')[0] },
@@ -33,15 +39,49 @@ const Dashboard = () => {
     { text: 'Last Year', value: last365Days.toISOString().split('T')[0] },
   ];
 
+  //2 level piechart
+
+
+  //user tickets
+  const [userTickets, setUserTickets] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchUserTickets = async (dateRange) => {
+    try {
+      const jwtToken = sessionStorage.getItem("jwt");
+      let dataRange = dateRange;
+      const endpoint = dateRange === "All"
+        ? "http://localhost:3001/analytics/fetchTotalTicketsByUser"
+        : `http://localhost:3001/analytics/fetchTotalTicketsByUser?timestamp=${dateRange}`;
+
+      const response = await axios.get(
+        endpoint,
+        {
+          headers: { Authorization: `Bearer ${jwtToken}` },
+        }
+      );
+      setUserTickets(response.data);
+    } catch (error) {
+      setError("Failed to fetch user tickets. Please try again.");
+    }
+  };
+
+
+
+
   // Fetch Time-Bound Analytics
   const fetchTimeBoundAnalytics = async (dateRange) => {
     try {
       const jwtToken = sessionStorage.getItem('jwt');
 
       let dataRange = dateRange;
+      const endpoint = dateRange === "All"
+        ? "http://localhost:3001/analytics/fetchAnalyticsTimeBound"
+        : `http://localhost:3001/analytics/fetchAnalyticsTimeBound?timestamp=${dateRange}`;
 
       const response = await axios.get(
-        `http://localhost:3001/analytics/fetchAnalyticsTimeBound?timestamp=${dataRange}`,
+        endpoint,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
@@ -76,18 +116,25 @@ const Dashboard = () => {
   };
 
   // Handle date range change
-  const handleDateRangeChange = (e) => {
-    setSelectedDateRange(e.target.value);
-    fetchTimeBoundAnalytics(e.target.value);
+  const handleDateRangeChange = (value) => {
+    setSelectedDateRange(value);
+    fetchTimeBoundAnalytics(value);
+  };
+
+  const handleUserDateRangeChange = (value) => {
+    setSelectedUserDateRange(value);
+    fetchUserTickets(value);
   };
 
   // Initial data load
   useEffect(() => {
     fetchTimeBoundAnalytics(selectedDateRange);
     fetchNonTimeBoundAnalytics();
+    fetchUserTickets(selectedUserDateRange);
+
   }, []);
 
-  const [activeTab, setActiveTab] = useState("nonTimeBound");
+  const [activeTab, setActiveTab] = useState("timeBound");
   const COLORS = [
     '#0284c7', // Original blue color
     '#22d3ee', // Cyan 400
@@ -103,101 +150,6 @@ const Dashboard = () => {
     '#075985', // Sky 700
     '#0c4a6e'  // Sky 900
   ];
-
-
-  const COLORS_NEEDLE = ['#10b981', '#f59e0b', '#ef4444'];
-
-
-  const RADIAN = Math.PI / 180;
-
-  const cx = 180;
-  const cy = 100;
-  const iR = 50;
-  const oR = 100;
-  const value = 50;
-
-  const needle = (data, cx, cy, iR, oR, color) => {
-    // Ensure data is valid
-    if (!Array.isArray(data) || data.length === 0) return null;
-
-    // Calculate total tickets
-    const total = data.reduce((sum, entry) => sum + entry["Ticket Count"], 0);
-
-    // Find the criticality with the highest count
-    const maxEntry = data.reduce((max, entry) =>
-      entry["Ticket Count"] > max["Ticket Count"] ? entry : max
-    );
-
-    // Calculate the cumulative sum up to the midpoint of the largest segment
-    let cumulativeSum = 0;
-    for (const entry of data) {
-      if (entry === maxEntry) {
-        cumulativeSum += entry["Ticket Count"] / 2;
-        break;
-      }
-      cumulativeSum += entry["Ticket Count"];
-    }
-
-    // Calculate the angle for the needle
-    const ang = 180.0 * (1 - cumulativeSum / total);
-    const length = (iR + 2 * oR) / 3;
-    const sin = Math.sin(-RADIAN * ang);
-    const cos = Math.cos(-RADIAN * ang);
-    const r = 5;
-
-    // Calculate needle points
-    const x0 = cx;
-    const y0 = cy;
-    const xba = x0 + r * sin;
-    const yba = y0 - r * cos;
-    const xbb = x0 - r * sin;
-    const ybb = y0 + r * cos;
-    const xp = x0 + length * cos;
-    const yp = y0 + length * sin;
-
-    return [
-      <circle key="circle" cx={x0} cy={y0} r={r} fill={color} stroke="none" />,
-      <path
-        key="path"
-        d={`M${xba},${yba} L${xbb},${ybb} L${xp},${yp} Z`}
-        fill={color}
-        stroke="none"
-      />,
-    ];
-  };
-
-  //user tickets
-  const [userTickets, setUserTickets] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchUserTickets = async () => {
-      setLoading(true);
-      try {
-        const jwtToken = sessionStorage.getItem("jwt");
-        const response = await axios.get(
-          'http://localhost:3001/fetchTotalTicketsByUser',
-          {
-            headers: { Authorization: `Bearer ${jwtToken}` },
-          }
-        );
-        setUserTickets(response.data);
-      } catch (error) {
-        setError("Failed to fetch user tickets. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (activeTab === "user") {
-      fetchUserTickets();
-    }
-  }, [activeTab]);
-
-
-
-
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -242,69 +194,60 @@ const Dashboard = () => {
               <div className="p-4 mb-2">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-semibold">Statistics</h3>
-                  <select
+                  <Select
                     value={selectedDateRange}
-                    onChange={handleDateRangeChange}
-                    className="font-medium text-gray-700 rounded-lg px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500"
+                    onChange={(value) => handleDateRangeChange(value)} // Adjust to handle the value directly
+                    className="w-48"
                   >
                     {dateOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
+                      <Option key={option.value} value={option.value}>
                         {option.text}
-                      </option>
+                      </Option>
                     ))}
-                  </select>
+                  </Select>
+
+
+
                 </div>
 
                 <div className='max-h-[60vh] overflow-y-auto overflow-x-auto max-w-[90vw]'>
 
                   {/* Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                    <Card title="Total Tickets">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 mr-4">
+                    <Card title="Total Tickets" tooltipContent="Total tickets launched. Based on date filter">
                       <p className="text-lg font-bold">{timeBoundData.incidentsReported || 0}</p>
                     </Card>
-                    <Card title="Tickets Resolved">
+                    <Card title="Tickets Resolved" tooltipContent="Total tickets closed based on date filter">
                       <p className="text-lg font-bold">{timeBoundData.incidentsResolved || 0}</p>
                     </Card>
+                    <Card title="Ticket by Criticality" tooltipContent="Total tickets categorized by criticality of issue. Based on date filter">
+                      <div className="flex flex-wrap gap-4">
+                        {timeBoundData.totalTicketsByIncidentCriticality?.length > 0 ? (
+                          timeBoundData.totalTicketsByIncidentCriticality.map((item, index) => {
+                            // Assign background color based on the Criticality Level
+                            const bgColor =
+                              item['Criticality Level'] === 'low'
+                                ? 'px-3 py-1 text-gray-700 font-semibold rounded bg-emerald-100'
+                                : item['Criticality Level'] === 'high'
+                                  ? 'px-3 py-1 text-gray-700 font-semibold rounded bg-yellow-100'
+                                  : item['Criticality Level'] === 'critical'
+                                    ? 'px-3 py-1 text-gray-700 font-semibold rounded bg-red-100'
+                                    : 'px-3 py-1 text-gray-700 font-semibold rounded bg-gray-100'; // Default color if no match
 
-                    {timeBoundData.totalTicketsByIncidentCriticality && (
-                      <div className=''>
-                        <ResponsiveContainer width="100%" height={140}>
-
-                          <PieChart >
-                            <Pie
-                              dataKey="Ticket Count"
-                              nameKey="Criticality Level"
-                              startAngle={180}
-                              endAngle={0}
-                              data={timeBoundData.totalTicketsByIncidentCriticality}
-                              cx={cx}
-                              cy={cy}
-                              innerRadius={iR}
-                              outerRadius={oR}
-                              fill="#8884d8"
-                              stroke="none"
-                              label
-
-                            >
-                              {timeBoundData.totalTicketsByIncidentCriticality.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS_NEEDLE[index % COLORS_NEEDLE.length]} />
-                              ))}
-                            </Pie>
-                            {needle(
-                              timeBoundData?.totalTicketsByIncidentCriticality || [],
-                              cx,
-                              cy,
-                              iR,
-                              oR,
-                              '#000'
-                            )}
-                            <Legend />
-
-                          </PieChart>
-                        </ResponsiveContainer>
+                            return (
+                              <div
+                                key={index}
+                                className={`text-lg font-bold px-4 py-2 rounded ${bgColor}`}
+                              >
+                                {`${item['Criticality Level']}: ${item['Ticket Count']}`}
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="text-lg font-bold">No data available</div>
+                        )}
                       </div>
-
-                    )}
+                    </Card>
 
                   </div>
 
@@ -312,9 +255,9 @@ const Dashboard = () => {
 
 
                   {/* Charts */}
-                  <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 mr-4">
                     {/* Assets by Status Bar Chart */}
-                    <Card title="Assets by Status">
+                    <Card title="Assets by Status" tooltipContent="total count of assets for each status. For example: easily identify how many are operational and how many are in repair. Based on date filter">
                       {timeBoundData.assetsByStatus && (
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={timeBoundData.assetsByStatus}>
@@ -336,7 +279,7 @@ const Dashboard = () => {
 
 
                     {/* Total Incidents on Locations Pie Chart */}
-                    <Card title="Total Incidents on Locations">
+                    {/* <Card title="Total Incidents on Locations"  tooltipContent="Count of tickets categorized by locations.">
                       {timeBoundData.totalIncidentsOnLocations && (
                         <ResponsiveContainer width="100%" height={300}>
                           <PieChart>
@@ -357,7 +300,49 @@ const Dashboard = () => {
                           </PieChart>
                         </ResponsiveContainer>
                       )}
+                    </Card> */}
+
+                    <Card title="Total Tickets by Location and Sub Location" tooltipContent="Inner pie chart represents sublocations. Outer pie chart represents locations">
+                      {timeBoundData.totalIncidentsOnLocations && timeBoundData.totalIncidentsOnSubLocations && (
+                        <ResponsiveContainer width="100%" height={500}>
+                          <PieChart>
+                            {/* Outer Pie for Locations */}
+                            <Pie
+                              data={timeBoundData.totalIncidentsOnLocations}
+                              dataKey="incident_count"
+                              nameKey="location_name"
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={60}
+                              fill="#8884d8"
+                            >
+                              {timeBoundData.totalIncidentsOnLocations.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            {/* Inner Pie for Sub-Locations */}
+                            <Pie
+                              data={timeBoundData.totalIncidentsOnSubLocations}
+                              dataKey="incident_count"
+                              nameKey="sub_location_name"
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={70}
+                              outerRadius={90}
+                              fill="#82ca9d"
+
+                            >
+                              {timeBoundData.totalIncidentsOnSubLocations.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      )}
                     </Card>
+
 
 
                   </div>
@@ -376,17 +361,17 @@ const Dashboard = () => {
 
                   {/* Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                    <Card title="Average Response Time (hrs)">
+                    <Card title="Average Response Time (hrs)" tooltipContent="The average time in which the users launched ticket will be assigned to the relevant personel and notified back to user.">
                       <p className="text-lg font-bold">
                         {nonTimeBoundData.averageResponseTime?.[0]?.["time (hrs)"] || 0}
                       </p>
                     </Card>
-                    <Card title="Average Ticket Closing Time (hrs)">
+                    <Card title="Average Ticket Closing Time (hrs)" tooltipContent="The average time it takes for the investigation report to be approved.">
                       <p className="text-lg font-bold">
                         {nonTimeBoundData.averageTicketClosingTime?.[0]?.["time (hrs)"] || 0}
                       </p>
                     </Card>
-                    <Card title="Average Ticket Lifecycle (hrs)">
+                    <Card title="Average Ticket Lifecycle (hrs)" tooltipContent="The average time it takes to close a ticket from user launching till ticket closure.">
                       <p className="text-lg font-bold">
                         {nonTimeBoundData.averageTicketLifecycle?.[0]?.["time (hrs)"] || 0}
                       </p>
@@ -395,7 +380,7 @@ const Dashboard = () => {
 
                   {/* Charts */}
                   <div>
-                    <Card title="Efficiency by Team">
+                    <Card title="Efficiency by Team" tooltipContent="A percentage value calculated based on how quickly and efficiently a particular action team is resolving issues">
                       {nonTimeBoundData.efficiency && (
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={nonTimeBoundData.efficiency}>
@@ -426,29 +411,46 @@ const Dashboard = () => {
 
             {activeTab === "user" && (
               <div>
-                {loading && <p>Loading...</p>}
-                {error && <p>{error}</p>}
-                {!loading && !error && (
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead>
-                      <tr>
-                        <th>User</th>
-                        <th>Total Tickets</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {userTickets.map((ticket) => (
-                        <tr key={ticket.user_id}>
-                          <td>{ticket.user_name}</td>
-                          <td>{ticket.total_tickets}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                {!error ? (
+                  <div>
+                    <div className="flex justify-between items-center mb-2 p-4">
+                      <h3 className="text-xl font-semibold">User</h3>
+                      <Select
+                        value={selectedUserDateRange}
+                        onChange={(value) => handleUserDateRangeChange(value)}
+                        className="w-48"
+                      >
+                        {dateOptions.map((option) => (
+                          <Option key={option.value} value={option.value}>
+                            {option.text}
+                          </Option>
+                        ))}
+                      </Select>
+                    </div>
+
+                    <Table
+                      dataSource={userTickets}
+                      columns={[
+                        {
+                          title: "User",
+                          dataIndex: "user_name",
+                          key: "user_name",
+                        },
+                        {
+                          title: "Total Tickets",
+                          dataIndex: "tickets",
+                          key: "tickets",
+                        },
+                      ]}
+                      rowKey="user_name"
+                      pagination={{ pageSize: 10 }}
+                    />
+                  </div>
+                ) : (
+                  <Typography.Text type="danger">{error}</Typography.Text>
                 )}
               </div>
             )}
-
           </div>
         </div>
       ) : (
@@ -460,14 +462,27 @@ const Dashboard = () => {
     </div>
   );
 };
-const Card = ({ children, title }) => {
+const Card = ({ title, tooltipContent, children }) => {
   return (
-    <div className="bg-white border border-gray-300 rounded-lg p-4">
+    <div className="relative bg-white border border-gray-300 rounded-lg p-4">
       {title && <h3 className="text-md font-semibold text-gray-700 mb-2">{title}</h3>}
-      {children}
+
+      {/* Question Icon */}
+      <span className="absolute top-2 right-2">
+        <label className="group inline-block">
+          <FaQuestionCircle className="text-gray-500 text-lg hover:text-sky-500 cursor-pointer" />
+          <div className="absolute right-0 mt-2 w-64 p-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+            {tooltipContent || ""}
+          </div>
+        </label>
+      </span>
+
+      {/* Card Content */}
+      <div>{children}</div>
     </div>
   );
 };
+
 
 
 

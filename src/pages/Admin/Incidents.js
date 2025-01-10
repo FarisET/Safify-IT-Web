@@ -472,7 +472,9 @@ const Incidents = () => {
                   {report.dateTime ? (
                     <>
                       {formatDate(report.dateTime).time}{' '}
-                      <span className="text-[0.7rem] font-semibold align-top">({formatDate(report.dateTime).period})</span>
+                      <span className="text-[0.7rem] font-semibold align-top">
+                        ({formatDate(report.dateTime).period})
+                      </span>
                     </>
                   ) : (
                     <span className="text-gray-700 font-bold">X</span>

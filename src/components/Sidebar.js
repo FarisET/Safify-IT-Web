@@ -74,8 +74,8 @@ const Sidebar = () => {
           isCollapsed={isCollapsed}
           title="Tickets"
           links={[
-            { to: '/incidents', icon: FaTicketAlt, label: 'Open Tickets' },
-            { to: '/incidents-completed', icon: FaTicketAlt, label: 'Closed Tickets' },
+            { to: '/tickets', icon: FaTicketAlt, label: 'Open Tickets' },
+            { to: '/tickets-closed', icon: FaTicketAlt, label: 'Closed Tickets' },
           ]}
         />
         <div className="border-t border-gray-200 my-1"></div>
