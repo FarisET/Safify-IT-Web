@@ -396,39 +396,56 @@ const UsersDirectory = () => {
                       <td className="px-6 py-3 border-b">
                         {user.isActive}
                       </td>
-                      <td className="">
-                        {user.isActive !== 'Disabled' && (
-                          <div className="px-6 py-3 border-b flex justify-end space-x-2">
-                            <button
-                              onClick={() => {
-                                setChangeEmailInput({ userId: user.id, newEmail: "" });
-                                setChangeEmailModalOpen(true);
-                              }}
-                              className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition whitespace-nowrap"
-                            >
-                              <span>Change email</span>
-                              <FaIdCard className="text-sm" />
-                            </button>
+                      <td className="px-6 py-3 border-b flex justify-end space-x-2">
 
-                            <button
-                              onClick={() => {
-                                setEditUserInput({ userId: user.id, userName: user.name, roleName: user.role });
-                                setEditUserModalOpen(true);
-                              }}
-                              className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
-                            >
-                              <span>Edit</span>
-                              <FaEdit className="text-sm" />
-                            </button>
+                        {user.isActive == 'Disabled' && (
+                          <button
+                            className="flex items-center space-x-2 px-3 py-1 text-sm text-white font-semibold rounded"
+                          >
+                            <span>-</span>
+                          </button>
 
-                            <button
-                              onClick={() => handleDeleteUserClick(user.id)}
-                              className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
-                            >
-                              <span>Disable</span>
-                              <FaTrash className="text-sm" />
-                            </button>
-                          </div>
+                        )}
+
+
+                        {user.isActive != 'Disabled' && (
+
+                          <button
+                            onClick={() => {
+                              setChangeEmailInput({ userId: user.id, newEmail: "" });
+                              setChangeEmailModalOpen(true);
+                            }
+                            }
+                            className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition whitespace-nowrap"
+                          >
+                            <span>Change email</span>
+                            <FaIdCard className="text-sm" />
+                          </button>
+                        )}
+                        {user.isActive != 'Disabled' && (
+
+                          <button
+                            onClick={() => {
+                              setEditUserInput({ userId: user.id, userName: user.name, roleName: user.role });
+                              setEditUserModalOpen(true);
+
+                            }}
+                            className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                          >
+                            <span>Edit</span>
+                            <FaEdit className="text-sm" />
+                          </button>
+                        )}
+
+                        {user.isActive != 'Disabled' && (
+
+                          <button
+                            onClick={() => handleDeleteUserClick(user.id)}
+                            className="flex items-center space-x-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                          >
+                            <span>Disable</span>
+                            <FaTrash className="text-sm" />
+                          </button>
                         )}
                       </td>
                     </tr>

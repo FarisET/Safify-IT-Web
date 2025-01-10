@@ -38,7 +38,7 @@ const Dashboard = () => {
     try {
       const jwtToken = sessionStorage.getItem('jwt');
 
-     let dataRange = dateRange;
+      let dataRange = dateRange;
 
       const response = await axios.get(
         `http://localhost:3001/analytics/fetchAnalyticsTimeBound?timestamp=${dataRange}`,
@@ -87,7 +87,7 @@ const Dashboard = () => {
     fetchNonTimeBoundAnalytics();
   }, []);
 
-  const [activeTab, setActiveTab] = useState("timeBound");
+  const [activeTab, setActiveTab] = useState("nonTimeBound");
   const COLORS = [
     '#0284c7', // Original blue color
     '#22d3ee', // Cyan 400
@@ -166,6 +166,36 @@ const Dashboard = () => {
     ];
   };
 
+  //user tickets
+  const [userTickets, setUserTickets] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUserTickets = async () => {
+      setLoading(true);
+      try {
+        const jwtToken = sessionStorage.getItem("jwt");
+        const response = await axios.get(
+          'http://localhost:3001/fetchTotalTicketsByUser',
+          {
+            headers: { Authorization: `Bearer ${jwtToken}` },
+          }
+        );
+        setUserTickets(response.data);
+      } catch (error) {
+        setError("Failed to fetch user tickets. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (activeTab === "user") {
+      fetchUserTickets();
+    }
+  }, [activeTab]);
+
+
 
 
 
@@ -193,6 +223,16 @@ const Dashboard = () => {
                 }`}
             >
               Efficiency
+            </button>
+
+            <button
+              onClick={() => setActiveTab("user")}
+              className={`px-4 py-2 font-semibold ${activeTab === "user"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-600 hover:text-blue-500"
+                }`}
+            >
+              User
             </button>
           </div>
 
@@ -383,6 +423,32 @@ const Dashboard = () => {
                 </div>
               </div>
             )}
+
+            {activeTab === "user" && (
+              <div>
+                {loading && <p>Loading...</p>}
+                {error && <p>{error}</p>}
+                {!loading && !error && (
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Total Tickets</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userTickets.map((ticket) => (
+                        <tr key={ticket.user_id}>
+                          <td>{ticket.user_name}</td>
+                          <td>{ticket.total_tickets}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+
           </div>
         </div>
       ) : (
