@@ -21,11 +21,21 @@ import NotFound from './pages/shared/NotFound';
 import IncidentsCompleted from './pages/Admin/IncidentsCompleted';
 import ApprovedReports from './pages/Admin/ApprovedReports';
 import BulkUpload from './pages/Admin/BulkUpload';
+import UserPortal from './pages/User/UserPortal';
+import UserTopNav from './user components/UserTopNav';
+import NotAuthorized from './pages/shared/NotAuthorized'
+import TicketForm from './pages/shared/TicketForm';
+
 
 const AppLayout = () => {
   const location = useLocation(); // Hook called within a Router context
   const isLoginScreen = location.pathname === "/login";
   const isNotFoundPage = location.pathname === "/404";
+  const isNotUserPortal = location.pathname === "/user-portal";
+  const isNotAction = location.pathname === "/action-team-portal";
+  const isNotTicketForm = location.pathname === "/launch-ticket";
+  const isNotUnAuthorized = location.pathname === "/not-authorized";
+
   const navigate = useNavigate();
   const logout = useLogout(); // Call the hook, do not invoke it
   const [logoutLoading, setLogoutLoading] = useState(false);
@@ -52,8 +62,8 @@ const AppLayout = () => {
         />
       )}
       {/* Conditionally render Sidebar and TopNavWrapper */}
-      {!isLoginScreen && !isNotFoundPage && <Sidebar />}
-      {!isLoginScreen && !isNotFoundPage && <TopNavWrapper />}
+      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized &&<Sidebar />}
+      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized && <TopNavWrapper />}
 
       {/* Page Content */}
       <div className={`flex-1 ${isLoginScreen || isNotFoundPage ? "" : "mt-12 p-4 ml-12"}`}>
@@ -70,7 +80,7 @@ const AppLayout = () => {
           <Route
             path="/tickets"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <Incidents />
               </ProtectedRoute>
             }
@@ -78,7 +88,7 @@ const AppLayout = () => {
           <Route
             path="/tickets-closed"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <IncidentsCompleted />
               </ProtectedRoute>
             }
@@ -86,7 +96,7 @@ const AppLayout = () => {
           <Route
             path="/assets"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <AssetPage />
               </ProtectedRoute>
             }
@@ -94,7 +104,7 @@ const AppLayout = () => {
           <Route
             path="/approvals"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <Approvals />
               </ProtectedRoute>
             }
@@ -102,7 +112,7 @@ const AppLayout = () => {
           <Route
             path="/approved-reports"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <ApprovedReports />
               </ProtectedRoute>
             }
@@ -110,7 +120,7 @@ const AppLayout = () => {
           <Route
             path="/solution-forum"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <SolutionForum />
               </ProtectedRoute>
             }
@@ -118,7 +128,7 @@ const AppLayout = () => {
           <Route
             path="/users-directory"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <UsersDirectory />
               </ProtectedRoute>
             }
@@ -127,7 +137,7 @@ const AppLayout = () => {
           <Route
             path="/locations-directory"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <LocationsDirectory />
               </ProtectedRoute>
             }
@@ -136,7 +146,7 @@ const AppLayout = () => {
           <Route
             path="/help"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <Help />
               </ProtectedRoute>
             }
@@ -145,7 +155,7 @@ const AppLayout = () => {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -154,11 +164,33 @@ const AppLayout = () => {
           <Route
             path="/bulk-upload-assets"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <BulkUpload />
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/user-portal"
+            element={
+              <ProtectedRoute requiredRole="user">
+                <UserTopNav>
+                  <UserPortal />
+                </UserTopNav>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/launch-ticket"
+            element={
+              <ProtectedRoute allowAll>
+                <UserTopNav >
+                  <TicketForm />
+                </UserTopNav>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/not-authorized" element={<NotAuthorized />} />
 
           {/* Default route to redirect to 404 */}
           <Route path="/404" element={<NotFound />} />

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ReactComponent as SafifyIcon } from '../assets/images/safify_it_icon.svg';
 import { FaBars, FaTimes, FaBell, FaQuestionCircle, FaCog, FaBullhorn } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import Notifications from '../components/NotificationsCard';
-import TeamsCard from '../components/ActionTeamsCard';
+import Notifications from './NotificationsCard';
+import TeamsCard from './ActionTeamsCard';
 import { Modal, Input } from 'antd';
 import axios from 'axios';
 

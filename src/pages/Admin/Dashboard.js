@@ -441,6 +441,11 @@ const Dashboard = () => {
                           dataIndex: "tickets",
                           key: "tickets",
                         },
+                        {
+                          title: "Asset(s) Assigned",
+                          dataIndex: "assets",
+                          key: "assets",
+                        },
                       ]}
                       rowKey="user_name"
                       pagination={{ pageSize: 10 }}

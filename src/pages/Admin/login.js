@@ -13,11 +13,10 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (loading) return; // Prevent re-execution if already loading
+    if (loading) return;
     setLoading(true);
     setError('');
 
-    console.log('Login function triggered'); // Debugging log
 
     try {
       const deviceToken = "webapp";
@@ -43,10 +42,11 @@ const LoginPage = () => {
 
 
         // Check if the role is not 'admin'
-        if (role !== 'admin') {
+        if (role == null) {
           setError('You are not authorized');
           return; // Exit the function if not authorized
         }
+  
 
         const currentTime = Date.now() / 1000;
         const timeToExpire = decodedToken.exp - currentTime;
@@ -60,8 +60,19 @@ const LoginPage = () => {
         localStorage.setItem('jwtToken', token);
         localStorage.setItem('timeToExpire', timeToExpire);
 
+        if (role == 'admin') {
+          navigate('/tickets');
+        } else if (role =='user') {
+          navigate('/user-portal');
 
-        navigate('/tickets');
+        } else if (role == 'action_team') {
+          navigate('/action-team-portal');
+
+        } else {
+          setError('You are not authorized');
+        }
+
+        
       } else if (response.status === 401) {
         setError("Incorrect credentials, please try again.");
       } else if (response.status === 500 && responseError) {
