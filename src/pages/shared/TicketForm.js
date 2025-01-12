@@ -49,7 +49,7 @@ const TicketForm = () => {
     try {
       const jwtToken = sessionStorage.getItem("jwt");
       const response = await axios.get(
-        "http://localhost:3001/userReport/dashboard/getLocationsAndSubLocations",
+        "http://localhost:3001/ticket/dashboard/getLocationsAndSubLocations",
         {
           headers: { Authorization: `Bearer ${jwtToken}` },
         }
@@ -95,7 +95,7 @@ const TicketForm = () => {
       const userId = sessionStorage.getItem("userId");
 
       const response = await axios.get(
-        `http://localhost:3001/userReport/dashboard/getAssetsandAssetTypes/${userId}`,
+        `http://localhost:3001/ticket/dashboard/getAssetsandAssetTypes/${userId}`,
         {
           headers: { Authorization: `Bearer ${jwtToken}` },
         }
@@ -151,7 +151,7 @@ const TicketForm = () => {
 
       // Send the data to the backend using axios
       const response = await axios.post(
-        `http://localhost:3001/userReport/dashboard/${userId}/MakeReport`,
+        `http://localhost:3001/ticket/dashboard/${userId}/MakeReport`,
         data,
         {
           headers: {
@@ -162,22 +162,25 @@ const TicketForm = () => {
 
       // Handle successful submission
       if (response.status === 200) {
-        setSubmitTicketMessage("Ticket Submitted Successfully:");
-        handleFormClose();
-        setTimeout(() => {          
-          if (role == 'admin') {
+        setSubmitTicketMessage("Ticket Submitted Successfully!");
+
+        // Delay navigation to allow the success message to be visible
+        setTimeout(() => {
+          if (role === 'admin') {
             navigate('/tickets');
-          } else if (role == 'user') {
+          } else if (role === 'user') {
             navigate('/user-portal');
-
-          } else if (role == 'action_team') {
-            navigate('/action-team-portal')
+          } else if (role === 'action_team') {
+            navigate('/action-team-portal');
           } else {
-            navigate('/404')
+            navigate('/404');
           }
-        }, 3000)
 
+          // Reset form after navigation
+          handleFormClose();
+        }, 3000);
       }
+
     } catch (error) {
       setSubmitTicketError("Failed to launch ticket. Please try again");
       // Handle error (e.g., show an error message to the user)
@@ -199,7 +202,7 @@ const TicketForm = () => {
       } else {
         navigate('/404')
       }
-    }, 2000)
+    }, 4000)
 
   }
 

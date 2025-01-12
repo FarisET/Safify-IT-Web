@@ -96,7 +96,7 @@ const TopNav = ({ teams, fetchTeams }) => {
     <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 h-16 flex items-center px-4 md:px-6 z-50">
       {/* Logo Section */}
       <div
-        className="flex items-center gap-3 w-[38.2%] flex-grow cursor-pointer"
+        className="flex items-center gap-3 w-auto flex-grow cursor-pointer"
         onClick={() => navigate('/tickets')}
       >
         <SafifyIcon className="w-8 h-8" />
@@ -116,7 +116,7 @@ const TopNav = ({ teams, fetchTeams }) => {
       </div>
 
       {/* Center Menu and Right Section for Large Screens */}
-      <div className="hidden md:flex flex-grow justify-center w-[23.6%] gap-6 font-semibold text-gray-700 relative">
+      <div className="hidden md:flex flex-grow justify-left w-auto gap-6 font-semibold text-gray-700 relative">
         <span
           className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
           onClick={() => navigate('/dashboard')}
@@ -140,9 +140,15 @@ const TopNav = ({ teams, fetchTeams }) => {
             <TeamsCard teams={teams} />
           </div>
         )}
+         <span
+          className="cursor-pointer bg-sky-200 hover:bg-gray-100 px-3 py-1 rounded"
+          onClick={() => navigate('/launch-ticket')}
+        >
+          Launch Ticket
+        </span>
       </div>
 
-      <div className="hidden md:flex items-center gap-4 w-[38.2%] justify-end">
+      <div className="hidden md:flex items-center gap-4 w-auto justify-end">
         {/* <span
           className="relative cursor-pointer hover:bg-gray-200 p-2 rounded-full transition"
           onClick={toggleNotifications}
@@ -251,6 +257,17 @@ const TopNav = ({ teams, fetchTeams }) => {
             >
               Assets
             </span>
+
+            <span
+              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+              onClick={() => {
+                navigate('/launch-ticket');
+                toggleMenu();
+              }}
+            >
+              Launch Tikcet
+            </span>
+
 
           </nav>
 

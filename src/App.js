@@ -25,6 +25,9 @@ import UserPortal from './pages/User/UserPortal';
 import UserTopNav from './user components/UserTopNav';
 import NotAuthorized from './pages/shared/NotAuthorized'
 import TicketForm from './pages/shared/TicketForm';
+import ActionTeamPortal from './pages/ActionTeam/ActionTeamPortal';
+import ActionTopNav from './pages/ActionTeam/ActionTopNav';
+import ActionTasks from './pages/ActionTeam/ActionTasks';
 
 
 const AppLayout = () => {
@@ -32,9 +35,11 @@ const AppLayout = () => {
   const isLoginScreen = location.pathname === "/login";
   const isNotFoundPage = location.pathname === "/404";
   const isNotUserPortal = location.pathname === "/user-portal";
-  const isNotAction = location.pathname === "/action-team-portal";
+  const isNotActionPortal = location.pathname === "/action-team-portal";
   const isNotTicketForm = location.pathname === "/launch-ticket";
   const isNotUnAuthorized = location.pathname === "/not-authorized";
+  const isNotActionTasks= location.pathname === "/my-tasks";
+  const isNotActionForm = location.pathname === "/not-authorized";
 
   const navigate = useNavigate();
   const logout = useLogout(); // Call the hook, do not invoke it
@@ -62,8 +67,8 @@ const AppLayout = () => {
         />
       )}
       {/* Conditionally render Sidebar and TopNavWrapper */}
-      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized &&<Sidebar />}
-      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized && <TopNavWrapper />}
+      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && <Sidebar />}
+      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && <TopNavWrapper />}
 
       {/* Page Content */}
       <div className={`flex-1 ${isLoginScreen || isNotFoundPage ? "" : "mt-12 p-4 ml-12"}`}>
@@ -189,6 +194,29 @@ const AppLayout = () => {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/action-team-portal"
+            element={
+              <ProtectedRoute requiredRole="action_team">
+                <ActionTopNav >
+                  <ActionTeamPortal />
+                </ActionTopNav>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/my-tasks"
+            element={
+              <ProtectedRoute requiredRole="action_team">
+                <ActionTopNav >
+                  <ActionTasks />
+                </ActionTopNav>
+              </ProtectedRoute>
+            }
+          />
+
 
           <Route path="/not-authorized" element={<NotAuthorized />} />
 

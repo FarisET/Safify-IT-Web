@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { ReactComponent as SafifyIcon } from '../assets/images/safify_it_icon.svg';
+import { ReactComponent as SafifyIcon } from '../../assets/images/safify_it_icon.svg';
 import { FaBars, FaTimes, FaBell, FaQuestionCircle, FaCog, FaBullhorn, FaPowerOff } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import useLogout from '../services/logout';
+import useLogout from '../../services/logout';
 
 
 
-const UserTopNav = ({ children }) => {
+const ActionTopNav = ({ children }) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -38,7 +38,7 @@ const UserTopNav = ({ children }) => {
         {/* Logo Section */}
         <div
           className="flex items-center gap-3 w-auto flex-grow cursor-pointer"
-          onClick={() => navigate('/user-portal')}
+          onClick={() => navigate('/action-team-portal')}
         >
           <SafifyIcon className="w-8 h-8" />
           <h1 className="hidden lg:block text-md lg:text-lg font-semibold text-gray-900">
@@ -58,15 +58,21 @@ const UserTopNav = ({ children }) => {
 
         {/* Center Menu and Right Section for Large Screens */}
         <div className="hidden md:flex flex-grow justify-left w-auto gap-6 font-semibold text-gray-700 relative">
+        <span
+            className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+            onClick={() => navigate('/my-tasks')}
+          >
+            My Tasks
+          </span>
           <span
             className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
-            onClick={() => navigate('/user-portal')}
+            onClick={() => navigate('/action-team-portal')}
           >
             My Tickets
           </span>
 
           <span
-            className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+            className="cursor-pointer bg-sky-200 hover:bg-gray-100 px-3 py-1 rounded"
             onClick={() => navigate('/launch-ticket')}
           >
             Launch Ticket
@@ -131,7 +137,16 @@ const UserTopNav = ({ children }) => {
               <span
                 className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
                 onClick={() => {
-                  navigate('/user-portal');
+                  navigate('/my-tasks');
+                  toggleMenu();
+                }}
+              >
+                My Tasks
+              </span>
+              <span
+                className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+                onClick={() => {
+                  navigate('/action-team-portal');
                   toggleMenu();
                 }}
               >
@@ -167,4 +182,4 @@ const UserTopNav = ({ children }) => {
   );
 };
 
-export default UserTopNav;
+export default ActionTopNav;
