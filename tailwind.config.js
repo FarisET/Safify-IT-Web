@@ -9,8 +9,8 @@ module.exports = {
         sans: ['Inter', 'sans-serif'],
       },
       colors: {
-        primary: '#0052CC', // Adjust this to match your design
-        secondary: '#172B4D', // Sidebar background color
+        primary: '#1893f8', // Adjust this to match your design
+        secondary: '#56aeff', // Sidebar background color
         grey: '#DFE1E6', // Border color
         lightGrey: '#F4F5F7', // Hover color
         blue: '#0065FF',

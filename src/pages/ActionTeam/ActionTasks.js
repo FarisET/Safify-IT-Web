@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Divider } from "antd";
 import { FaImage } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
-const ActionTasks = () => {
+const ActionTasks = ({ticketID, taskID}) => {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     //Image
     const [selectedImage, setSelectedImage] = useState(null);
+    const navigate = useNavigate();
 
     // Fetch assigned tasks from the API
     const fetchAssignedReports = async () => {
@@ -50,7 +52,7 @@ const ActionTasks = () => {
                 </div>
             )}
 
-            {error && <p className="text-center text-red-500">Error: {error}</p>}
+            {error && <p className="text-center text-red-500">{error}</p>}
 
             {!loading && tasks.length === 0 && (
                 <div className="flex flex-col items-center justify-center mt-10 px-4">
@@ -74,6 +76,7 @@ const ActionTasks = () => {
                     </p>
                 </div>
             )}
+
 
             {selectedImage && (
                 <div
@@ -145,6 +148,7 @@ const ActionTasks = () => {
                                         No Image
                                     </p>}
                                     <button
+                                        onClick={()=>navigate('/action-form')}
                                         type="submit"
                                         className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
                                     >

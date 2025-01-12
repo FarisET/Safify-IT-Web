@@ -28,6 +28,8 @@ import TicketForm from './pages/shared/TicketForm';
 import ActionTeamPortal from './pages/ActionTeam/ActionTeamPortal';
 import ActionTopNav from './pages/ActionTeam/ActionTopNav';
 import ActionTasks from './pages/ActionTeam/ActionTasks';
+import ActionForm from './pages/ActionTeam/ActionForm';
+import LaunchTicketPage from './pages/shared/LaunchTicketPage';
 
 
 const AppLayout = () => {
@@ -38,8 +40,8 @@ const AppLayout = () => {
   const isNotActionPortal = location.pathname === "/action-team-portal";
   const isNotTicketForm = location.pathname === "/launch-ticket";
   const isNotUnAuthorized = location.pathname === "/not-authorized";
-  const isNotActionTasks= location.pathname === "/my-tasks";
-  const isNotActionForm = location.pathname === "/not-authorized";
+  const isNotActionTasks = location.pathname === "/my-tasks";
+  const isNotActionForm = location.pathname === "/action-form";
 
   const navigate = useNavigate();
   const logout = useLogout(); // Call the hook, do not invoke it
@@ -67,8 +69,8 @@ const AppLayout = () => {
         />
       )}
       {/* Conditionally render Sidebar and TopNavWrapper */}
-      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && <Sidebar />}
-      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && <TopNavWrapper />}
+      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && !isNotActionForm && <Sidebar />}
+      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && !isNotActionForm && <TopNavWrapper />}
 
       {/* Page Content */}
       <div className={`flex-1 ${isLoginScreen || isNotFoundPage ? "" : "mt-12 p-4 ml-12"}`}>
@@ -188,12 +190,11 @@ const AppLayout = () => {
             path="/launch-ticket"
             element={
               <ProtectedRoute allowAll>
-                <UserTopNav >
-                  <TicketForm />
-                </UserTopNav>
+                <LaunchTicketPage />
               </ProtectedRoute>
             }
           />
+
 
           <Route
             path="/action-team-portal"
@@ -212,6 +213,17 @@ const AppLayout = () => {
               <ProtectedRoute requiredRole="action_team">
                 <ActionTopNav >
                   <ActionTasks />
+                </ActionTopNav>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/action-form"
+            element={
+              <ProtectedRoute requiredRole="action_team">
+                <ActionTopNav >
+                  <ActionForm />
                 </ActionTopNav>
               </ProtectedRoute>
             }
