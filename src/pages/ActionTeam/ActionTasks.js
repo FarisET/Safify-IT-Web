@@ -4,7 +4,7 @@ import { Divider } from "antd";
 import { FaImage } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
-const ActionTasks = ({ticketID, taskID}) => {
+const ActionTasks = ({ ticketID, taskID }) => {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -112,8 +112,15 @@ const ActionTasks = ({ticketID, taskID}) => {
                                 <strong>Criticality:</strong> {task.incident_criticality_level}
                             </p>
                             <p className="text-sm text-gray-700">
-                                <strong>Status:</strong> {task.status}
+                                <strong>Status: </strong>
+                                <span
+                                    className={`${task.status === 'approved' ? 'text-emerald-800 font-semibold' : ''
+                                        }`}
+                                >
+                                    {task.status}
+                                </span>
                             </p>
+
                             <p className="text-sm text-gray-700">
                                 <strong>Sub-location:</strong> {task.sub_location_name}
                             </p>
@@ -138,7 +145,7 @@ const ActionTasks = ({ticketID, taskID}) => {
                                         <button
                                             onClick={() => setSelectedImage(task.image)}
                                             type="button"
-                                            className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                                            className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-sky-200 transition"
                                         >
                                             <FaImage />
                                         </button>
@@ -147,13 +154,16 @@ const ActionTasks = ({ticketID, taskID}) => {
                                     >
                                         No Image
                                     </p>}
-                                    <button
-                                        onClick={()=>navigate('/action-form')}
-                                        type="submit"
-                                        className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
-                                    >
-                                        Take Action
-                                    </button>
+                                    {task.status != 'approved' && (
+                                        <button
+                                            onClick={() => navigate('/action-form', { state: { user_report_id: task.user_report_id } })}
+                                            type="submit"
+                                            className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+                                        >
+                                            Take Action
+                                        </button>
+
+                                    )}
                                 </div>
                             </div>
 

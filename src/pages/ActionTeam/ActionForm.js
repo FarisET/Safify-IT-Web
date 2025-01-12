@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 
 const ActionForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -11,9 +12,11 @@ const ActionForm = () => {
     reporter: "",
     steps: [],
     solution: "",
-    attachedImage: null
+    attachedImage: null,
   });
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user_report_id } = location.state || {};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,25 +56,72 @@ const ActionForm = () => {
     }
   };
 
+  const [submitFormLoading, setSubmitFormLoading] = useState(false);
+  const [error, setError] = useState('');
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const userId = sessionStorage.getItem("userId"); // Assuming userid is stored in sessionStorage
+    const endpoint = `http://localhost:3001/actionTeam/dashboard/${userId}/MakeActionReport`;
+
+    const data = new FormData();
+    data.append("reported_by", formData.reporter);
+    data.append("report_description", formData.description);
+    data.append("resolution_description", formData.solution);
+    data.append("user_report_id", user_report_id); // Adjust based on actual usage
+    if (formData.attachedImage) {
+      data.append("proof_image", formData.attachedImage);
+    }
+
     try {
-      console.log("Submitted data:", formData);
-      navigate("/success");
+      setSubmitFormLoading(true);
+      await axios.post(endpoint, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+        },
+      });
+      setSubmissionSuccess(true);
+      setTabs((prevTabs) => [
+        ...prevTabs,
+        { id: 4, label: "Page 4: Success" },
+      ]);
+      setCurrentPage(4);
+      setFormData({
+        description: "",
+        criticality: "low",
+        sublocId: null,
+        assetNo: null,
+        reporter: "",
+        steps: [],
+        solution: "",
+        attachedImage: null,
+      });
     } catch (error) {
-      console.error("Submission failed:", error);
+      setError("Submission failed:", error.response || error.message)
+    } finally {
+      setSubmitFormLoading(false);
     }
   };
 
-  const tabs = [
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
+
+  const [tabs, setTabs] = React.useState([
     { id: 1, label: "Page 1: Details" },
     { id: 2, label: "Page 2: Steps" },
     { id: 3, label: "Page 3: Resolution" },
-  ];
+  ]);
 
   return (
     <div className="p-4 max-w-lg mx-auto mt-8">
       <h1 className="text-2xl font-bold text-center mb-6">Action Form</h1>
+      {submitFormLoading && (
+        <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>
+      )}
+      {error && (
+        <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{error}</p>
+      )}
 
       {/* Timeline Navigation */}
       <div className="flex items-center justify-between mb-6">
@@ -80,10 +130,10 @@ const ActionForm = () => {
             <div
               onClick={() => setCurrentPage(tab.id)}
               className={`flex items-center justify-center w-10 h-10 rounded-full cursor-pointer ${currentPage === tab.id
-                ? "bg-primary text-white"
-                : currentPage > tab.id
                   ? "bg-primary text-white"
-                  : "bg-gray-200 text-gray-700"
+                  : currentPage > tab.id
+                    ? "bg-primary text-white"
+                    : "bg-gray-200 text-gray-700"
                 }`}
             >
               {tab.id}
@@ -127,7 +177,7 @@ const ActionForm = () => {
 
         {currentPage === 2 && (
           <div>
-            <h2 className="text-gray-700 mb-4">Solution Steps <span className="text-gray-500">(Optional)</span></h2>
+            <h2 className="text-gray-700 mb-4">Solution Steps</h2>
             {formData.steps.map((step, index) => (
               <div key={index} className="flex items-center gap-2 mb-4">
                 <textarea
@@ -160,9 +210,8 @@ const ActionForm = () => {
         )}
 
         {currentPage === 3 && (
-            <div className="flex flex-col gap-2">
-              <label className="text-gray-700">Resolution</label>
-               
+          <div className="flex flex-col gap-2">
+            <label className="text-gray-700">Resolution</label>
             <textarea
               name="solution"
               value={formData.solution}
@@ -183,13 +232,24 @@ const ActionForm = () => {
           </div>
         )}
 
+        {currentPage === 4 && submissionSuccess && (
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-green-600 mb-4">
+              Form Submitted
+            </h2>
+            <p className="text-gray-700">
+              Your action report has been submitted for aproval.
+            </p>
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="flex justify-between mt-6">
-          {currentPage > 1 && (
+          {currentPage > 1 || currentPage !=4 && (
             <button
               type="button"
               onClick={() => setCurrentPage(currentPage - 1)}
-              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
             >
               Back
             </button>
@@ -198,7 +258,7 @@ const ActionForm = () => {
             <button
               type="button"
               onClick={() => setCurrentPage(currentPage + 1)}
-              className="px-4 py-2 bg-primary text-white rounded hover:bg-indigo-600"
+              className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-sky-200 transition"
             >
               Next
             </button>
@@ -206,11 +266,20 @@ const ActionForm = () => {
           {currentPage === 3 && (
             <button
               type="submit"
-              className="px-4 py-2 bg-primary text-white rounded hover:bg-indigo-600"
+              className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
             >
               Submit
             </button>
           )}
+          {/* {currentPage === 4 && (
+            <button
+            onClick={()=> navigate('/ac')}
+              className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-emerald-200 transition"
+            >
+              Back to Portal 
+            </button>
+          )} */}
+
         </div>
       </form>
     </div>

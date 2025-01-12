@@ -195,6 +195,15 @@ const AppLayout = () => {
             }
           />
 
+          <Route
+            path="/my-tickets"
+            element={
+              <ProtectedRoute allowAll>
+                <UserPortal />
+              </ProtectedRoute>
+            }
+          />
+
 
           <Route
             path="/action-team-portal"
