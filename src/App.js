@@ -30,6 +30,7 @@ import ActionTasks from './pages/ActionTeam/ActionTasks';
 import ActionForm from './pages/ActionTeam/ActionForm';
 import LaunchTicketPage from './pages/shared/LaunchTicketPage';
 import MyTicketPage from './pages/shared/MyTicketsPage';
+import ScanNetwork from './pages/Admin/ScanNetwork';
 
 
 const AppLayout = () => {
@@ -174,6 +175,14 @@ const AppLayout = () => {
             element={
               <ProtectedRoute requiredRole="admin">
                 <BulkUpload />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/scan-network"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <ScanNetwork />
               </ProtectedRoute>
             }
           />
