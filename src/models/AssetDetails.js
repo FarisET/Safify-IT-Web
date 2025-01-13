@@ -13,7 +13,8 @@ export class AssetDetails {
         userName,
         assetLocation,
         locationName,
-        assetSubLocationId
+        assetSubLocationId,
+        mac
     ) {
         this.assetNo = assetNo;
         this.assetName = assetName;
@@ -29,6 +30,7 @@ export class AssetDetails {
         this.assetLocation = assetLocation;
         this.locationName = locationName;
         this.assetSubLocationId = assetSubLocationId;
+        this.mac = mac;
     }
 
     static fromJson(json) {
@@ -46,7 +48,8 @@ export class AssetDetails {
             json.user_name || '',
             json.asset_location || '',
             json.location_name || '',
-            json.asset_location_id || ''
+            json.asset_location_id || '',
+            json.mac || ''
         );
     }
 
@@ -66,6 +69,7 @@ export class AssetDetails {
             asset_location: this.assetLocation,
             location_name: this.locationName,
             asset_location_id: this.assetSubLocationId,
+            mac: this.mac
         };
     }
 }

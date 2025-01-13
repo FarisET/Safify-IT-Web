@@ -21,7 +21,6 @@ import NotFound from './pages/shared/NotFound';
 import IncidentsCompleted from './pages/Admin/IncidentsCompleted';
 import ApprovedReports from './pages/Admin/ApprovedReports';
 import BulkUpload from './pages/Admin/BulkUpload';
-import UserPortal from './pages/User/UserPortal';
 import UserTopNav from './user components/UserTopNav';
 import NotAuthorized from './pages/shared/NotAuthorized'
 import TicketForm from './pages/shared/TicketForm';
@@ -30,18 +29,20 @@ import ActionTopNav from './pages/ActionTeam/ActionTopNav';
 import ActionTasks from './pages/ActionTeam/ActionTasks';
 import ActionForm from './pages/ActionTeam/ActionForm';
 import LaunchTicketPage from './pages/shared/LaunchTicketPage';
+import MyTicketPage from './pages/shared/MyTicketsPage';
 
 
 const AppLayout = () => {
   const location = useLocation(); // Hook called within a Router context
   const isLoginScreen = location.pathname === "/login";
   const isNotFoundPage = location.pathname === "/404";
-  const isNotUserPortal = location.pathname === "/user-portal";
   const isNotActionPortal = location.pathname === "/action-team-portal";
   const isNotTicketForm = location.pathname === "/launch-ticket";
   const isNotUnAuthorized = location.pathname === "/not-authorized";
   const isNotActionTasks = location.pathname === "/my-tasks";
   const isNotActionForm = location.pathname === "/action-form";
+  const isNotMyTickets = location.pathname === "/my-tickets";
+
 
   const navigate = useNavigate();
   const logout = useLogout(); // Call the hook, do not invoke it
@@ -69,8 +70,8 @@ const AppLayout = () => {
         />
       )}
       {/* Conditionally render Sidebar and TopNavWrapper */}
-      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && !isNotActionForm && <Sidebar />}
-      {!isLoginScreen && !isNotFoundPage && !isNotUserPortal && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && !isNotActionForm && <TopNavWrapper />}
+      {!isLoginScreen && !isNotFoundPage && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && !isNotActionForm && !isNotMyTickets && <Sidebar />}
+      {!isLoginScreen && !isNotFoundPage && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && !isNotActionForm && !isNotMyTickets && <TopNavWrapper />}
 
       {/* Page Content */}
       <div className={`flex-1 ${isLoginScreen || isNotFoundPage ? "" : "mt-12 p-4 ml-12"}`}>
@@ -176,16 +177,7 @@ const AppLayout = () => {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/user-portal"
-            element={
-              <ProtectedRoute requiredRole="user">
-                <UserTopNav>
-                  <UserPortal />
-                </UserTopNav>
-              </ProtectedRoute>
-            }
-          />
+          
           <Route
             path="/launch-ticket"
             element={
@@ -199,7 +191,7 @@ const AppLayout = () => {
             path="/my-tickets"
             element={
               <ProtectedRoute allowAll>
-                <UserPortal />
+                <MyTicketPage />
               </ProtectedRoute>
             }
           />

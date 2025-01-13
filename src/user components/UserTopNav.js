@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ReactComponent as SafifyIcon } from '../assets/images/safify_it_icon.svg';
-import { FaBars, FaTimes, FaBell, FaQuestionCircle, FaCog, FaBullhorn, FaPowerOff } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { FaBars, FaTimes, FaPowerOff } from 'react-icons/fa';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useLogout from '../services/logout';
-
-
 
 const UserTopNav = ({ children }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -26,11 +25,13 @@ const UserTopNav = ({ children }) => {
     setLogoutLoading(false);
   };
 
-  const onCloseLogoutModal = async () => {
+  const onCloseLogoutModal = () => {
     setLogoutLoading(false);
-    setShowLogoutConfirm(false)
+    setShowLogoutConfirm(false);
   };
 
+  // Function to check if the menu is active
+  const isActive = (path) => location.pathname === path;
 
   return (
     <>
@@ -38,7 +39,7 @@ const UserTopNav = ({ children }) => {
         {/* Logo Section */}
         <div
           className="flex items-center gap-3 w-auto flex-grow cursor-pointer"
-          onClick={() => navigate('/user-portal')}
+          onClick={() => navigate('/my-tickets')}
         >
           <SafifyIcon className="w-8 h-8" />
           <h1 className="hidden lg:block text-md lg:text-lg font-semibold text-gray-900">
@@ -59,14 +60,18 @@ const UserTopNav = ({ children }) => {
         {/* Center Menu and Right Section for Large Screens */}
         <div className="hidden md:flex flex-grow justify-left w-auto gap-6 font-semibold text-gray-700 relative">
           <span
-            className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
-            onClick={() => navigate('/user-portal')}
+            className={`cursor-pointer px-3 py-1 rounded ${
+              isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
+            }`}
+            onClick={() => navigate('/my-tickets')}
           >
             My Tickets
           </span>
 
           <span
-            className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+            className={`cursor-pointer px-3 py-1 rounded ${
+              isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
+            }`}
             onClick={() => navigate('/launch-ticket')}
           >
             Launch Ticket
@@ -74,14 +79,14 @@ const UserTopNav = ({ children }) => {
         </div>
 
         <div className="hidden md:flex items-center gap-4 w-auto justify-end">
-
           <span
             onClick={() => setShowLogoutConfirm(true)}
             className="relative cursor-pointer hover:text-red-500 rounded-full group"
           >
             <FaPowerOff />
             <span className="absolute top-full right-0 mt-2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition">
-              Logout</span>
+              Logout
+            </span>
           </span>
         </div>
 
@@ -89,12 +94,10 @@ const UserTopNav = ({ children }) => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-4 rounded shadow-lg">
               <h3 className="text-lg font-semibold mb-2">Confirm Logout</h3>
-
               <p>Are you sure you want to logout?</p>
-
-              {logoutLoading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
-
-
+              {logoutLoading && (
+                <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>
+              )}
               <div className="flex justify-end gap-2 mt-4">
                 <button
                   onClick={() => onCloseLogoutModal()}
@@ -113,8 +116,6 @@ const UserTopNav = ({ children }) => {
           </div>
         )}
 
-
-
         {/* Hamburger Menu for Small Screens */}
         {isMenuOpen && (
           <div className="fixed top-0 right-0 h-screen w-64 bg-white shadow-lg z-50 flex flex-col p-4">
@@ -129,16 +130,20 @@ const UserTopNav = ({ children }) => {
             </div>
             <nav className="flex flex-col gap-4 font-semibold text-gray-700">
               <span
-                className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+                className={`cursor-pointer px-3 py-1 rounded ${
+                  isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
+                }`}
                 onClick={() => {
-                  navigate('/user-portal');
+                  navigate('/my-tickets');
                   toggleMenu();
                 }}
               >
                 My Tickets
               </span>
               <span
-                className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+                className={`cursor-pointer px-3 py-1 rounded ${
+                  isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
+                }`}
                 onClick={() => {
                   navigate('/launch-ticket');
                   toggleMenu();
@@ -147,16 +152,6 @@ const UserTopNav = ({ children }) => {
                 Launch Ticket
               </span>
             </nav>
-
-            <div className="mt-auto flex flex-col gap-4">
-              <button
-            onClick={() => setShowLogoutConfirm(true)}
-            className="flex font-semibold items-center gap-2 hover:bg-red-200 p-2 rounded mb-4"
-              >
-                <FaPowerOff className='text-red-500' />
-                <span>Logout</span>
-              </button>
-            </div>
           </div>
         )}
       </div>

@@ -63,10 +63,10 @@ const LoginPage = () => {
         if (role == 'admin') {
           navigate('/tickets');
         } else if (role =='user') {
-          navigate('/user-portal');
+          navigate('/my-tickets');
 
         } else if (role == 'action_team') {
-          navigate('/action-team-portal');
+          navigate('/my-tasks');
 
         } else {
           setError('You are not authorized');

@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { AssetType } from '../../models/AssetType';
 import { format } from 'date-fns';
-import { FaUser, FaTrash, FaArrowRight, FaImage, FaEdit, FaEllipsisV, FaRecycle, FaLink, FaDownload, FaArrowDown } from 'react-icons/fa';
+import { FaUser, FaTrash, FaArrowRight, FaImage, FaEdit, FaEllipsisV, FaRecycle, FaLink, FaDownload, FaArrowDown, FaQuestionCircle } from 'react-icons/fa';
 import LocationDropdown from "../../components/SearchableLocationDropdown";
 import AssignToDropdown from "../../components/SearchableUsersDropdown";
 import Split from "react-split";
 import { Modal, Upload } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { Select } from "antd";
+const { Option } = Select;
+
 
 
 
@@ -28,8 +31,11 @@ const Assets = () => {
     //-------------Asset types-------------
     const [assetTypes, setAssetTypes] = useState([]);
     const [selectedAssetTypeId, setSelectedAssetTypeId] = useState(null);
+    const [assetTypeObj, setAssetTypeObj] = useState(null);
     const [selectedAssetType, setSelectedAssetType] = useState(null);
     const [initLoading, setinitLoading] = useState(false);
+    const [filterType, setFilterType] = useState('all');
+
 
 
 
@@ -51,9 +57,10 @@ const Assets = () => {
             );
             setAssetTypes(assetTypesData);
 
-            if (assetTypesData.length > 0) {
-                setSelectedAssetTypeId(assetTypesData[0].assetTypeId);
-            }
+            // if (assetTypesData.length > 0) {
+            //     setSelectedAssetTypeId(assetTypesData[0].assetTypeId);
+            //     setAssetTypeObj(assetTypesData[0]);
+            // }
         } catch (error) {
             console.error('Error fetching asset types:', error);
         } finally {
@@ -85,11 +92,14 @@ const Assets = () => {
     const [addTypeloading, setaddTypeLoading] = useState(false);
     const [addTypeerrorMessage, setaddTypeErrorMessage] = useState("");
     const [addTypesuccessMessage, setAddTypeSuccessMessage] = useState("");
+    const [isMacType, setIsMacType] = useState(false);
+
 
     const onCloseAddTypeModal = () => {
         setaddTypeModalOpen(false);
         setAssetTypeDesc('');
         setaddTypeErrorMessage('');
+        setIsMacType(false);
     }
 
 
@@ -102,7 +112,11 @@ const Assets = () => {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.post(
                 `http://localhost:3001/admin/dashboard/addAssetType`,
-                { asset_type_desc: assetTypeDesc },
+                {
+                    asset_type_desc: assetTypeDesc,
+                    has_mac: isMacType
+
+                },
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -117,6 +131,7 @@ const Assets = () => {
                 setaddTypeModalOpen(false);
                 fetchAssetTypes(); // Refresh asset types list
                 setAssetTypeDesc('');
+                setIsMacType(false);
             }, 2000);
 
         } catch (error) {
@@ -211,6 +226,9 @@ const Assets = () => {
     const [UpdateTypeloading, setUpdateTypeLoading] = useState(false);
     const [UpdateTypeInput, setUpdateTypeInput] = useState("");
     const [UpdateTypeError, setUpdateTypeError] = useState(null);
+    const [isMacTypeUpdate, setIsMacTypeUpdate] = useState(false);
+
+
 
 
 
@@ -220,6 +238,7 @@ const Assets = () => {
         setUpdateTypeError('');
         setUpdateTypeInput('');
         setAssetTypeDesc('');
+        setIsMacTypeUpdate(false);
     }
 
 
@@ -230,10 +249,16 @@ const Assets = () => {
         setUpdateTypeModalMessage('')
         setUpdateTypeError('');
         try {
+
+
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.put(
                 `http://localhost:3001/admin/dashboard/updateAssetType`,
-                { asset_type_id: selectedAssetTypeId, asset_type_desc: assetTypeDesc },
+                {
+                    asset_type_id: selectedAssetTypeId,
+                    asset_type_desc: assetTypeDesc,
+                    has_mac: isMacTypeUpdate
+                },
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -242,11 +267,12 @@ const Assets = () => {
                 }
             );
 
-            setUpdateTypeModalMessage("Asset Type renamed successfully!");
+            setUpdateTypeModalMessage("Asset Type updated successfully!");
             setTimeout(() => {
                 setUpdateTypeLoading(false);
                 setUpdateTypeModalOpen(false);
                 setUpdateTypeModalMessage('');
+                setIsMacTypeUpdate(false);
                 fetchAssetTypes();
             }, 2000);
 
@@ -254,7 +280,7 @@ const Assets = () => {
             if (error.response && error.response.data.error) {
                 setUpdateTypeError(error.response.data.error);
             } else {
-                setUpdateTypeError("Failed to rename asset. Please try again.");
+                setUpdateTypeError("Failed to update asset. Please try again.");
             }
         } finally {
             setUpdateTypeLoading(false);
@@ -359,6 +385,8 @@ const Assets = () => {
 
     const [addAssetModalOpen, setaddAssetModalOpen] = useState(false);
     const [addAssetDesc, setAssetDesc] = useState("");
+    const [addAssetMac, setAssetMac] = useState("");
+
     const [addAssetName, setAssetName] = useState("");
     const [addAssetloading, setaddAssetLoading] = useState(false);
     const [addAsseterrorMessage, setaddAssetErrorMessage] = useState("");
@@ -369,7 +397,10 @@ const Assets = () => {
         setAssetName('');
         setAssetDesc('');
         setaddAssetErrorMessage('');
+        setAssetMac('');
     }
+
+
 
     const handleAddAsset = async () => {
         setaddAssetLoading(true);
@@ -377,6 +408,11 @@ const Assets = () => {
         setaddAssetSuccessMessage("");
 
         try {
+
+            if (addAssetMac && !/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(addAssetMac.trim())) {
+                setaddAssetErrorMessage('Mac Address Invalid.');
+                return;
+            }
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.post(
                 `http://localhost:3001/admin/dashboard/addAsset`,
@@ -384,6 +420,7 @@ const Assets = () => {
                     asset_name: addAssetName,
                     asset_desc: addAssetDesc,
                     asset_type_id: selectedAssetTypeId,
+                    mac: addAssetMac
                 },
                 {
                     headers: {
@@ -437,6 +474,7 @@ const Assets = () => {
         setassignLocError(null)
 
         try {
+
 
             if (assignLoc === 'unassigned' || assignLoc === 'Select a location') {
                 setassignLocError('Please select a valid location');
@@ -918,6 +956,7 @@ const Assets = () => {
         assetDescription: "",
         status: "",
         assettypeId: "",
+        mac: ""
 
     });
 
@@ -941,6 +980,7 @@ const Assets = () => {
             assetDescription: asset.asset_desc,
             status: asset.status,
             assettypeId: asset.asset_type_id,
+            mac: asset.mac
         });
         fetchLocationsAndSublocations();
         fetchUsers();
@@ -970,11 +1010,15 @@ const Assets = () => {
             asset_desc: formData.assetDescription,
             asset_type_id: formData.assettypeId || null,
             status: formData.asset_status || "available",
+            mac: formData.mac
         };
-
-
-
         try {
+            
+            if (formData.mac && !/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(formData.mac.trim())) {
+                setModalErrorMessage('Mac Address Invalid.');
+                return;
+            }
+
             const jwtToken = sessionStorage.getItem("jwt");
 
             const response = await axios.put(
@@ -1054,7 +1098,7 @@ const Assets = () => {
 
 
     return (
-        <div className="bg-gray-100">
+        <div className="h-[90vh] bg-gray-100">
             <Split
                 className="flex"
                 sizes={[15, 25, 60]} // Adjust pane sizes
@@ -1071,8 +1115,8 @@ const Assets = () => {
                 }}
 
             >
-                <div className="h-screen border-r border-gray-200 overflow-auto border-x bg-white">
-                    <div className=" flex justify-between items-center p-4 border-b bg-white">
+                <div className="border-r border-gray-200 overflow-auto border-x bg-white">
+                    <div className="flex justify-between items-center p-4 border-b bg-white">
                         <h2 className="text-lg font-semibold">Asset Types</h2>
                         <button
                             type="button"
@@ -1082,76 +1126,108 @@ const Assets = () => {
                             Add +
                         </button>
                     </div>
-                    {!initLoading ? (
 
-                        <ul className="p-4 space-y-2 overflow-y-auto"
+                    {/* Filter Options */}
+                    <div className="p-4 flex items-center gap-4 border-b bg-white">
+
+                        <Select
+                            id="filterType"
+                            value={filterType}
+                            onChange={(value) => setFilterType(value)}
+                            className="w-full"
+                            place holder='Select Filter'
+                        >
+                            <Option value="all">All</Option>
+                            <Option value="network">Network</Option>
+                            <Option value="non-network">Non-Network</Option>
+                        </Select>
+                    </div>
+
+
+                    {!initLoading ? (
+                        <ul
+                            className="p-4 space-y-2 overflow-y-auto"
                             style={{
                                 maxHeight: '80vh',
-                            }}>                    {assetTypes.map((type) => (
-                                <li
-                                    key={type.assetTypeId}
-                                    className={`px-3 py-1 rounded flex items-center justify-between gap-2 cursor-pointer transition ${selectedAssetTypeId === type.assetTypeId ? "bg-gray-100 shadow" : "bg-white hover:bg-gray-100"
-                                        }`}
-                                    onClick={() => setSelectedAssetTypeId(type.assetTypeId)}
-                                >
-                                    {/* Asset Type Details */}
-                                    <div>
-                                        <p className="text-sm font-medium">
-                                            {type.assetTypeDesc}
-                                            <span className="text-sm text-gray-500"> ({type.assets.filter(asset => asset.assetNo != null).length})</span>
-                                        </p>
-                                    </div>
-
-                                    {/* More Options Icon */}
-                                    {selectedAssetTypeId === type.assetTypeId && (
-                                        <div className="relative">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation(); // Prevent parent click event
-                                                    toggleOptions(type.assetTypeId);
-                                                }}
-                                                className="p-1 transition text-sm text-gray-700"
-                                            >
-                                                <FaEllipsisV />
-                                            </button>
-
-                                            {/* Options Card */}
-                                            {activeOptionsId === type.assetTypeId && (
-                                                <div className="absolute right-0 mt-2 w-20 bg-white shadow-md border rounded-md z-10">
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleUpdateTypeClick(type.assetTypeId);
-                                                            setActiveOptionsId(null); // Close menu
-                                                        }}
-                                                        className="block w-full text-center p-1 font-semibold text-sm text-gray-700 hover:bg-gray-100"
-                                                    >
-                                                        Rename
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDeleteTypeClick(type.assetTypeId, type.assetTypeDesc);
-                                                            setActiveOptionsId(null); // Close menu
-                                                        }}
-                                                        className="block w-full text-center p-1 font-semibold text-sm text-red-500 hover:bg-red-100"
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </div>
-                                            )}
+                            }}
+                        >
+                            {assetTypes
+                                .filter((type) => {
+                                    if (filterType === 'network') return type.has_mac == 'allowed';
+                                    if (filterType === 'non-network') return type.has_mac == 'not allowed';
+                                    return true;
+                                })
+                                .map((type) => (
+                                    <li
+                                        key={type.assetTypeId}
+                                        className={`px-3 py-1 rounded flex items-center justify-between gap-2 cursor-pointer transition ${selectedAssetTypeId === type.assetTypeId ? 'bg-gray-100 shadow' : 'bg-white hover:bg-gray-100'
+                                            }`}
+                                        onClick={() => {
+                                            setSelectedAssetTypeId(type.assetTypeId);
+                                            setAssetTypeObj(type);
+                                        }}
+                                    >
+                                        {/* Asset Type Details */}
+                                        <div>
+                                            <p className="text-sm font-medium">
+                                                {type.assetTypeDesc}
+                                                <span className="text-sm text-gray-500">
+                                                    {' '}
+                                                    ({type.assets.filter((asset) => asset.assetNo != null).length})
+                                                </span>
+                                            </p>
                                         </div>
-                                    )}
-                                </li>
-                            ))}
+
+                                        {/* More Options Icon */}
+                                        {selectedAssetTypeId === type.assetTypeId && (
+                                            <div className="relative">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // Prevent parent click event
+                                                        toggleOptions(type.assetTypeId);
+                                                    }}
+                                                    className="p-1 transition text-sm text-gray-700"
+                                                >
+                                                    <FaEllipsisV />
+                                                </button>
+
+                                                {/* Options Card */}
+                                                {activeOptionsId === type.assetTypeId && (
+                                                    <div className="absolute right-0 mt-2 w-20 bg-white shadow-md border rounded-md z-10">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleUpdateTypeClick(type.assetTypeId);
+                                                                setActiveOptionsId(null); // Close menu
+                                                            }}
+                                                            className="block w-full text-center p-1 font-semibold text-sm text-gray-700 hover:bg-gray-100"
+                                                        >
+                                                            Update
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeleteTypeClick(type.assetTypeId, type.assetTypeDesc);
+                                                                setActiveOptionsId(null); // Close menu
+                                                            }}
+                                                            className="block w-full text-center p-1 font-semibold text-sm text-red-500 hover:bg-red-100"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </li>
+                                ))}
                         </ul>
                     ) : (
                         <div className="inset-0 mt-[40vh] flex items-center justify-center">
                             <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-6 h-6 animate-spin"></div>
                         </div>
                     )}
-
                 </div>
+
                 <div className="h-screen border-x border-gray-200 bg-white overflow-auto">
                     <div className="flex justify-between items-center p-4 border-b bg-gray-50">
                         <h2 className="text-lg font-semibold">Assets</h2>
@@ -1287,6 +1363,10 @@ const Assets = () => {
                                 {/* Description */}
                                 <strong className="text-gray-600 font-semibold text-sm">Description</strong>
                                 <span className="text-gray-800 text-sm font-medium">{assetDetails.asset_desc}</span>
+
+                                {/* MAC */}
+                                <strong className="text-gray-600 font-semibold text-sm">MAC Address</strong>
+                                <span className="text-gray-800 text-sm font-medium">{assetDetails.mac}</span>
 
                                 {/* Status */}
                                 <strong className="text-gray-600 font-semibold text-sm">Status</strong>
@@ -1531,7 +1611,7 @@ const Assets = () => {
                             {modalErrorMessage && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{modalErrorMessage}</p>}
 
                             <label className="block">
-                                <span className="text-gray-700 text-sm">Asset Name:</span>
+                                <span className="text-gray-700 text-sm">Asset Name</span>
                                 <input
                                     type="text"
                                     name="assetName"
@@ -1543,7 +1623,7 @@ const Assets = () => {
 
                             {/* Asset Description */}
                             <label className="block">
-                                <span className="text-gray-700 text-sm">Asset Description:</span>
+                                <span className="text-gray-700 text-sm">Asset Description</span>
                                 <input
                                     type="text"
                                     name="assetDescription"
@@ -1553,15 +1633,21 @@ const Assets = () => {
                                 />
                             </label>
 
-                            {/* Sublocation
-                            <label className="block">
-                                <span className="text-gray-700 text-sm">Sublocation:</span>
-                                <LocationDropdown
-                                    options={sublocations}
-                                    selectedValue={formData.sublocation}
-                                    onChange={handleSublocationChange}
-                                />
-                            </label> */}
+                            {(assetTypeObj.has_mac != 'not allowed') && (
+                                <label className="block mb-4">
+                                    <div className="flex items-center">
+                                        <span className="text-gray-700 text-sm">Mac Address</span>
+
+                                    </div>
+                                    <input
+                                        type="text"
+                                        name="mac"
+                                        value={formData.mac}
+                                        onChange={handleInputChange}
+                                        className="m-1 block w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2"
+                                    />
+                                </label>
+                            )}
 
                             {/* Action Buttons */}
                             <div className="flex justify-end space-x-2">
@@ -1978,7 +2064,7 @@ const Assets = () => {
 
 
                             <label className="block mb-4">
-                                <span className="text-gray-700 text-sm">Name:</span>
+                                <span className="text-gray-700 text-sm">Name</span>
                                 <input
                                     type="text"
                                     value={assetTypeDesc}
@@ -1986,6 +2072,30 @@ const Assets = () => {
                                     className="m-1 block w-full rounded-md border-b borequiredrder-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
 
                                 />
+                                <div className="flex flex-col gap-1 mt-2">
+                                    <label className="text-gray-700">Network Device?</label>
+                                    <p >will this category of devices have mac addresses?</p>
+
+                                    <div className="flex gap-4">
+                                        {[
+                                            { label: "Yes", value: 1 },
+                                            { label: "No", value: 0 },
+                                        ].map((option) => (
+                                            <label key={option.value} className="flex items-center gap-2">
+                                                <input
+                                                    type="radio"
+                                                    name="isMacType"
+                                                    value={option.value}
+                                                    checked={isMacType === option.value}
+                                                    onChange={(e) => setIsMacType(Number(e.target.value))}
+                                                    className="focus:ring-sky-500"
+                                                />
+                                                {option.label}
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                </div>
                             </label>
 
 
@@ -2015,7 +2125,7 @@ const Assets = () => {
             {UpdateTypeModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
-                        <h2 className="text-xl font-semibold mb-4">Rename Asset Type</h2>
+                        <h2 className="text-xl font-semibold mb-4">Update Asset Type</h2>
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
@@ -2038,6 +2148,28 @@ const Assets = () => {
 
                                 />
                             </label>
+
+                            <label className="text-gray-700 mt-2">Network Device?</label>
+
+
+                            <div className="flex gap-4">
+                                {[
+                                    { label: "Yes", value: 1 },
+                                    { label: "No", value: 0 },
+                                ].map((option) => (
+                                    <label key={option.value} className="flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            name="isMacType"
+                                            value={option.value}
+                                            checked={isMacTypeUpdate === option.value}
+                                            onChange={(e) => setIsMacTypeUpdate(Number(e.target.value))}
+                                            className="focus:ring-sky-500"
+                                        />
+                                        {option.label}
+                                    </label>
+                                ))}
+                            </div>
 
 
                             <div className="flex justify-end space-x-2">
@@ -2082,26 +2214,53 @@ const Assets = () => {
                             {addAsseterrorMessage && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{addAsseterrorMessage}</p>}
 
                             <label className="block mb-4">
-                                <span className="text-gray-700 text-sm">Asset Name:</span>
+                                <span className="text-gray-700 text-sm">Asset Name</span>
                                 <input
                                     type="text"
                                     value={addAssetName}
                                     onChange={(e) => setAssetName(e.target.value)}
-                                    className="m-1 block w-full rounded-md border-b border-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
+                                    className="m-1 block w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2"
                                     required
                                 />
                             </label>
 
                             <label className="block mb-4">
-                                <span className="text-gray-700 text-sm">Asset Description:</span>
+                                <span className="text-gray-700 text-sm">Asset Description</span>
                                 <input
                                     type="text"
                                     value={addAssetDesc}
                                     onChange={(e) => setAssetDesc(e.target.value)}
-                                    className="m-1 block w-full rounded-md border-b border-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2"
+                                    className="m-1 block w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2"
                                     required
                                 />
                             </label>
+                            {(assetTypeObj.has_mac != 'not allowed') && (
+                                <label className="block mb-4">
+                                    <div className="flex items-center">
+                                        <span className="text-gray-700 text-sm">Mac Address</span>
+                                        <div className="relative group ml-2">
+                                            <FaQuestionCircle className="text-gray-700 text-md hover:text-sky-500 cursor-pointer" />
+                                            <div className="absolute left-0 mt-1 p-2 bg-gray-800 text-white w-72 text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                                The MAC address should of 17 Bits including colons "XX:XX:XX:XX:XX:XX".
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={addAssetMac}
+                                        onChange={(e) => {
+                                            if (e.target.value.length <= 17) setAssetMac(e.target.value);
+                                        }}
+                                        className="m-1 block w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2"
+                                        placeholder="XX:XX:XX:XX:XX:XX"
+                                    />
+                                </label>
+                            )}
+
+
+
+
+
 
 
                             <div className="flex justify-end space-x-2">

@@ -109,15 +109,31 @@ const ActionTasks = ({ ticketID, taskID }) => {
                                 <strong>Description:</strong> {task.report_description}
                             </p>
                             <p className="text-sm text-gray-700">
-                                <strong>Criticality:</strong> {task.incident_criticality_level}
+                                <strong>Criticality: </strong>
+                                <span
+                                    className={`${task.status === 'low' 
+                                        ? 'text-emerald-800 font-semibold' 
+                                        : task.status === 'high' 
+                                        ? 'text-yellow-800 font-semibold' 
+                                        : 'text-red-800 font-semibold'
+                                      }`}
+                                >
+                                 {task.incident_criticality_level.charAt(0).toUpperCase()+task.incident_criticality_level.slice(1).toLowerCase()}
+
+                                </span>
                             </p>
                             <p className="text-sm text-gray-700">
                                 <strong>Status: </strong>
                                 <span
-                                    className={`${task.status === 'approved' ? 'text-emerald-800 font-semibold' : ''
-                                        }`}
+                                    className={`${task.status === 'approved' 
+                                        ? 'text-emerald-800 font-semibold' 
+                                        : task.status === 'approval pending' 
+                                        ? 'text-yellow-800 font-semibold' 
+                                        : 'text-red-800 font-semibold'
+                                      }`}
                                 >
-                                    {task.status}
+                                     {task.status.charAt(0).toUpperCase() + task.status.slice(1).toLowerCase()}
+
                                 </span>
                             </p>
 
@@ -154,7 +170,7 @@ const ActionTasks = ({ ticketID, taskID }) => {
                                     >
                                         No Image
                                     </p>}
-                                    {task.status != 'approved' && (
+                                    {(task.status != 'approved' && task.status != 'approval pending') && (
                                         <button
                                             onClick={() => navigate('/action-form', { state: { user_report_id: task.user_report_id } })}
                                             type="submit"

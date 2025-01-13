@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { ReactComponent as SafifyIcon } from '../../assets/images/safify_it_icon.svg';
 import { FaBars, FaTimes, FaBell, FaQuestionCircle, FaCog, FaBullhorn, FaPowerOff } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useLogout from '../../services/logout';
 
 
 
 const ActionTopNav = ({ children }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -31,6 +32,9 @@ const ActionTopNav = ({ children }) => {
     setShowLogoutConfirm(false)
   };
 
+  const isActive = (path) => location.pathname === path;
+
+
 
   return (
     <>
@@ -38,7 +42,7 @@ const ActionTopNav = ({ children }) => {
         {/* Logo Section */}
         <div
           className="flex items-center gap-3 w-auto flex-grow cursor-pointer"
-          onClick={() => navigate('/action-team-portal')}
+          onClick={() => navigate('/my-tasks')}
         >
           <SafifyIcon className="w-8 h-8" />
           <h1 className="hidden lg:block text-md lg:text-lg font-semibold text-gray-900">
@@ -58,21 +62,24 @@ const ActionTopNav = ({ children }) => {
 
         {/* Center Menu and Right Section for Large Screens */}
         <div className="hidden md:flex flex-grow justify-left w-auto gap-6 font-semibold text-gray-700 relative">
-        <span
-            className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+          <span
+            className={`cursor-pointer px-3 py-1 rounded ${isActive('/my-tasks') ? 'text-primary' : 'hover:bg-gray-100'
+              }`}
             onClick={() => navigate('/my-tasks')}
           >
             My Tasks
           </span>
           <span
-            className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
-            onClick={() => navigate('/action-team-portal')}
+            className={`cursor-pointer px-3 py-1 rounded ${isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
+              }`}
+            onClick={() => navigate('/my-tickets')}
           >
             My Tickets
           </span>
 
           <span
-            className="cursor-pointer bg-sky-200 hover:bg-gray-100 px-3 py-1 rounded"
+            className={`cursor-pointer px-3 py-1 rounded ${isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
+              }`}
             onClick={() => navigate('/launch-ticket')}
           >
             Launch Ticket
@@ -135,7 +142,8 @@ const ActionTopNav = ({ children }) => {
             </div>
             <nav className="flex flex-col gap-4 font-semibold text-gray-700">
               <span
-                className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+                className={`cursor-pointer px-3 py-1 rounded ${isActive('/my-tasks') ? 'text-primary' : 'hover:bg-gray-100'
+                  }`}
                 onClick={() => {
                   navigate('/my-tasks');
                   toggleMenu();
@@ -144,16 +152,20 @@ const ActionTopNav = ({ children }) => {
                 My Tasks
               </span>
               <span
-                className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+                className={`cursor-pointer px-3 py-1 rounded ${
+                  isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
+                }`}
                 onClick={() => {
-                  navigate('/action-team-portal');
+                  navigate('/my-tickets');
                   toggleMenu();
                 }}
               >
                 My Tickets
               </span>
               <span
-                className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+                className={`cursor-pointer px-3 py-1 rounded ${
+                  isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
+                }`}
                 onClick={() => {
                   navigate('/launch-ticket');
                   toggleMenu();
@@ -165,8 +177,8 @@ const ActionTopNav = ({ children }) => {
 
             <div className="mt-auto flex flex-col gap-4">
               <button
-            onClick={() => setShowLogoutConfirm(true)}
-            className="flex font-semibold items-center gap-2 hover:bg-red-200 p-2 rounded mb-4"
+                onClick={() => setShowLogoutConfirm(true)}
+                className="flex font-semibold items-center gap-2 hover:bg-red-200 p-2 rounded mb-4"
               >
                 <FaPowerOff className='text-red-500' />
                 <span>Logout</span>
