@@ -38,7 +38,7 @@ const Sidebar = () => {
   return (
     <>
       <div
-        className={`fixed top-12 left-0 h-[calc(90vh)] bg-white border-r shadow-sm z-40 transition-all duration-300 flex flex-col ${isCollapsed ? 'w-16' : 'w-64'}`}
+        className={`fixed top-12 left-0 h-[calc(93vh)] bg-white border-r shadow-sm z-40 transition-all duration-300 flex flex-col ${isCollapsed ? 'w-16' : 'w-64'}`}
       >
         <div className="flex items-center justify-between px-3 mb-2 mt-6">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsCollapsed(!isCollapsed)}>

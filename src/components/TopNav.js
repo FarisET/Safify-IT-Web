@@ -114,7 +114,7 @@ const TopNav = ({ teams, fetchTeams }) => {
         <span
           className={`cursor-pointer px-3 py-1 rounded ${isActive('/assets') ? 'text-primary' : 'hover:bg-gray-100'
             }`}
-            onClick={() => navigate('/assets')}>
+          onClick={() => navigate('/assets')}>
           Assets
         </span>
         <div className="relative teams-menu mt-1">
@@ -125,8 +125,9 @@ const TopNav = ({ teams, fetchTeams }) => {
           </span>
           {showTeams && <TeamsCard teams={teams} />}
         </div>
-
-        <span className="cursor-pointer ${isActive('/my-tasks') ? 'text-primary' : 'hover:bg-gray-100 px-3 py-1 rounded" onClick={() => navigate('/my-tickets')}>
+        <span
+          className={`cursor-pointer px-3 py-1 rounded ${isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'}`}
+          onClick={() => navigate('/my-tickets')}>
           My Tickets
         </span>
         <span className="flex items-center gap-2 px-3 cursor-pointer py-1 bg-primary text-white font-semibold rounded-lg shadow hover:bg-sky-600 transition-transform transform hover:scale-105" onClick={() => navigate('/launch-ticket')}>
@@ -185,7 +186,9 @@ const TopNav = ({ teams, fetchTeams }) => {
           </div>
           <nav className="flex flex-col gap-4 font-semibold text-gray-700">
             <span
-              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+              className={`cursor-pointer px-3 py-1 rounded ${isActive('/dashboard') ? 'text-primary' : 'hover:bg-gray-100'
+                }`}
+
               onClick={() => {
                 navigate('/dashboard');
                 toggleMenu();
@@ -194,8 +197,9 @@ const TopNav = ({ teams, fetchTeams }) => {
               Dashboard
             </span>
             <span
-              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
-              onClick={() => {
+          className={`cursor-pointer px-3 py-1 rounded ${isActive('/assets') ? 'text-primary' : 'hover:bg-gray-100'
+          }`}
+            onClick={() => {
                 navigate('/assets');
                 toggleMenu();
               }}
@@ -205,8 +209,9 @@ const TopNav = ({ teams, fetchTeams }) => {
 
 
             <span
-              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
-              onClick={() => {
+          className={`cursor-pointer px-3 py-1 rounded ${isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
+          }`}
+            onClick={() => {
                 navigate('/launch-ticket');
                 toggleMenu();
               }}
@@ -215,8 +220,9 @@ const TopNav = ({ teams, fetchTeams }) => {
             </span>
 
             <span
-              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
-              onClick={() => {
+          className={`cursor-pointer px-3 py-1 rounded ${isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
+          }`}
+            onClick={() => {
                 navigate('/my-tickets');
                 toggleMenu();
               }}

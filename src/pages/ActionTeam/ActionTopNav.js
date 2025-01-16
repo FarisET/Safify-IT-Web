@@ -117,7 +117,7 @@ const ActionTopNav = ({ children }) => {
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:text-red-500 transition"
+                  className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:text-red-500 transition"
                 >
                   Logout
                 </button>
