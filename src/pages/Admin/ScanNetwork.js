@@ -296,7 +296,7 @@ const ScanNetwork = () => {
             title: 'Action',
             key: 'action',
             render: (text, record) =>
-                record.mac && record.mac !== 'N/A' ? (
+                record.mac && record.mac !== 'N/A' && record.asset_no =='N/A' ? (
                     addedAssets.has(record.mac) ? ( // Check if the asset is added
                         <Button type="link" disabled>
                             Added
