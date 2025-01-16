@@ -45,6 +45,7 @@ const AppLayout = () => {
   const isNotMyTickets = location.pathname === "/my-tickets";
 
 
+
   const navigate = useNavigate();
   const logout = useLogout(); // Call the hook, do not invoke it
   const [logoutLoading, setLogoutLoading] = useState(false);
@@ -186,7 +187,7 @@ const AppLayout = () => {
               </ProtectedRoute>
             }
           />
-          
+
           <Route
             path="/launch-ticket"
             element={
@@ -244,7 +245,10 @@ const AppLayout = () => {
 
           {/* Default route to redirect to 404 */}
           <Route path="/404" element={<NotFound />} />
-          <Route path="*" element={<Navigate to="/404" />} />
+          <Route
+            path="*"
+            element={<Navigate to="/404" state={{ from: location.pathname }} />}
+          />
         </Routes>
       </div>
     </div>

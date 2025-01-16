@@ -60,18 +60,16 @@ const UserTopNav = ({ children }) => {
         {/* Center Menu and Right Section for Large Screens */}
         <div className="hidden md:flex flex-grow justify-left w-auto gap-6 font-semibold text-gray-700 relative">
           <span
-            className={`cursor-pointer px-3 py-1 rounded ${
-              isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
-            }`}
+            className={`cursor-pointer px-3 py-1 rounded ${isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
+              }`}
             onClick={() => navigate('/my-tickets')}
           >
             My Tickets
           </span>
 
           <span
-            className={`cursor-pointer px-3 py-1 rounded ${
-              isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
-            }`}
+            className={`cursor-pointer px-3 py-1 rounded ${isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
+              }`}
             onClick={() => navigate('/launch-ticket')}
           >
             Launch Ticket
@@ -107,7 +105,7 @@ const UserTopNav = ({ children }) => {
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:text-red-500 transition"
+                  className="px-3 py-1 bg-gray-100 text-gray-700 text-sm font-semibold rounded hover:text-red-500 transition"
                 >
                   Logout
                 </button>
@@ -130,9 +128,8 @@ const UserTopNav = ({ children }) => {
             </div>
             <nav className="flex flex-col gap-4 font-semibold text-gray-700">
               <span
-                className={`cursor-pointer px-3 py-1 rounded ${
-                  isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
-                }`}
+                className={`cursor-pointer px-3 py-1 rounded ${isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
+                  }`}
                 onClick={() => {
                   navigate('/my-tickets');
                   toggleMenu();
@@ -141,9 +138,8 @@ const UserTopNav = ({ children }) => {
                 My Tickets
               </span>
               <span
-                className={`cursor-pointer px-3 py-1 rounded ${
-                  isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
-                }`}
+                className={`cursor-pointer px-3 py-1 rounded ${isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
+                  }`}
                 onClick={() => {
                   navigate('/launch-ticket');
                   toggleMenu();
@@ -152,6 +148,15 @@ const UserTopNav = ({ children }) => {
                 Launch Ticket
               </span>
             </nav>
+            <div className="mt-auto flex flex-col gap-4">
+              <button
+                onClick={() => setShowLogoutConfirm(true)}
+                className="flex font-semibold items-center gap-2 hover:bg-red-200 p-2 rounded mb-4"
+              >
+                <FaPowerOff className='text-red-500' />
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
         )}
       </div>

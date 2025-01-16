@@ -90,10 +90,7 @@ const ActionForm = () => {
      question_three: formData.steps[2],
      question_four: formData.steps[3],
      question_five: formData.steps[4]
-
     }
-
-
 
     try {
       setSubmitFormLoading(true);

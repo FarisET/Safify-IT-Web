@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { ReactComponent as SafifyIcon } from '../assets/images/safify_it_icon.svg';
 import { FaBars, FaTimes, FaBell, FaQuestionCircle, FaBullhorn } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Notifications from './NotificationsCard';
 import TeamsCard from './ActionTeamsCard';
 import { Modal, Input } from 'antd';
 import axios from 'axios';
+import useLogout from '../services/logout';
+
 
 const TopNav = ({ teams, fetchTeams }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // State Management
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,6 +56,9 @@ const TopNav = ({ teams, fetchTeams }) => {
     setAnnouncementMsg('');
     setAnnouncementError(false);
   };
+
+  const isActive = (path) => location.pathname === path;
+
 
   const handleAnnouncementSubmit = async () => {
     try {
@@ -100,20 +106,27 @@ const TopNav = ({ teams, fetchTeams }) => {
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex flex-grow justify-left w-auto gap-6 font-semibold text-gray-700">
-        <span className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded" onClick={() => navigate('/dashboard')}>
+        <span
+          className={`cursor-pointer px-3 py-1 rounded ${isActive('/dashboard') ? 'text-primary' : 'hover:bg-gray-100'
+            }`} onClick={() => navigate('/dashboard')}>
           Dashboard
         </span>
-        <span className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded" onClick={() => navigate('/assets')}>
+        <span
+          className={`cursor-pointer px-3 py-1 rounded ${isActive('/assets') ? 'text-primary' : 'hover:bg-gray-100'
+            }`}
+            onClick={() => navigate('/assets')}>
           Assets
         </span>
         <div className="relative teams-menu mt-1">
-          <span className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded" onClick={toggleTeams}>
+          <span
+            className={`cursor-pointer px-3 py-1 rounded hover:bg-gray-100
+              `} onClick={toggleTeams}>
             Teams
           </span>
           {showTeams && <TeamsCard teams={teams} />}
         </div>
-        
-        <span className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded" onClick={() => navigate('/my-tickets')}>
+
+        <span className="cursor-pointer ${isActive('/my-tasks') ? 'text-primary' : 'hover:bg-gray-100 px-3 py-1 rounded" onClick={() => navigate('/my-tickets')}>
           My Tickets
         </span>
         <span className="flex items-center gap-2 px-3 cursor-pointer py-1 bg-primary text-white font-semibold rounded-lg shadow hover:bg-sky-600 transition-transform transform hover:scale-105" onClick={() => navigate('/launch-ticket')}>
@@ -157,6 +170,73 @@ const TopNav = ({ teams, fetchTeams }) => {
           {announcementMsg && <p className="mt-2 text-emerald-600">{announcementMsg}</p>}
           {announcementError && <p className="mt-2 text-red-600">{announcementError}</p>}
         </Modal>
+      )}
+
+      {isMenuOpen && (
+        <div className="fixed top-0 right-0 h-screen w-64 bg-white shadow-lg z-50 flex flex-col p-4">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
+            <button
+              className="p-2 rounded-full hover:bg-gray-200 transition"
+              onClick={toggleMenu}
+            >
+              <FaTimes size={20} />
+            </button>
+          </div>
+          <nav className="flex flex-col gap-4 font-semibold text-gray-700">
+            <span
+              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+              onClick={() => {
+                navigate('/dashboard');
+                toggleMenu();
+              }}
+            >
+              Dashboard
+            </span>
+            <span
+              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+              onClick={() => {
+                navigate('/assets');
+                toggleMenu();
+              }}
+            >
+              Assets
+            </span>
+
+
+            <span
+              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+              onClick={() => {
+                navigate('/launch-ticket');
+                toggleMenu();
+              }}
+            >
+              Launch Ticket
+            </span>
+
+            <span
+              className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded"
+              onClick={() => {
+                navigate('/my-tickets');
+                toggleMenu();
+              }}
+            >
+              My Tickets
+            </span>
+
+          </nav>
+
+          <div className="mt-auto flex flex-col gap-4">
+
+            <button
+              onClick={() => navigate('/help')}
+              className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded mb-4">
+              <FaQuestionCircle />
+              <span>Help</span>
+            </button>
+
+          </div>
+        </div>
       )}
     </div>
   );
