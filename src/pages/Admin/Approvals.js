@@ -365,20 +365,22 @@ const Approvals = () => {
         </div>
       )}
 
-      {/* Image Modal */}
       {selectedImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded shadow-lg">
-            <img src={selectedImage} alt="Proof" className="max-w-full max-h-[80vh]" />
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition mt-4"
-            >
-              Close
-            </button>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          onClick={() => setSelectedImage(null)} // Close modal on background click
+        >
+          <div
+            className="fixed w-64 h-70 bg-transparent rounded-lg p-4 relative"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the card
+          >
+            <div className="flex items-center justify-center h-full">
+              <img src={selectedImage} alt="Report" className="max-w-full max-h-full rounded" />
+            </div>
           </div>
         </div>
       )}
+      
     </div>
   );
 };

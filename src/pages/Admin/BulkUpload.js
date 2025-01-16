@@ -189,18 +189,7 @@ const BulkUpload = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            {/* <div className="flex items-top space-x-2 relative">
-                <h4 className="text-2xl font-semibold mb-4 text-left">Bulk Upload</h4>
-
-                <div className="relative group">
-                    <FaQuestionCircle className="text-gray-700 text-md hover:text-sky-500 cursor-pointer" />
-                    <div className="p-2 bg-gray-800 text-white w-96 text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                        Download the excel template and fill in the fields according to the format. All fields are compulsory. Place a '-' where applicable
-                    </div>
-                </div>
-            </div> */}
             <h4 className="text-2xl font-semibold mb-4 text-left">Bulk Upload</h4>
-
 
             {uploadMsg && <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">{uploadMsg}</p>}
             {uploadError && <p className="mb-4 p-3 rounded text-red-600 bg-red-100">{uploadError}</p>}

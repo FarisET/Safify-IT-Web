@@ -3,7 +3,7 @@ import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import Report from '../../models/ActionReport';  // Adjust path as necessary
 import { formatDate } from '../../utils/date';
-import { FaChevronDown, FaCheck, FaTrash } from 'react-icons/fa';
+import { FaChevronDown, FaCheck, FaTrash, FaImage } from 'react-icons/fa';
 
 const ApprovedReports = () => {
   const [actionReports, setactionReports] = useState([]);
@@ -21,6 +21,8 @@ const ApprovedReports = () => {
   const [responseMessage, setResponseMessage] = useState(''); // Response from the endpoint
   const [reportToApprove, setReportToApprove] = useState(null); // Report to approve/reject
   const [isDropdownOpen, setIsDropdownOpen] = useState(null); // State for controlling dropdown visibility
+  const [selectedImage, setSelectedImage] = useState(null);
+
 
   useEffect(() => {
     fetchActionReports();
@@ -176,10 +178,10 @@ const ApprovedReports = () => {
               <th className="px-4 py-2 border-b">Summary</th>
               <th className="px-4 py-2 border-b">Assignee</th>
               <th className="px-4 py-2 border-b">Action Team</th>
+              <th className="px-4 py-2 border-b">Image</th>
               <th className="px-4 py-2 border-b">Status</th>
               <th className="px-4 py-2 border-b">Date</th>
               <th className="px-4 py-2 border-b">Time</th>
-              <th className="px-4 py-2 border-b">Action</th>
             </tr>
           </thead>
           <tbody className="text-left">
@@ -193,6 +195,19 @@ const ApprovedReports = () => {
                 </td>
                 <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportedBy}</td>
                 <td className="px-4 py-2 border-b">{report.actionTeamName}</td>
+                <td className="px-4 py-2 border-b text-center">
+                  {report.proofImage ? (
+                    <button
+                      className="text-sky-600 font-semibold cursor-pointer hover:underline focus:outline-none focus:ring focus:ring-blue-300 transition-all"
+                      onClick={() => setSelectedImage(report.proofImage)}
+                      title="Click to view the image"
+                    >
+                      <FaImage />
+                    </button>
+                  ) : (
+                    <span className="text-gray-700 font-bold">X</span>
+                  )}
+                </td>
                 <td
                   className={`px-4 py-2 border-b whitespace-nowrap`}
                 >
@@ -213,35 +228,6 @@ const ApprovedReports = () => {
                     </>
                   ) : (
                     <span className="text-gray-700 font-bold">X</span>
-                  )}
-                </td>              <td className="px-4 py-2 border-b">
-                  {report.status.toLowerCase() === 'approval pending' && (
-                    <div className="relative">
-                      <button
-                        onClick={() => toggleDropdown(report.userReportId)}
-                        className="bg-gray-300 text-gray-700 px-2 py-1 rounded flex items-center space-x-2"
-                      >
-                        <FaChevronDown />
-                      </button>
-                      {isDropdownOpen === report.userReportId && (
-                        <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-10 p-2"
-                        >
-                          <button
-                            onClick={() => approveReport(report.userReportId, report.actionReportId)}
-                            className="block w-full text-gray-700 font-bold text-sm py-1 px-2 rounded bg-emerald-100 hover:bg-emerald-200 transition duration-200 ease-in-out"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => rejectReport(report.actionReportId)}
-                            className="block w-full text-gray-700 text-sm font-bold py-1 px-2 rounded mt-2 bg-red-100 hover:bg-red-200 transition duration-200 ease-in-out"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      )}
-
-                    </div>
                   )}
                 </td>
               </tr>
@@ -270,6 +256,22 @@ const ApprovedReports = () => {
             <p className="text-sm text-gray-500 mt-2">
               Great! Seems like there are no approved reports.
             </p>
+          </div>
+        </div>
+      )}
+
+      {selectedImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          onClick={() => setSelectedImage(null)} // Close modal on background click
+        >
+          <div
+            className="fixed w-64 h-70 bg-transparent rounded-lg p-4 relative"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the card
+          >
+            <div className="flex items-center justify-center h-full">
+              <img src={selectedImage} alt="Report" className="max-w-full max-h-full rounded" />
+            </div>
           </div>
         </div>
       )}
