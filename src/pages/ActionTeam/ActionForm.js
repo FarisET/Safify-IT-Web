@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { FaArrowAltCircleLeft } from "react-icons/fa";
 
 const ActionForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({
     description: "",
     criticality: "low",
-    sublocId: null,
-    assetNo: null,
     reporter: "",
     steps: [],
     solution: "",
@@ -17,6 +16,8 @@ const ActionForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user_report_id } = location.state || {};
+    const [role, setRole] = useState(sessionStorage.getItem("role"))
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,6 +57,19 @@ const ActionForm = () => {
     }
   };
 
+  const handleCancel = () => {
+
+    if (role === 'admin') {
+      navigate('/tickets');
+    } else if (role === 'user') {
+      navigate('/my-tickets');
+    } else if (role === 'action_team') {
+      navigate('/my-tasks');
+    } else {
+      navigate('/404');
+    }
+  }
+
   const [submitFormLoading, setSubmitFormLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -65,21 +79,30 @@ const ActionForm = () => {
     const userId = sessionStorage.getItem("userId"); // Assuming userid is stored in sessionStorage
     const endpoint = `http://localhost:3001/actionTeam/dashboard/${userId}/MakeActionReport`;
 
-    const data = new FormData();
-    data.append("reported_by", formData.reporter);
-    data.append("report_description", formData.description);
-    data.append("resolution_description", formData.solution);
-    data.append("user_report_id", user_report_id); // Adjust based on actual usage
-    if (formData.attachedImage) {
-      data.append("proof_image", formData.attachedImage);
+    const data = {
+    reported_by: formData.reporter,
+    report_description: formData.description,
+    resolution_description: formData.solution,
+    user_report_id: user_report_id,
+     proof_image: formData.attachedImage,
+     question_one: formData.steps[0],
+     question_two: formData.steps[1],
+     question_three: formData.steps[2],
+     question_four: formData.steps[3],
+     question_five: formData.steps[4]
+
     }
+
+
 
     try {
       setSubmitFormLoading(true);
-      await axios.post(endpoint, data, {
+      await axios.post(endpoint, data, 
+        {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          "Content-Type": "multipart/form-data",
+
         },
       });
       setSubmissionSuccess(true);
@@ -99,7 +122,7 @@ const ActionForm = () => {
         attachedImage: null,
       });
     } catch (error) {
-      setError("Submission failed:", error.response || error.message)
+      setError("Submission failed:", error.message)
     } finally {
       setSubmitFormLoading(false);
     }
@@ -130,10 +153,10 @@ const ActionForm = () => {
             <div
               onClick={() => setCurrentPage(tab.id)}
               className={`flex items-center justify-center w-10 h-10 rounded-full cursor-pointer ${currentPage === tab.id
+                ? "bg-primary text-white"
+                : currentPage > tab.id
                   ? "bg-primary text-white"
-                  : currentPage > tab.id
-                    ? "bg-primary text-white"
-                    : "bg-gray-200 text-gray-700"
+                  : "bg-gray-200 text-gray-700"
                 }`}
             >
               {tab.id}
@@ -233,19 +256,28 @@ const ActionForm = () => {
         )}
 
         {currentPage === 4 && submissionSuccess && (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-green-600 mb-4">
-              Form Submitted
+          <div className="flex flex-col border p-6 rounded-lg justify-center items-center text-center bg-gray-50">
+            <h2 className="text-2xl font-bold text-emerald-600 mb-4">
+              ✅ Form Submitted!
             </h2>
-            <p className="text-gray-700">
-              Your action report has been submitted for aproval.
+            <p className="text-lg text-gray-700 mb-6">
+              Your report has been sent to your administrator for approval.
             </p>
+
+            <button
+              onClick={() => handleCancel()}
+              type="button"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white font-semibold rounded-lg shadow hover:bg-sky-600 transition-transform transform hover:scale-105"
+            >
+              <FaArrowAltCircleLeft size={20} />
+              Back to Portal
+            </button>
           </div>
         )}
 
         {/* Action Buttons */}
         <div className="flex justify-between mt-6">
-          {currentPage > 1 || currentPage !=4 && (
+          {currentPage > 1 && currentPage != 4 && (
             <button
               type="button"
               onClick={() => setCurrentPage(currentPage - 1)}

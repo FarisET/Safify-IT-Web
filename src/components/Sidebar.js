@@ -10,18 +10,18 @@ import {
   FaCheckCircle,
   FaPowerOff,
   FaSign,
-
   FaTicketAlt,
+  FaNetworkWired,
 } from 'react-icons/fa';
 import { ReactComponent as SafifyIcon } from '../assets/images/safify_it_icon.svg';
 import useLogout from '../services/logout';
+import { Tooltip } from 'antd'; // ✅ Import Tooltip from antd
 
 const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(true); // Default state is now collapsed
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
 
-  // Use the custom hook inside the component
   const logout = useLogout();
 
   const handleLogout = async () => {
@@ -32,17 +32,14 @@ const Sidebar = () => {
 
   const onCloseLogoutModal = async () => {
     setLogoutLoading(false);
-    setShowLogoutConfirm(false)
+    setShowLogoutConfirm(false);
   };
-
-
 
   return (
     <>
-      {/* Sidebar */}
       <div
-className={`fixed top-12 left-0 h-[calc(90vh)] bg-white border-r shadow-sm z-40 transition-all duration-300 flex flex-col ${isCollapsed ? 'w-16' : 'w-64'}`}      >
-        {/* Header with logo and toggle button */}
+        className={`fixed top-12 left-0 h-[calc(90vh)] bg-white border-r shadow-sm z-40 transition-all duration-300 flex flex-col ${isCollapsed ? 'w-16' : 'w-64'}`}
+      >
         <div className="flex items-center justify-between px-3 mb-2 mt-6">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsCollapsed(!isCollapsed)}>
             <SafifyIcon className={`w-6 h-6 ${isCollapsed && 'hidden'}`} />
@@ -56,10 +53,8 @@ className={`fixed top-12 left-0 h-[calc(90vh)] bg-white border-r shadow-sm z-40 
           </div>
         </div>
 
-        {/* Divider */}
         <div className="border-b border-gray-200 my-3"></div>
 
-        {/* Scrollable Sidebar Content */}
         <div className="flex flex-col h-[calc(100%-4rem)] overflow-y-auto">
           <SidebarSection
             isCollapsed={isCollapsed}
@@ -105,12 +100,11 @@ className={`fixed top-12 left-0 h-[calc(90vh)] bg-white border-r shadow-sm z-40 
           <SidebarSection
             isCollapsed={isCollapsed}
             title="Network Discovery"
-            links={[{ to: '/scan-network', icon: FaUsers, label: 'Scan Network' }]}
+            links={[{ to: '/scan-network', icon: FaNetworkWired, label: 'Scan Network' }]}
           />
           <div className="border-t border-gray-200 my-1"></div>
         </div>
 
-        {/* Fixed Logout Button */}
         <div className="w-full px-3">
           <button
             onClick={() => setShowLogoutConfirm(true)}
@@ -120,19 +114,14 @@ className={`fixed top-12 left-0 h-[calc(90vh)] bg-white border-r shadow-sm z-40 
             {!isCollapsed && <span>Logout</span>}
           </button>
         </div>
-      </div>      
-      
-      {/* Logout Confirmation Dialog */}
+      </div>
+
       {showLogoutConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded shadow-lg">
             <h3 className="text-lg font-semibold mb-2">Confirm Logout</h3>
-
             <p>Are you sure you want to logout?</p>
-
             {logoutLoading && <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
-
-
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => onCloseLogoutModal()}
@@ -150,29 +139,25 @@ className={`fixed top-12 left-0 h-[calc(90vh)] bg-white border-r shadow-sm z-40 
           </div>
         </div>
       )}
-
     </>
   );
 };
+
 const SidebarSection = ({ title, links, isCollapsed }) => (
   <div className="px-3">
     {!isCollapsed && <h3 className="text-gray-600 font-semibold mb-2">{title}</h3>}
     <div className="space-y-2">
       {links.map(({ to, icon: Icon, label }) => (
-        <NavLink
-          key={to}
-          to={to}
-          className="flex items-center gap-2 text-gray-700 p-2 rounded hover:bg-gray-200 transition-all relative group"
-          activeClassName="bg-blue-500 text-white"
-        >
-          <Icon className="text-lg" />
-          {!isCollapsed && <span>{label}</span>}
-          {isCollapsed && (
-            <span className="absolute left-full ml-2 hidden group-hover:block bg-black text-white text-sm rounded py-1 px-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-              {label}
-            </span>
-          )}
-        </NavLink>
+        <Tooltip key={to} title={label} placement="right" visible={isCollapsed ? undefined : false}>
+          <NavLink
+            to={to}
+            className="flex items-center gap-2 text-gray-700 p-2 rounded hover:bg-gray-200 transition-all"
+            activeClassName="bg-blue-500 text-white"
+          >
+            <Icon className="text-lg" />
+            {!isCollapsed && <span>{label}</span>}
+          </NavLink>
+        </Tooltip>
       ))}
     </div>
   </div>

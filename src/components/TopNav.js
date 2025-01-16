@@ -112,11 +112,12 @@ const TopNav = ({ teams, fetchTeams }) => {
           </span>
           {showTeams && <TeamsCard teams={teams} />}
         </div>
-        <span className="cursor-pointer bg-sky-200 hover:bg-gray-100 px-3 py-1 rounded" onClick={() => navigate('/launch-ticket')}>
-          Launch Ticket
-        </span>
+        
         <span className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded" onClick={() => navigate('/my-tickets')}>
           My Tickets
+        </span>
+        <span className="flex items-center gap-2 px-3 cursor-pointer py-1 bg-primary text-white font-semibold rounded-lg shadow hover:bg-sky-600 transition-transform transform hover:scale-105" onClick={() => navigate('/launch-ticket')}>
+          Launch Ticket
         </span>
       </div>
 

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import Report from '../../models/ActionReport';  // Adjust path as necessary
 import { formatDate } from '../../utils/date';
-import { FaChevronDown, FaCheck, FaTrash } from 'react-icons/fa';
+import { FaChevronDown, FaCheck, FaTrash, FaImage } from 'react-icons/fa';
 
 const Approvals = () => {
   const [actionReports, setactionReports] = useState([]);
@@ -21,6 +21,15 @@ const Approvals = () => {
   const [responseMessage, setResponseMessage] = useState(''); // Response from the endpoint
   const [reportToApprove, setReportToApprove] = useState(null); // Report to approve/reject
   const [isDropdownOpen, setIsDropdownOpen] = useState(null); // State for controlling dropdown visibility
+  const [approvalLoading, setApprovalLoading] = useState(null);
+  const [reportToProcess, setReportToProcess] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalError, setModalError] = useState('');
+  const [modalSuccess, setModalSuccess] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [modalAction, setModalAction] = useState(null);
+
+
 
   useEffect(() => {
     fetchActionReports();
@@ -45,52 +54,89 @@ const Approvals = () => {
     }
   };
 
-  const approveReport = async (reportId, actionReportId) => {
+
+
+
+  const handleApprove = async () => {
+    if (!reportToProcess) return;
     const jwtToken = sessionStorage.getItem('jwt');
     const payload = {
-      user_report_id: reportId,
-      action_report_id: actionReportId,
+      user_report_id: reportToProcess.userReportId,
+      action_report_id: reportToProcess.actionReportId,
       is_approved: true,
     };
 
+    setModalLoading(true);
+    setModalError('');
+    setModalSuccess('');
     try {
       const response = await axios.post(
         'http://localhost:3001/admin/dashboard/approvedActionReport',
         payload,
         {
           headers: {
-            'Authorization': `Bearer ${jwtToken}`,
+            Authorization: `Bearer ${jwtToken}`,
             'Content-Type': 'application/json',
           },
         }
       );
       if (response.status === 200) {
-        setResponseMessage(response.data.message); // Display response from the endpoint
-        await fetchActionReports(); // Reload the reports
-        setIsModalOpen(false); // Close modal after action
+        setModalSuccess('Report approved successfully!');
+        fetchActionReports();
       }
     } catch (err) {
-      setErrorMessage('Failed to approve the report. Please try again.');
-      setResponseMessage(''); // Clear any previous success message
+      setModalError('Failed to approve the report. Please try again.');
+    } finally {
+      setModalLoading(false);
     }
   };
 
-  const rejectReport = async (actionReportId) => {
+  const handleReject = async () => {
+    if (!reportToProcess) return;
+    const jwtToken = sessionStorage.getItem('jwt');
+    const url = `http://localhost:3001/admin/dashboard/deleteActionReport/${reportToProcess.actionReportId}`;
+
+    setModalLoading(true);
+    setModalError('');
+    setModalSuccess('');
     try {
-      const result = await deleteActionReport(actionReportId);
-      if (result) {
-        setResponseMessage('Report rejected successfully.');
+      const response = await axios.delete(url, {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      });
+      if (response.status === 200) {
+        setModalSuccess('Report rejected successfully!');
         fetchActionReports();
-        setIsModalOpen(false);
-      } else {
-        setErrorMessage('Failed to delete the report. Please try again.');
-        setResponseMessage('');
+        setTimeout(() => {
+          closeModal();
+
+        }, 3000);
       }
     } catch (err) {
-      setErrorMessage('Error rejecting the report. Please try again.');
-      setResponseMessage('');
+      setModalError('Failed to reject the report. Please try again.');
+      setTimeout(() => {
+        closeModal();
+      }, 3000);
+    } finally {
+      setModalLoading(false);
     }
   };
+
+  const openModal = (action, report) => {
+    setModalAction(action);
+    setReportToProcess(report);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalAction(null);
+    setReportToProcess(null);
+    setModalError('');
+    setModalSuccess('');
+  };
+
 
   const deleteActionReport = async (actionReportId) => {
     const jwtToken = sessionStorage.getItem('jwt');
@@ -176,6 +222,7 @@ const Approvals = () => {
               <th className="px-4 py-2 border-b">Assignee</th>
               <th className="px-4 py-2 border-b">Action Team</th>
               <th className="px-4 py-2 border-b">Status</th>
+              <th className="px-4 py-2 border-b">Image</th>
               <th className="px-4 py-2 border-b">Date</th>
               <th className="px-4 py-2 border-b">Time</th>
               <th className="px-4 py-2 border-b">Action</th>
@@ -199,6 +246,19 @@ const Approvals = () => {
                     {report.status}
                   </span>
                 </td>
+                <td className="px-4 py-2 border-b text-center">
+                  {report.proofImage ? (
+                    <button
+                      className="text-sky-600 font-semibold cursor-pointer hover:underline focus:outline-none focus:ring focus:ring-blue-300 transition-all"
+                      onClick={() => setSelectedImage(report.proofImage)}
+                      title="Click to view the image"
+                    >
+                      <FaImage />
+                    </button>
+                  ) : (
+                    <span className="text-gray-700 font-bold">X</span>
+                  )}
+                </td>
                 <td className="px-4 py-2 border-b font-semibold">
                   {report.dateTime
                     ? formatDate(report.dateTime).date // Display formatted date
@@ -213,7 +273,8 @@ const Approvals = () => {
                   ) : (
                     <span className="text-gray-700 font-bold">X</span>
                   )}
-                </td>              <td className="px-4 py-2 border-b">
+                </td>
+                <td className="px-4 py-2 border-b">
                   {report.status.toLowerCase() === 'approval pending' && (
                     <div className="relative">
                       <button
@@ -226,14 +287,14 @@ const Approvals = () => {
                         <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-10 p-2"
                         >
                           <button
-                            onClick={() => approveReport(report.userReportId, report.actionReportId)}
+                            onClick={() => openModal('approve', report)}
                             className="block w-full text-gray-700 font-bold text-sm py-1 px-2 rounded bg-emerald-100 hover:bg-emerald-200 transition duration-200 ease-in-out"
                           >
                             Approve
                           </button>
                           <button
-                            onClick={() => rejectReport(report.actionReportId)}
-                            className="block w-full text-gray-700 text-sm font-bold py-1 px-2 rounded mt-2 bg-red-100 hover:bg-red-200 transition duration-200 ease-in-out"
+                            onClick={() => openModal('reject', report)}
+                            className="block w-full mt-2 text-gray-700 font-bold text-sm py-1 px-2 rounded bg-red-100 hover:bg-red-200 transition duration-200 ease-in-out"
                           >
                             Reject
                           </button>
@@ -273,21 +334,48 @@ const Approvals = () => {
         </div>
       )}
 
-
-      {/* Modal for Success/Error Messages */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
-            <h2 className="text-lg font-semibold">{responseMessage ? 'Success' : 'Error'}</h2>
-            <p className="mt-4">{responseMessage || errorMessage}</p>
-            <div className="flex justify-end space-x-4 mt-4">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Close
-              </button>
-            </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-4 rounded shadow-lg">
+            <h3 className="text-lg font-bold mb-4">
+              {modalAction === 'approve' ? 'Approve Report' : 'Reject Report'}
+            </h3>
+            <p>Are you sure you want to <strong>{modalAction}</strong> this report?</p>
+            {modalLoading && <div className='mb-4 mt-4 p-3 rounded text-sky-600 bg-sky-100'>Loading...</div>}
+            {modalError && <div className="mb-4 mt-4 p-3 rounded text-red-600 bg-red-100">{modalError}</div>}
+            {modalSuccess && <div className="mb-4 mt-4 p-3 rounded text-emerald-600 bg-emerald-100">{modalSuccess}</div>}
+            {!modalLoading && !modalSuccess && (
+              <div className="mt-4 flex justify-end space-x-2">
+                <button
+                  onClick={closeModal}
+                  className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={modalAction === 'approve' ? handleApprove : handleReject}
+                  className={`px-3 py-1 bg-gray-100 font-semibold rounded transition ${modalAction === 'approve' ? 'hover:bg-emerald-200' : 'hover:bg-red-200'
+                    } text-gray-700`}
+                >
+                  Confirm
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-4 rounded shadow-lg">
+            <img src={selectedImage} alt="Proof" className="max-w-full max-h-[80vh]" />
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded hover:bg-red-200 transition mt-4"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
