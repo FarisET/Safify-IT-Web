@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Modal,Table, Input, Button, message } from 'antd';
+import { Modal, Table, Input, Button, Select, message } from 'antd';
 import axios from 'axios';
 import { useScan } from '../../state/context/scanContext';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+const { Option } = Select;
+
 
 const ScanNetwork = () => {
     const [ipRange, setIpRange] = useState('');
-    const [loading, setLoading] = useState(false);
     const { scanState, setScanState } = useScan();
     const [paginationConfig, setPaginationConfig] = useState({
         current: 1,
@@ -16,6 +17,24 @@ const ScanNetwork = () => {
     });
     const [selectedPorts, setSelectedPorts] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [addAssetData, setAddAssetData] = useState({
+        name: '',
+        vendor: '',
+        mac: '',
+        assetTypeId: '',
+    });
+    const [addAssetLoading, setAddAssetLoading] = useState(false);
+    const [isAssetModalVisible, setIsAssetModalVisible] = useState(false);
+    const [addedAssets, setAddedAssets] = useState(new Set());
+
+
+
+    const assetTypes = [
+        { id: 1, description: 'Laptop' },
+        { id: 2, description: 'Printer' },
+        { id: 3, description: 'Router' },
+    ];
+
 
 
 
@@ -132,6 +151,69 @@ const ScanNetwork = () => {
         message.success('Exported to PDF.');
     };
 
+    const handleFormChange = (key, value) => {
+        setAddAssetData((prev) => ({ ...prev, [key]: value }));
+    };
+
+
+    const handleAddAsset = async () => {
+        const { name, vendor, mac, assetTypeId } = addAssetData;
+
+
+        if (!assetTypeId) {
+            message.error('Please select an asset type.');
+            return;
+        }
+
+        setAddAssetLoading(true);
+
+        try {
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.post(
+                'http://localhost:3001/admin/dashboard/addAsset',
+                {
+                    asset_name: name,
+                    asset_desc: vendor,
+                    mac,
+                    asset_type_id: assetTypeId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            message.success('Asset added successfully!');
+            setAddedAssets((prev) => new Set(prev).add(mac));
+            setTimeout(() => {
+                handleAssetModalClose()
+            }, 2000);
+
+        } catch (error) {
+            message.error('Failed to add asset. Please try again.');
+        } finally {
+            setAddAssetLoading(false);
+        }
+    };
+
+    const handleAssetModalClose = () => {
+        setIsAssetModalVisible(false);
+        setAddAssetData({ name: '', vendor: '', mac: '', assetTypeId: '' });
+
+    }
+
+    const handleOpenAddAssetModal = (record) => {
+        setAddAssetData({
+            name: record.name || '',
+            vendor: record.vendor || '',
+            mac: record.mac || '',
+            assetTypeId: '',
+        });
+        setIsAssetModalVisible(true);
+    };
+
     const columns = [
         {
             title: '#',
@@ -172,11 +254,17 @@ const ScanNetwork = () => {
             key: 'ports',
             render: (text, record) =>
                 record.ports && record.ports.length > 0 ? (
-                    <Button type="link" onClick={() => handleViewPorts(record.ports)}>
-                        View Ports
-                    </Button>
+                    <div style={{ textAlign: 'center' }}>
+
+                        <Button type="link" onClick={() => handleViewPorts(record.ports)}>
+                            View Ports
+                        </Button>
+                    </div>
                 ) : (
-                    'N/A'
+                    <div style={{ textAlign: 'center' }}>
+
+                        N/A
+                    </div>
                 ),
         },
         {
@@ -203,6 +291,24 @@ const ScanNetwork = () => {
             title: 'Asset Scan Status',
             dataIndex: 'asset_scan_status',
             key: 'asset_scan_status',
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (text, record) =>
+                record.mac && record.mac !== 'N/A' ? (
+                    addedAssets.has(record.mac) ? ( // Check if the asset is added
+                        <Button type="link" disabled>
+                            Added
+                        </Button>
+                    ) : (
+                        <Button type="link" onClick={() => handleOpenAddAssetModal(record)}>
+                            Add Asset
+                        </Button>
+                    )
+                ) : (
+                    <div style={{ textAlign: 'center' }}>N/A</div>
+                ),
         },
     ];
 
@@ -272,6 +378,50 @@ const ScanNetwork = () => {
                     <p>No port details available.</p>
                 )}
             </Modal>
+
+            <Modal
+                title="Add Asset"
+                visible={isAssetModalVisible}
+                onCancel={() => setIsAssetModalVisible(false)}
+                footer={[
+                    <Button key="cancel" onClick={() => setIsAssetModalVisible(false)}>
+                        Cancel
+                    </Button>,
+                    <Button key="submit" type="primary" loading={addAssetLoading} onClick={handleAddAsset}>
+                        Add Asset
+                    </Button>,
+                ]}
+            >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <Input
+                        placeholder="Asset Name"
+                        value={addAssetData.name}
+                        onChange={(e) => handleFormChange('name', e.target.value)}
+                    />
+                    <Input
+                        placeholder="Description"
+                        value={addAssetData.vendor}
+                        onChange={(e) => handleFormChange('vendor', e.target.value)}
+                    />
+                    <Input
+                        placeholder="MAC Address"
+                        value={addAssetData.mac}
+                        readOnly
+                    />
+                    <Select
+                        placeholder="Select Asset Type"
+                        value={addAssetData.assetTypeId}
+                        onChange={(value) => handleFormChange('assetTypeId', value)}
+                    >
+                        {assetTypes.map((type) => (
+                            <Select.Option key={type.id} value={type.id}>
+                                {type.description}
+                            </Select.Option>
+                        ))}
+                    </Select>
+                </div>
+            </Modal>
+
         </div>
     );
 };
