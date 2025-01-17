@@ -78,7 +78,7 @@ const ActionTopNav = ({ children }) => {
           </span>
 
           <span
-            className={`cursor-pointer px-3 py-1 rounded ${isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
+            className={`flex items-center gap-2 px-3 cursor-pointer py-1 bg-primary text-white font-semibold rounded-lg shadow hover:bg-sky-600 transition-transform transform hover:scale-105'
               }`}
             onClick={() => navigate('/launch-ticket')}
           >

@@ -18,13 +18,15 @@ const Assets = () => {
 
 
     const [locations, setLocations] = useState([]);
-    const [filteredSublocations, setFilteredSublocations] = useState([]); const [sublocations, setSublocations] = useState([]);
+    const [filteredSublocations, setFilteredSublocations] = useState([]);
+    const [sublocations, setSublocations] = useState([]);
     const [users, setUsers] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(null);
     const [modalErrorMessage, setModalErrorMessage] = useState(null);
     const navigate = useNavigate();
 
+    
 
 
 
@@ -504,7 +506,7 @@ const Assets = () => {
                 setAssignLocLoading(false);
                 setLocModalOpen(false);
                 setLocModalMessage('')
-                fetchAssetDetails(selectedAsset); // Refresh asset types list
+                fetchAssetDetails(selectedAsset);
             }, 2000);
 
         } catch (error) {
@@ -964,6 +966,8 @@ const Assets = () => {
         formData.assetDescription = '';
         formData.assetName = '';
         formData.location = '';
+        setModalErrorMessage('');
+        setModalMessage('');
         setModalOpen(false);
     }
 
@@ -1013,11 +1017,17 @@ const Assets = () => {
             mac: formData.mac
         };
         try {
-            
-            if (formData.mac && !/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(formData.mac.trim())) {
+
+            if (
+                formData.mac?.trim() && // Check if `formData.mac` exists and is not empty
+                formData.mac.trim() !== '-' && // Skip validation if the input is a dash
+                formData.mac.trim() !== 'missing' &&
+                !/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(formData.mac.trim()) // Validate MAC format
+            ) {
                 setModalErrorMessage('Mac Address Invalid.');
                 return;
             }
+
 
             const jwtToken = sessionStorage.getItem("jwt");
 
@@ -1098,7 +1108,8 @@ const Assets = () => {
 
 
     return (
-        <div className="h-[90vh] bg-gray-100">
+        <div
+            className="bg-gray-100 h-screen flex flex-col overflow-hidden">
             <Split
                 className="flex"
                 sizes={[15, 25, 60]} // Adjust pane sizes
@@ -1965,8 +1976,6 @@ const Assets = () => {
                                     options={filteredSublocations} // Array of users
                                     selectedValue={assignLoc}
                                     onChange={(id) => handleAssignLocInputChange({ value: id })}
-
-
 
                                 />
                             </label>
