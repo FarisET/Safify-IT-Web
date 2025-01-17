@@ -262,13 +262,13 @@ const IncidentsCompleted = () => {
         <table className="table-auto w-full border-collapse shadow-lg rounded-md">
           <thead className="text-black text-left">
             <tr>
-              <th className="px-4 py-2 border-b">
+              {/* <th className="px-4 py-2 border-b">
                 <input
                   type="checkbox"
                   onChange={(e) => setSelectedReports(e.target.checked ? filteredReports.map(r => r.userReportId) : [])}
                   checked={selectedReports.length === filteredReports.length}
                 />
-              </th>
+              </th> */}
               <th className="px-4 py-2 border-b">Ticket</th>
               <th className="px-4 py-2 border-b">Asset</th>
               {/* <th className="px-4 py-2 border-b">Asset.No</th> */}
@@ -287,13 +287,13 @@ const IncidentsCompleted = () => {
           <tbody className="text-left">
             {filteredReports.map((report) => (
               <tr key={report.userReportId} className="bg-white hover:bg-gray-100">
-                <td className="px-4 py-2 border-b">
+                {/* <td className="px-4 py-2 border-b">
                   <input
                     type="checkbox"
                     checked={selectedReports.includes(report.userReportId)}
                     onChange={() => toggleReportSelection(report.userReportId)}
                   />
-                </td>
+                </td> */}
                 <td className="px-4 py-2 border-b">
                   <div className="font-semibold text-gray-700 cursor-pointer hover:underline transition">
                     {report.userReportId}

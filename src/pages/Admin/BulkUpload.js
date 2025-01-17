@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, Table, Input, Button, message } from 'antd';
+import { Modal, Upload, Table, Input, Button, message } from 'antd';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { FaQuestionCircle } from 'react-icons/fa';
@@ -12,22 +12,133 @@ const BulkUpload = () => {
     const [uploadError, setUploadError] = useState('');
     const [showFinishButton, setShowFinishButton] = useState(false);
     const [showRedItemsOnly, setShowRedItemsOnly] = useState(false);
-
-
     const [duplicateAssets, setDuplicateAssets] = useState([]);
     const [invalidAssetTypes, setInvalidAssetTypes] = useState([]);
+    const [invalidMacs, setInvalidMacs] = useState([]);
     const [uploadSummary, setUploadSummary] = useState(null);
-
     const [searchTerm, setSearchTerm] = useState('');
 
 
     const downloadTemplate = () => {
         const link = document.createElement('a');
-        link.href = '/files/assets.xlsx'; // Directly point to the file in the public folder
+        link.href = '/files/bulk upload assets template.xlsx'; // Directly point to the file in the public folder
         const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '');
         link.download = `assets_${timestamp}.xlsx`;
         link.click();
     };
+
+    const handleFileInputChange = (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            return;
+        }
+
+
+        const validExtensions = ['xlsx'];
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        const mimeType = file.type;
+
+        if (!validExtensions.includes(fileExtension) || mimeType !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+            message.error('Invalid file type. Please upload an Excel file (.xlsx).');
+            event.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const binaryStr = e.target.result;
+            const workbook = XLSX.read(binaryStr, { type: 'binary' });
+            const sheetName = workbook.SheetNames[0];
+            const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+            const requiredColumns = ['asset_no', 'asset_name', 'asset_desc', 'asset_types_desc'];
+            const fileColumns = Object.keys(sheetData[0] || {});
+            const missingColumns = requiredColumns.filter((col) => !fileColumns.includes(col));
+
+            if (missingColumns.length > 0) {
+                message.error(`The uploaded file is missing required columns: ${missingColumns.join(', ')}`);
+                setData([]);
+                setSelectedFile(null);
+                setShowFinishButton(false);
+                return;
+            }
+
+            // Check for duplicate asset_no within the sheet
+            const assetNoCount = {};
+            const updatedSheetData = sheetData.map((row) => {
+                const assetNo = row.asset_no;
+                if (assetNo) {
+                    assetNoCount[assetNo] = (assetNoCount[assetNo] || 0) + 1;
+                }
+                return row;
+            });
+
+            const sheetDuplicates = Object.keys(assetNoCount).filter((key) => assetNoCount[key] > 1);
+
+            // Flag duplicates within the sheet
+            const flaggedData = sheetData.map((row) => ({
+                ...row,
+                isDuplicateWithinSheet: sheetDuplicates.includes(row.asset_no),
+            }));
+
+            if (sheetDuplicates.length > 0) {
+
+                Modal.error({
+
+                    title: 'Duplicate Assets Found',
+
+                    content: (
+
+                        <div>
+
+                            <p>The following asset numbers are duplicated within the sheet:</p>
+
+                            <ul>
+
+                                {sheetDuplicates.map((duplicate) => (
+
+                                    <li key={duplicate}>{duplicate}</li>
+
+                                ))}
+                            </ul>
+                        </div>
+                    ),
+                    okText: 'Close',
+                    okButtonProps: {
+                        className: 'bg-primary text-white hover:bg-primary-dark',
+                    },
+                });
+
+            }
+
+            // Validate MAC addresses
+            const invalidMacsTemp = [];
+            const macRegex = /^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/;
+
+            const validatedData = flaggedData.map((row) => {
+                const macAddress = row.mac_address ? String(row.mac_address).trim() : ''; // Ensure mac_address is a string
+                const isInvalidMac = macAddress && !macRegex.test(macAddress);
+                if (isInvalidMac) {
+                    invalidMacsTemp.push(row.asset_no); // Store the asset_no of rows with invalid MACs
+                }
+
+                return {
+                    ...row,
+                    isInvalidMac,
+                };
+            });
+
+            setInvalidMacs(invalidMacsTemp || []);
+            setData(validatedData); // Reconciled data containing both flags and validation results
+            setShowFinishButton(true);
+        };
+        reader.readAsBinaryString(file);
+        setSelectedFile(file);
+    };
+
+
+
+
 
     const handleFileUpload = (file) => {
         const reader = new FileReader();
@@ -114,6 +225,7 @@ const BulkUpload = () => {
 
                 setDuplicateAssets(duplicate_assets.map(item => item.asset_no));
                 setInvalidAssetTypes(invalid_asset_types.map(item => item.asset_no));
+                setInvalidMacs()
 
                 generateUploadSummary(rows_inserted, duplicateCount, invalidTypeCount);
 
@@ -126,7 +238,7 @@ const BulkUpload = () => {
             }
 
         } catch (error) {
-            setUploadError(`Failed to upload file. ${error.message}`);
+            setUploadError(`Failed to upload file. ${error.response.data.error}`);
         } finally {
             setUploadLoading(false);
         }
@@ -143,8 +255,15 @@ const BulkUpload = () => {
             title: 'Asset No',
             dataIndex: 'asset_no',
             key: 'asset_no',
-            render: (text) => (
-                <span style={{ color: duplicateAssets.includes(text) ? 'red' : 'inherit' }}>
+            render: (text, record) => (
+                <span
+                    style={{
+                        color:
+                            duplicateAssets.includes(text) || record.isDuplicateWithinSheet
+                                ? 'red'
+                                : 'inherit',
+                    }}
+                >
                     {text}
                 </span>
             ),
@@ -169,20 +288,28 @@ const BulkUpload = () => {
                 </span>
             ),
         },
+        {
+            title: 'Mac Address',
+            dataIndex: 'mac_address',
+            key: 'mac_address',
+            render: (text, record) => (
+                <span style={{ color: invalidMacs?.includes(record.asset_no) ? 'red' : 'inherit' }}>
+                    {text}
+                </span>
+            ),
+        },
     ];
 
     const filteredData = data.filter((item) => {
         const matchesSearch = Object.values(item).some((value) =>
             value.toString().toLowerCase().includes(searchTerm.toLowerCase())
         );
-
         if (showRedItemsOnly) {
             const isRedItem =
                 duplicateAssets.includes(item.asset_no) ||
                 invalidAssetTypes.includes(item.asset_no);
             return matchesSearch && isRedItem;
         }
-
         return matchesSearch;
     });
 
@@ -196,7 +323,7 @@ const BulkUpload = () => {
             {uploadSummary && <p className="mb-4 p-3 rounded text-gray-700 bg-amber-100">{uploadSummary}</p>}
 
             <div className="flex-col space-y-4 justify-center text-left">
-                <Upload
+                {/* <Upload
                     beforeUpload={handleFileUpload}
                     accept=".xlsx"
                     showUploadList={false}
@@ -204,7 +331,14 @@ const BulkUpload = () => {
                     <button className="px-6 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-sky-200 transition">
                         Browse File
                     </button>
-                </Upload>
+                </Upload> */}
+                <input
+                    type="file"
+                    accept=".xlsx"
+                    onChange={(e) => handleFileInputChange(e)}
+                // className="px-6 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-sky-200 transition"
+                />
+
 
                 <button
                     onClick={() => downloadTemplate()}

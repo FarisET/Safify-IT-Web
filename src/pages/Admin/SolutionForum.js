@@ -34,11 +34,18 @@ const SolutionForum = () => {
     fetchForumEntries();
   }, []);
 
-  const filteredEntries = forumEntries.filter(
-    (item) =>
-      item.Problem.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.Solution.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredEntries = forumEntries.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+
+    return (
+      (item.Problem && item.Problem.toLowerCase().includes(searchLower)) ||
+      (item.Solution && item.Solution.toLowerCase().includes(searchLower)) ||
+      (item['Reported Time'] && item['Reported Time'].toString().toLowerCase().includes(searchLower)) ||
+      (item['Asset Name'] && item['Asset Name'].toLowerCase().includes(searchLower)) ||
+      (item['Asset Number'] && item['Asset Number'].toString().toLowerCase().includes(searchLower))
     );
+  })
+
 
   const handleStepsClick = (steps) => {
     setSelectedSteps(steps);
@@ -51,9 +58,9 @@ const SolutionForum = () => {
   };
 
   if (loading) return <div className="">
-          <div className="fixed inset-0 flex items-center justify-center">
-        <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-16 h-16 animate-spin"></div>
-      </div>
+    <div className="fixed inset-0 flex items-center justify-center">
+      <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-16 h-16 animate-spin"></div>
+    </div>
 
   </div>;
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;

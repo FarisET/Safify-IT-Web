@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Table, Input, Button, Select, message } from 'antd';
 import axios from 'axios';
 import { useScan } from '../../state/context/scanContext';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-const { Option } = Select;
-
+import { AssetType } from '../../models/AssetType';
 
 const ScanNetwork = () => {
+    const { Option } = Select;
     const [ipRange, setIpRange] = useState('');
     const { scanState, setScanState } = useScan();
     const [paginationConfig, setPaginationConfig] = useState({
@@ -26,14 +26,48 @@ const ScanNetwork = () => {
     const [addAssetLoading, setAddAssetLoading] = useState(false);
     const [isAssetModalVisible, setIsAssetModalVisible] = useState(false);
     const [addedAssets, setAddedAssets] = useState(new Set());
+    const [isScanning, setIsScanning] = useState(false);
 
 
 
-    const assetTypes = [
-        { id: 1, description: 'Laptop' },
-        { id: 2, description: 'Printer' },
-        { id: 3, description: 'Router' },
-    ];
+
+    const [assetTypes, setAssetTypes] = useState([]);
+    const [selectedAssetTypeId, setSelectedAssetTypeId] = useState(null);
+    const [selectedAssetType, setSelectedAssetType] = useState(null);
+    const [initLoading, setinitLoading] = useState(false);
+    const [filterType, setFilterType] = useState('all');
+
+
+
+
+    const fetchAssetTypes = async () => {
+        try {
+            setinitLoading(true);
+            const jwtToken = sessionStorage.getItem('jwt');
+            const response = await axios.get(
+                'http://localhost:3001/admin/dashboard/fetchAssetTypes',
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                    },
+                }
+            );
+
+            setAssetTypes(response.data);
+
+        } catch (error) {
+            console.error('Error fetching asset types:', error);
+        } finally {
+            setinitLoading();
+        }
+    };
+
+
+    useEffect(() => {
+        fetchAssetTypes();
+    },
+        []);
+
 
 
 
@@ -45,7 +79,7 @@ const ScanNetwork = () => {
             message.error('Please enter an IP range.');
             return;
         }
-
+        setIsScanning(true);
         setScanState((prev) => ({ ...prev, isLoading: true }));
         try {
             const jwtToken = sessionStorage.getItem('jwt');
@@ -214,6 +248,13 @@ const ScanNetwork = () => {
         setIsAssetModalVisible(true);
     };
 
+    const handleStopScan = () => {
+        setIsScanning(false);
+        setScanState((prev) => ({ ...prev, isLoading: false }));
+        message.info('Scan stopped.');
+    };
+
+
     const columns = [
         {
             title: '#',
@@ -296,7 +337,7 @@ const ScanNetwork = () => {
             title: 'Action',
             key: 'action',
             render: (text, record) =>
-                record.mac && record.mac !== 'N/A' && record.asset_no =='N/A' ? (
+                record.mac && record.mac !== 'N/A' && record.asset_no == 'N/A' ? (
                     addedAssets.has(record.mac) ? ( // Check if the asset is added
                         <Button type="link" disabled>
                             Added
@@ -323,9 +364,15 @@ const ScanNetwork = () => {
                     onChange={(e) => setIpRange(e.target.value)}
                     style={{ width: '300px' }}
                 />
-                <Button type="primary" onClick={handleRunScan} loading={scanState.isLoading}>
-                    Run Scan
+                <Button
+                    type="primary"
+                    className='bg-primary'
+                    onClick={() => (isScanning ? handleStopScan() : handleRunScan())}
+                    loading={isScanning ? false : scanState.isLoading} // Allow stop action even during loading
+                >
+                    {isScanning ? 'Stop Scan' : 'Run Scan'}
                 </Button>
+
                 <div style={{ display: 'flex', gap: '10px' }}>
 
                     <Button type="default" onClick={handleClearTable}>
@@ -393,29 +440,39 @@ const ScanNetwork = () => {
                 ]}
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <Input
-                        placeholder="Asset Name"
-                        value={addAssetData.name}
-                        onChange={(e) => handleFormChange('name', e.target.value)}
-                    />
-                    <Input
-                        placeholder="Description"
-                        value={addAssetData.vendor}
-                        onChange={(e) => handleFormChange('vendor', e.target.value)}
-                    />
-                    <Input
-                        placeholder="MAC Address"
-                        value={addAssetData.mac}
-                        readOnly
-                    />
+                    <label>
+                        Asset Name
+                        <Input
+                            placeholder="Asset Name"
+                            value={addAssetData.name}
+                            onChange={(e) => handleFormChange('name', e.target.value)}
+                        />
+                    </label>
+                    <label>
+                        Description
+                        <Input
+                            placeholder="Description"
+                            value={addAssetData.vendor}
+                            onChange={(e) => handleFormChange('vendor', e.target.value)}
+                        />
+                    </label>
+                    <label>
+                        MAC Address
+                        <Input
+                            placeholder="MAC Address"
+                            value={addAssetData.mac}
+                            readOnly
+                        />
+                    </label>
+
                     <Select
                         placeholder="Select Asset Type"
                         value={addAssetData.assetTypeId}
                         onChange={(value) => handleFormChange('assetTypeId', value)}
                     >
                         {assetTypes.map((type) => (
-                            <Select.Option key={type.id} value={type.id}>
-                                {type.description}
+                            <Select.Option key={type.asset_type_id} value={type.asset_type_id}>
+                                {type.asset_type_desc}
                             </Select.Option>
                         ))}
                     </Select>
