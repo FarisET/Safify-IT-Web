@@ -265,14 +265,9 @@ const Approvals = () => {
                     : <span className="text-gray-700 font-bold">X</span>}
                 </td>
                 <td className="px-4 py-2 border-b font-semibold">
-                  {report.dateTime ? (
-                    <>
-                      {formatDate(report.dateTime).time.split(' ')[0]}
-                      <span className="text-[0.7rem] font-semibold align-top">({formatDate(report.dateTime).period})</span>
-                    </>
-                  ) : (
-                    <span className="text-gray-700 font-bold">X</span>
-                  )}
+                  {report.dateTime
+                    ? `${report.dateTime.split(' ')[1]} ${report.dateTime.split(' ')[2]}` // Extract and display the time and period
+                    : <span className="text-gray-700 font-bold">X</span>}
                 </td>
                 <td className="px-4 py-2 border-b">
                   {report.status.toLowerCase() === 'approval pending' && (
@@ -380,7 +375,7 @@ const Approvals = () => {
           </div>
         </div>
       )}
-      
+
     </div>
   );
 };

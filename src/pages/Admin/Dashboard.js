@@ -67,6 +67,31 @@ const Dashboard = () => {
     }
   };
 
+  //user assets
+  const [userAssets, setUserAssets] = useState([]);
+  const [userAssetLoading, setUserAssetLoading] = useState(false);
+  const [userAssetError, setUserAssetError] = useState(null);
+
+
+  const fetchUserAssets = async (dateRange) => {
+    try {
+      const jwtToken = sessionStorage.getItem("jwt");
+      let dataRange = dateRange;
+      const endpoint =
+        "http://localhost:3001/analytics/fetchUserAssetsGrouped"
+
+      const response = await axios.get(
+        endpoint,
+        {
+          headers: { Authorization: `Bearer ${jwtToken}` },
+        }
+      );
+      setUserAssets(response.data);
+    } catch (error) {
+      setUserAssetError("Failed to fetch user tickets. Please try again.");
+    }
+  };
+
 
 
 
@@ -131,6 +156,7 @@ const Dashboard = () => {
     fetchTimeBoundAnalytics(selectedDateRange);
     fetchNonTimeBoundAnalytics();
     fetchUserTickets(selectedUserDateRange);
+    fetchUserAssets();
 
   }, []);
 
@@ -428,6 +454,7 @@ const Dashboard = () => {
                       </Select>
                     </div>
 
+                    {/* Tickets Table */}
                     <Table
                       dataSource={userTickets}
                       columns={[
@@ -441,21 +468,49 @@ const Dashboard = () => {
                           dataIndex: "tickets",
                           key: "tickets",
                         },
-                        {
-                          title: "Asset(s) Assigned",
-                          dataIndex: "assets",
-                          key: "assets",
-                        },
                       ]}
                       rowKey="user_name"
                       pagination={{ pageSize: 10 }}
                     />
+
+                    {/* Assets Table */}
+                    <div className="mt-6">
+                      <h3 className="text-xl font-semibold mb-4">Assigned Assets</h3>
+                      <Table
+                        dataSource={
+                          userAssets?.users?.map((user, index) => ({
+                            key: index,
+                            user: `User ${index + 1}`,
+                            assets:
+                              user.assets
+                                ?.filter((asset) => asset.asset_no && asset.asset_name)
+                                .map((asset) => `${asset.asset_no}: ${asset.asset_name}`)
+                                .join(", ") || "No assets assigned",
+                          })) || []
+                        }
+                        columns={[
+                          {
+                            title: "User",
+                            dataIndex: "user",
+                            key: "user",
+                          },
+                          {
+                            title: "Assigned Assets",
+                            dataIndex: "assets",
+                            key: "assets",
+                          },
+                        ]}
+                        rowKey="user"
+                        pagination={{ pageSize: 10 }}
+                      />
+                    </div>
                   </div>
                 ) : (
                   <Typography.Text type="danger">{error}</Typography.Text>
                 )}
               </div>
             )}
+
           </div>
         </div>
       ) : (
