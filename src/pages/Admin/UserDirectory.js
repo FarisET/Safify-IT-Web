@@ -410,8 +410,7 @@ const UsersDirectory = () => {
                         )}
 
 
-                        {user.isActive != 'Disabled' && (
-
+                        {/* {user.isActive != 'Disabled' && (
                           <button
                             onClick={() => {
                               setChangeEmailInput({ userId: user.id, newEmail: "" });
@@ -423,7 +422,7 @@ const UsersDirectory = () => {
                             <span>Change email</span>
                             <FaIdCard className="text-sm" />
                           </button>
-                        )}
+                        )} */}
                         {user.isActive != 'Disabled' && (
 
                           <button
