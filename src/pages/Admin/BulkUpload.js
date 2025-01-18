@@ -14,6 +14,11 @@ const BulkUpload = () => {
     const [showRedItemsOnly, setShowRedItemsOnly] = useState(false);
     const [duplicateAssets, setDuplicateAssets] = useState([]);
     const [invalidAssetTypes, setInvalidAssetTypes] = useState([]);
+    const [duplicateMacAddresses, setDuplicateMacAddresses] = useState([]);
+    const [macNotAllowed, setMacNotAllowed] = useState([]);
+
+    
+    
     const [invalidMacs, setInvalidMacs] = useState([]);
     const [uploadSummary, setUploadSummary] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -66,7 +71,7 @@ const BulkUpload = () => {
             const sheetName = workbook.SheetNames[0];
             const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-            const requiredColumns = ['asset_no', 'asset_name', 'asset_desc', 'asset_types_desc'];
+            const requiredColumns = ['asset_no', 'asset_name', 'asset_desc', 'asset_type_desc'];
             const fileColumns = Object.keys(sheetData[0] || {});
             const missingColumns = requiredColumns.filter((col) => !fileColumns.includes(col));
 
@@ -163,7 +168,7 @@ const BulkUpload = () => {
             const sheetName = workbook.SheetNames[0];
             const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-            const requiredColumns = ['asset_no', 'asset_name', 'asset_desc', 'asset_types_desc'];
+            const requiredColumns = ['asset_no', 'asset_name', 'asset_desc', 'asset_type_desc'];
             const fileColumns = Object.keys(sheetData[0] || {});
             const missingColumns = requiredColumns.filter(col => !fileColumns.includes(col));
 
@@ -183,7 +188,7 @@ const BulkUpload = () => {
         return false;
     };
 
-    const generateUploadSummary = (rowsInserted, duplicateCount, invalidTypeCount) => {
+    const generateUploadSummary = (rowsInserted, duplicateCount, invalidTypeCount, invalidMacCount, macNotAllowedCount) => {
         setUploadSummary(
             <div>
                 <h3 className='mt-2 mb-2 font-semibold text-md'>Upload Summary:</h3>
@@ -199,6 +204,14 @@ const BulkUpload = () => {
                     <li className='flex align-center space-x-2'>
                         <h4 className='font-semibold text-gray-700'>Invalid Asset Types:</h4>{' '}
                         <span className=''>{invalidTypeCount}</span>
+                    </li>
+                    <li className='flex align-center space-x-2'>
+                        <h4 className='font-semibold text-gray-700'>Duplicate Mac addresses:</h4>{' '}
+                        <span className=''>{invalidMacCount}</span>
+                    </li>
+                    <li className='flex align-center space-x-2'>
+                        <h4 className='font-semibold text-gray-700'>Non Network Asset Type with Mac Address</h4>{' '}
+                        <span className=''>{macNotAllowedCount}</span>
                     </li>
                 </ul>
                 <p className='mt-2 flex align-center space-x-2'>
@@ -232,17 +245,20 @@ const BulkUpload = () => {
 
 
 
-            const { rows_inserted, duplicate_assets, invalid_asset_types } = response.data.status;
+            const { rows_inserted, duplicate_assets, invalid_asset_types, duplicate_mac_addresses, mac_not_allowed  } = response.data.status;
 
-            if (duplicate_assets.length > 0 || invalid_asset_types.length > 0) {
+            if (duplicate_assets.length > 0 || invalid_asset_types.length > 0 || duplicate_mac_addresses.length > 0 || mac_not_allowed.length > 0) {
                 const duplicateCount = duplicate_assets.length;
                 const invalidTypeCount = invalid_asset_types.length;
+                const invalidMacCount = duplicate_mac_addresses.length;
+                const macNotAllowedCount = mac_not_allowed.length;
 
                 setDuplicateAssets(duplicate_assets.map(item => item.asset_no));
                 setInvalidAssetTypes(invalid_asset_types.map(item => item.asset_no));
-                setInvalidMacs()
-
-                generateUploadSummary(rows_inserted, duplicateCount, invalidTypeCount);
+                setDuplicateMacAddresses(duplicate_mac_addresses.map(item => item.asset_no));
+                setMacNotAllowed(mac_not_allowed.map(item => item.asset_no));
+                setInvalidMacs();
+                generateUploadSummary(rows_inserted, duplicateCount, invalidTypeCount, invalidMacCount, macNotAllowedCount);
 
 
             } else {
@@ -295,10 +311,10 @@ const BulkUpload = () => {
         },
         {
             title: 'Asset Type Description',
-            dataIndex: 'asset_types_desc',
-            key: 'asset_types_desc',
+            dataIndex: 'asset_type_desc',
+            key: 'asset_type_desc',
             render: (text, record) => (
-                <span style={{ color: invalidAssetTypes.includes(record.asset_no) ? 'red' : 'inherit' }}>
+                <span style={{ color: invalidAssetTypes.includes(record.asset_no) || macNotAllowed.includes(record.asset_no) ? 'red' : 'inherit' }}>
                     {text}
                 </span>
             ),
@@ -308,7 +324,7 @@ const BulkUpload = () => {
             dataIndex: 'mac_address',
             key: 'mac_address',
             render: (text, record) => (
-                <span style={{ color: invalidMacs?.includes(record.asset_no) ? 'red' : 'inherit' }}>
+                <span style={{ color: invalidMacs?.includes(record.asset_no) || duplicateMacAddresses?.includes(record.asset_no)  ? 'red' : 'inherit' }}>
                     {text}
                 </span>
             ),
