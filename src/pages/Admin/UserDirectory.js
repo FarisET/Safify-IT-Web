@@ -227,7 +227,7 @@ const UsersDirectory = () => {
 
     } catch (error) {
       // Set error message
-      setEditUserError("Failed to update user. Please try again.");
+      setEditUserError(`Failed to update user. ${error.response.data.error}`);
     } finally {
       // Stop the loading spinner
       setEditUserLoading(false);
