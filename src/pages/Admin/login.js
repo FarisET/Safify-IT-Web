@@ -3,8 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as SafifyIcon } from '../../assets/images/safify_it_icon.svg';
 import {getTabsFromLocalStorage, saveTabsToLocalStorage} from '../../utils/tabUtils'
-
-
+import constants from '../../const';
 const LoginPage = () => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
@@ -25,8 +24,8 @@ const LoginPage = () => {
 
     try {
       const deviceToken = "webapp";
-
-      const response = await axios.post('http://localhost:3001/user/login', {
+        
+      const response = await axios.post(`${constants.API.BASE_URL}/user/login`, {
         user_id: userId,
         user_pass: password,
         device_token: deviceToken
