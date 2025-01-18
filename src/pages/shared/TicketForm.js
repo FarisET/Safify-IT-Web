@@ -5,7 +5,7 @@ import axios from 'axios';
 import AssetDropdown from "../../components/AssetDropdown";
 import { useNavigate } from 'react-router-dom';
 import { FaArrowAltCircleLeft } from "react-icons/fa";
-
+import constants from '../../const';
 
 const TicketForm = () => {
   const [formData, setFormData] = useState({
@@ -55,7 +55,7 @@ const TicketForm = () => {
     try {
       const jwtToken = sessionStorage.getItem("jwt");
       const response = await axios.get(
-        "http://localhost:3001/ticket/dashboard/getLocationsAndSubLocations",
+        `${constants.API.BASE_URL}/ticket/dashboard/getLocationsAndSubLocations`,
         {
           headers: { Authorization: `Bearer ${jwtToken}` },
         }
@@ -101,7 +101,7 @@ const TicketForm = () => {
       const userId = sessionStorage.getItem("userId");
 
       const response = await axios.get(
-        `http://localhost:3001/ticket/dashboard/getAssetsandAssetTypes/${userId}`,
+        `${constants.API.BASE_URL}/ticket/dashboard/getAssetsandAssetTypes/${userId}`,
         {
           headers: { Authorization: `Bearer ${jwtToken}` },
         }
@@ -181,7 +181,7 @@ const TicketForm = () => {
 
       // Send the data to the backend using axios
       const response = await axios.post(
-        `http://localhost:3001/ticket/dashboard/${userId}/MakeReport`,
+        `${constants.API.BASE_URL}/ticket/dashboard/${userId}/MakeReport`,
         data,
         {
           headers: {

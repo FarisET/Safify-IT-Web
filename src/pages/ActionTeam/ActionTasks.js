@@ -3,7 +3,7 @@ import axios from "axios";
 import { Divider } from "antd";
 import { FaImage } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-
+import constants from "../../const";
 const ActionTasks = ({ ticketID, taskID }) => {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ const ActionTasks = ({ ticketID, taskID }) => {
             const userId = sessionStorage.getItem("userId");
 
             const response = await axios.get(
-                `http://localhost:3001/actionTeam/dashboard/${userId}/fetchAssignedTasks`,
+                `${constants.API.BASE_URL}/actionTeam/dashboard/${userId}/fetchAssignedTasks`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,

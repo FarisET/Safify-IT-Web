@@ -3,7 +3,7 @@ import axios from "axios";
 import { Divider } from "antd";
 import { FaImage } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-
+import constants from "../../const";
 const MyTickets = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ const MyTickets = () => {
       const userId = sessionStorage.getItem("userId");
 
       const response = await axios.get(
-        `http://localhost:3001/ticket/dashboard/${userId}/reports`,
+        `${constants.API.BASE_URL}/ticket/dashboard/${userId}/reports`,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,

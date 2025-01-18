@@ -32,7 +32,6 @@ import LaunchTicketPage from './pages/shared/LaunchTicketPage';
 import MyTicketPage from './pages/shared/MyTicketsPage';
 import ScanNetwork from './pages/Admin/ScanNetwork';
 import TabManager from './components/TabManager'
-import Dashboard2 from './pages/Dashboard2';
 
 
 const AppLayout = () => {
@@ -169,15 +168,6 @@ const AppLayout = () => {
             element={
               <ProtectedRoute requiredRole="admin">
                 <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/dashboard2"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <Dashboard2 />
               </ProtectedRoute>
             }
           />

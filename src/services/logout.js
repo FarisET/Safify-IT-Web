@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-
+import constants from '../const';
 const useLogout = () => {
   const navigate = useNavigate();
 
@@ -7,7 +7,7 @@ const useLogout = () => {
     try {
       const userId = sessionStorage.getItem('userId');
 
-      const response = await fetch(`http://localhost:3001/user/logout`, {
+      const response = await fetch(`${constants.API.BASE_URL}/user/logout`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId }),

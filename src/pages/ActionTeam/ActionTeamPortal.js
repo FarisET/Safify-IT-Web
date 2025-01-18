@@ -3,7 +3,7 @@ import axios from "axios";
 import { Divider } from "antd";
 import { FaImage } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-
+import constants from "../../const";
 const ActionTeamPortal = ({ ticketID, taskID }) => {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ const ActionTeamPortal = ({ ticketID, taskID }) => {
             const userId = sessionStorage.getItem("userId");
 
             const response = await axios.get(
-                `http://localhost:3001/userReport/dashboard/${userId}/reports`,
+                `${constants.API.BASE_URL}/userReport/dashboard/${userId}/reports`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,

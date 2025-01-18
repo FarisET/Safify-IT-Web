@@ -7,7 +7,7 @@ import TeamsCard from './ActionTeamsCard';
 import { Modal, Input } from 'antd';
 import axios from 'axios';
 import useLogout from '../services/logout';
-
+import constants from '../const';
 
 const TopNav = ({ teams, fetchTeams }) => {
   const navigate = useNavigate();
@@ -65,7 +65,7 @@ const TopNav = ({ teams, fetchTeams }) => {
       setAnnouncementLoading(true);
       const jwtToken = sessionStorage.getItem('jwt');
       await axios.post(
-        'http://localhost:3001/admin/dashboard/alertUsers',
+        `${constants.API.BASE_URL}/admin/dashboard/alertUsers`,
         { messageTitle: announcementTitle, messageBody: announcementBody },
         { headers: { Authorization: `Bearer ${jwtToken}` } }
       );

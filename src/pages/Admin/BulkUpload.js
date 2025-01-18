@@ -3,7 +3,7 @@ import { Modal, Upload, Table, Input, Button, message } from 'antd';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { FaQuestionCircle } from 'react-icons/fa';
-
+import constants from '../../const';
 const BulkUpload = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [data, setData] = useState([]);
@@ -233,7 +233,7 @@ const BulkUpload = () => {
         try {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.post(
-                'http://localhost:3001/admin/bulkUpload/uploadAssetJson',
+                `${constants.API.BASE_URL}/admin/bulkUpload/uploadAssetJson`,
                 { jsonAssetData: data },
                 {
                     headers: {

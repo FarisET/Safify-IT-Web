@@ -7,7 +7,7 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { AssetType } from '../../models/AssetType';
 import { useTimer } from "../../state/context/useTimer";
-
+import constants from '../../const';
 const ScanNetwork = () => {
 
     useEffect(() => {
@@ -63,7 +63,7 @@ const ScanNetwork = () => {
             setinitLoading(true);
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.get(
-                'http://localhost:3001/admin/dashboard/fetchAssetTypes',
+                `${constants.API.BASE_URL}/admin/dashboard/fetchAssetTypes`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -104,7 +104,7 @@ const ScanNetwork = () => {
             setElapsedTime(0);
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.post(
-                'http://localhost:3001/network/runScan',
+                `${constants.API.BASE_URL}/network/runScan`,
                 { iprange: ipRange },
                 {
                     headers: {
@@ -227,7 +227,7 @@ const ScanNetwork = () => {
         try {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.post(
-                'http://localhost:3001/admin/dashboard/addAsset',
+                `${constants.API.BASE_URL}/admin/dashboard/addAsset`,
                 {
                     asset_name: name,
                     asset_desc: vendor,

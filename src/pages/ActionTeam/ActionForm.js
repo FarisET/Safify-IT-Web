@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FaArrowAltCircleLeft } from "react-icons/fa";
-
+import constants from "../../const";
 const ActionForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({
@@ -77,7 +77,7 @@ const ActionForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userId = sessionStorage.getItem("userId"); // Assuming userid is stored in sessionStorage
-    const endpoint = `http://localhost:3001/actionTeam/dashboard/${userId}/MakeActionReport`;
+    const endpoint = `${constants.API.BASE_URL}/actionTeam/dashboard/${userId}/MakeActionReport`;
 
     const data = {
     reported_by: formData.reporter,
