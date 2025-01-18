@@ -31,6 +31,7 @@ import ActionForm from './pages/ActionTeam/ActionForm';
 import LaunchTicketPage from './pages/shared/LaunchTicketPage';
 import MyTicketPage from './pages/shared/MyTicketsPage';
 import ScanNetwork from './pages/Admin/ScanNetwork';
+import TabManager from './components/TabManager'
 
 
 const AppLayout = () => {

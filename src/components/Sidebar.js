@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   FaChevronLeft,
   FaBookOpen,
@@ -143,24 +143,32 @@ const Sidebar = () => {
   );
 };
 
-const SidebarSection = ({ title, links, isCollapsed }) => (
-  <div className="px-3">
-    {!isCollapsed && <h3 className="text-gray-600 font-semibold mb-2">{title}</h3>}
-    <div className="space-y-2">
-      {links.map(({ to, icon: Icon, label }) => (
-        <Tooltip key={to} title={label} placement="right" visible={isCollapsed ? undefined : false}>
-          <NavLink
-            to={to}
-            className="flex items-center gap-2 text-gray-700 p-2 rounded hover:bg-gray-200 transition-all"
-            activeClassName="bg-blue-500 text-white"
-          >
-            <Icon className="text-lg" />
-            {!isCollapsed && <span>{label}</span>}
-          </NavLink>
-        </Tooltip>
-      ))}
+const SidebarSection = ({ title, links, isCollapsed }) => {
+  const location = useLocation();
+
+  return (
+    <div className="px-3">
+      {!isCollapsed && <h3 className="text-gray-600 font-semibold mb-2">{title}</h3>}
+      <div className="space-y-2">
+        {links.map(({ to, icon: Icon, label }) => {
+          const isActive = location.pathname === to;
+          const activeClass = isActive ? 'text-primary' : 'text-gray-700';
+
+          return (
+            <Tooltip key={to} title={label} placement="right" visible={isCollapsed ? undefined : false}>
+              <NavLink
+                to={to}
+                className={`flex items-center gap-2 p-2 rounded hover:bg-gray-200 transition-all ${isActive ? 'bg-blue-500 text-white' : ''}`}
+              >
+                <Icon className={`text-lg ${activeClass}`} />
+                {!isCollapsed && <span className={`${activeClass}`}>{label}</span>}
+              </NavLink>
+            </Tooltip>
+          );
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default Sidebar;

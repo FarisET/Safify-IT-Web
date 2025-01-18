@@ -4,6 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import Report from '../../models/UserReport';  // Adjust path as necessary
 import { FaUser, FaTrash, FaArrowRight, FaImage } from 'react-icons/fa';
 import { formatDate } from '../../utils/date';
+import { Select } from 'antd';
 
 const IncidentsCompleted = () => {
   const [userReports, setUserReports] = useState([]);
@@ -25,7 +26,7 @@ const IncidentsCompleted = () => {
   const [responseMessage, setResponseMessage] = useState('');
   const [responseStatus, setResponseStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  const {Option} = Select;
 
 
 
@@ -218,17 +219,17 @@ const IncidentsCompleted = () => {
           {/* Criticality Dropdown */}
           <div className="flex flex-col space-y-1">
             <label htmlFor="criticality" className="text-sm font-medium text-gray-600">Criticality</label>
-            <select
+            <Select
               id="criticality"
               value={critFilter}
-              onChange={(e) => setcritFilter(e.target.value)}
-              className="font-semibold text-gray-700 rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setcritFilter(value)}
+              className="w-24"
             >
-              <option value="All">All</option>
-              <option value="critical">Critical</option>
-              <option value="high">High</option>
-              <option value="low">Low</option>
-            </select>
+              <Option value="All">All</Option>
+              <Option value="critical">Critical</Option>
+              <Option value="high">High</Option>
+              <Option value="low">Low</Option>
+            </Select>
           </div>
 
 
@@ -392,7 +393,7 @@ const IncidentsCompleted = () => {
         </table>
       ) : (
 
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-blue-100 text-sky-500 rounded-full">
               <svg
@@ -480,17 +481,17 @@ const IncidentsCompleted = () => {
               <label htmlFor="criticality" className="block text-gray-700 mb-2">
                 Select Criticality
               </label>
-              <select
-                id="criticality"
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={selectedCriticality}
-                onChange={(e) => setSelectedCriticality(e.target.value)} // Handle criticality selection
-              >
-                <option value="">Select Criticality</option>
-                <option value="CRT1">Minor</option>
-                <option value="CRT2">Serious</option>
-                <option value="CRT3">Critical</option>
-              </select>
+              <Select
+              id="criticality"
+              value={critFilter}
+              onChange={(value) => setSelectedCriticality(value)}
+              className="w-24"
+            >
+              <Option value="All">All</Option>
+              <Option value="critical">Critical</Option>
+              <Option value="high">High</Option>
+              <Option value="low">Low</Option>
+            </Select>
             </div>
 
             {/* Loading Indicator */}

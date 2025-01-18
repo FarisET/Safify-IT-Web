@@ -1014,7 +1014,9 @@ const Assets = () => {
             asset_desc: formData.assetDescription,
             asset_type_id: formData.assettypeId || null,
             status: formData.asset_status || "available",
-            mac: formData.mac
+            mac: formData.mac,
+
+
         };
         try {
 
@@ -1022,6 +1024,7 @@ const Assets = () => {
                 formData.mac?.trim() && // Check if `formData.mac` exists and is not empty
                 formData.mac.trim() !== '-' && // Skip validation if the input is a dash
                 formData.mac.trim() !== 'missing' &&
+                formData.mac.trim() !== 'not required' &&
                 !/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(formData.mac.trim()) // Validate MAC format
             ) {
                 setModalErrorMessage('Mac Address Invalid.');
@@ -2250,7 +2253,7 @@ const Assets = () => {
                                         <div className="relative group ml-2">
                                             <FaQuestionCircle className="text-gray-700 text-md hover:text-sky-500 cursor-pointer" />
                                             <div className="absolute left-0 mt-1 p-2 bg-gray-800 text-white w-72 text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                                                The MAC address should of 17 Bits including colons "XX:XX:XX:XX:XX:XX".
+                                                The MAC address should be of 17 Bits including colons "XX:XX:XX:XX:XX:XX".
                                             </div>
                                         </div>
                                     </div>

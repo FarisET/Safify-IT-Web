@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as SafifyIcon } from '../../assets/images/safify_it_icon.svg';
+import {getTabsFromLocalStorage, saveTabsToLocalStorage} from '../../utils/tabUtils'
 
 
 const LoginPage = () => {
@@ -10,6 +11,10 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const defaultTabs = [
+    { key: '/dashboard', title: 'Dashboard' },
+    { key: '/tickets', title: 'Tickets' },
+  ];
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -59,6 +64,8 @@ const LoginPage = () => {
 
         localStorage.setItem('jwtToken', token);
         localStorage.setItem('timeToExpire', timeToExpire);
+
+        saveTabsToLocalStorage(defaultTabs);
 
         if (role == 'admin') {
           navigate('/tickets');

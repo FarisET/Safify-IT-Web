@@ -81,7 +81,11 @@ const Approvals = () => {
         }
       );
       if (response.status === 200) {
-        setModalSuccess('Report approved successfully!');
+        setModalSuccess('Report approved successfully!')
+        setTimeout(() =>
+          closeModal()
+          , 2000);
+
         fetchActionReports();
       }
     } catch (err) {
@@ -304,7 +308,7 @@ const Approvals = () => {
           </tbody>
         </table>
       ) : (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-emerald-100 text-emerald-500 rounded-full">
               <svg

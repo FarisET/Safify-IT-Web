@@ -164,7 +164,7 @@ const UsersDirectory = () => {
         }
       );
 
-      setDeleteUserModalMessage("User deleted successfully!");
+      setDeleteUserModalMessage("User disabled successfully!");
       setTimeout(() => {
         setDeleteUserLoading(false);
         setDeleteUserModalOpen(false);
@@ -218,10 +218,13 @@ const UsersDirectory = () => {
           },
         }
       );
-
+      setEditUserError('')
       setEditUserModalMessage("User updated successfully");
       fetchUsers();
+      setTimeout(()=> {
       handleCloseEditUserModal();
+    }, 3000);
+
     } catch (error) {
       // Set error message
       setEditUserError("Failed to update user. Please try again.");
@@ -233,10 +236,9 @@ const UsersDirectory = () => {
 
 
   const handleCloseEditUserModal = (e) => {
-    e.preventDefault();
     setEditUserModalOpen(false);
     setEditUserInput({ userId: "", userName: "", roleName: "" });
-    setEditUserError(null);
+    setEditUserError('');
     setEditUserModalMessage('');
   };
 

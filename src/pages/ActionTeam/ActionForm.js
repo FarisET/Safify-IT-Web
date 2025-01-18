@@ -119,7 +119,7 @@ const ActionForm = () => {
         attachedImage: null,
       });
     } catch (error) {
-      setError("Submission failed:", error.message)
+      setError(`Submission failed: ${error.response.data.error}`);
     } finally {
       setSubmitFormLoading(false);
     }

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Pie, PieChart, BarChart, Bar, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
-import { Table, Select, Typography } from "antd";
+import { Button, Table, Select, Typography } from "antd";
 import axios from 'axios';
 import { Divider } from 'antd';
 import { FaQuestionCircle } from 'react-icons/fa';
+import { FaFileExcel } from "react-icons/fa";
+import * as XLSX from "xlsx";
 
 const { Option } = Select;
 
@@ -39,7 +41,46 @@ const Dashboard = () => {
     { text: 'Last Year', value: last365Days.toISOString().split('T')[0] },
   ];
 
-  //2 level piechart
+  
+
+  const exportFlatDataToExcel = (data, sheetName, fileName) => {
+    // Create a new workbook
+    const workbook = XLSX.utils.book_new();
+  
+    // Convert the flat data to a worksheet
+    const worksheet = XLSX.utils.json_to_sheet(data);
+  
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  
+    // Trigger download of the Excel file
+    XLSX.writeFile(workbook, fileName);
+  };
+
+  const exportTableToExcel = (data, sheetName, fileName) => {
+    // Flatten the data structure into a plain array
+    const flattenedData = data.users.flatMap((user, index) =>
+      user.assets
+        .filter((asset) => asset.asset_no && asset.asset_name) // Filter out null assets
+        .map((asset) => ({
+          User: `User ${index + 1}`,
+          "Asset No": asset.asset_no,
+          "Asset Name": asset.asset_name,
+        }))
+    );
+  
+    // Create a new workbook
+    const workbook = XLSX.utils.book_new();
+  
+    // Convert flattened data to a worksheet
+    const worksheet = XLSX.utils.json_to_sheet(flattenedData);
+  
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  
+    // Trigger download of the Excel file
+    XLSX.writeFile(workbook, fileName);
+  };
 
 
   //user tickets
@@ -438,9 +479,21 @@ const Dashboard = () => {
             {activeTab === "user" && (
               <div>
                 {!error ? (
-                  <div>
+                <div className='max-h-[60vh] overflow-y-auto overflow-x-auto max-w-[90vw]'>
                     <div className="flex justify-between items-center mb-2 p-4">
-                      <h3 className="text-xl font-semibold">User</h3>
+                      <div className='md:flex gap-3'>
+                      <h3 className="text-xl font-semibold">User Tickets</h3>
+                      <Button
+                      className='bg-primary'
+                        type="primary"
+                        icon={<FaFileExcel className='text-sm'/>}
+                        onClick={() =>
+                          exportFlatDataToExcel(userTickets, "Tickets", "TicketsData.xlsx")
+                        }
+                      >
+                        Export
+                      </Button>
+                      </div>
                       <Select
                         value={selectedUserDateRange}
                         onChange={(value) => handleUserDateRangeChange(value)}
@@ -475,7 +528,20 @@ const Dashboard = () => {
 
                     {/* Assets Table */}
                     <div className="mt-6">
-                      <h3 className="text-xl font-semibold mb-4">Assigned Assets</h3>
+                      <div className='flex gap-3'>
+                           <h3 className="text-xl font-semibold mb-4">Assigned Assets</h3>
+                      
+                      <Button
+                      className='bg-primary'
+                        type="primary"
+                        icon={<FaFileExcel className='text-sm'/>}
+                        onClick={() =>
+                          exportTableToExcel(userAssets, "Assets", "AssignedAssetsData.xlsx")
+                        }
+                      >
+                        Export
+                      </Button>
+                      </div>
                       <Table
                         dataSource={
                           userAssets?.users?.map((user, index) => ({

@@ -6,11 +6,29 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { AssetType } from '../../models/AssetType';
+import { useTimer } from "../../state/context/useTimer";
 
 const ScanNetwork = () => {
+
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+          event.preventDefault();
+          event.returnValue = ""; // Required for modern browsers to display a warning
+        };
+    
+        // Attach the event listener
+        window.addEventListener("beforeunload", handleBeforeUnload);
+    
+        // Cleanup on component unmount
+        return () => {
+          window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+      }, []);
+
     const { Option } = Select;
     const [ipRange, setIpRange] = useState('');
     const { scanState, setScanState } = useScan();
+    const { timerVisible, setTimerVisible, elapsedTime, setElapsedTime } = useTimer();
     const [paginationConfig, setPaginationConfig] = useState({
         current: 1,
         pageSize: 10,
@@ -37,7 +55,7 @@ const ScanNetwork = () => {
     const [initLoading, setinitLoading] = useState(false);
     const [filterType, setFilterType] = useState('all');
 
-
+   
 
 
     const fetchAssetTypes = async () => {
@@ -82,6 +100,8 @@ const ScanNetwork = () => {
         setIsScanning(true);
         setScanState((prev) => ({ ...prev, isLoading: true }));
         try {
+            setTimerVisible(true);
+            setElapsedTime(0);
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.post(
                 'http://localhost:3001/network/runScan',
@@ -95,9 +115,12 @@ const ScanNetwork = () => {
             );
             setScanState({ isLoading: false, data: response.data });
             message.success('Scan completed successfully');
+            setIsScanning(false);
+            setTimerVisible(false);
         } catch (error) {
             setScanState({ isLoading: false, data: [] });
             message.error('Error running scan.');
+            setTimerVisible(false);
         }
     };
 
@@ -252,6 +275,7 @@ const ScanNetwork = () => {
         setIsScanning(false);
         setScanState((prev) => ({ ...prev, isLoading: false }));
         message.info('Scan stopped.');
+        setTimerVisible(false);
     };
 
 

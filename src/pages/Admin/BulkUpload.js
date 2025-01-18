@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Upload, Table, Input, Button, message } from 'antd';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -17,6 +17,21 @@ const BulkUpload = () => {
     const [invalidMacs, setInvalidMacs] = useState([]);
     const [uploadSummary, setUploadSummary] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+          event.preventDefault();
+          event.returnValue = ""; // Required for modern browsers to display a warning
+        };
+    
+        // Attach the event listener
+        window.addEventListener("beforeunload", handleBeforeUnload);
+    
+        // Cleanup on component unmount
+        return () => {
+          window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+      }, []);
 
 
     const downloadTemplate = () => {

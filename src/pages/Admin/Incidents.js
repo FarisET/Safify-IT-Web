@@ -5,6 +5,8 @@ import Report from '../../models/UserReport';  // Adjust path as necessary
 import { FaUser, FaTrash, FaArrowRight, FaImage } from 'react-icons/fa';
 import { formatDate } from '../../utils/date';
 import { FaCircleExclamation } from 'react-icons/fa6';
+import { Select } from 'antd';
+
 
 const Incidents = () => {
   const [userReports, setUserReports] = useState([]);
@@ -30,7 +32,8 @@ const Incidents = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [selectedRowToggle, setSelectedRowToggle] = useState(false);
 
-
+  const { Option } = Select;
+  
   //Escalate Ticket
   const [isEscalateModalVisible, setIsEscalateModalVisible] = useState(false);
   const [isEscalateLoading, setisEscalateLoading] = useState(false);
@@ -198,13 +201,17 @@ const Incidents = () => {
     )
     ?.filter((report) => {
       if (statusFilter !== 'All') {
-        return report.status.toLowerCase() === statusFilter.toLowerCase();
+        return (
+          report?.status?.toLowerCase() === statusFilter.toLowerCase()
+        );
       }
       return true;
     })
     ?.filter((report) => {
       if (critFilter !== 'All') {
-        return report.incidentCriticalityLevel?.toLowerCase() === critFilter.toLowerCase();
+        return (
+          report?.incidentCriticalityLevel?.toLowerCase() === critFilter.toLowerCase()
+        );
       }
       return true;
     });
@@ -300,32 +307,32 @@ const Incidents = () => {
           {/* Criticality Dropdown */}
           <div className="flex flex-col space-y-1">
             <label htmlFor="criticality" className="text-sm font-medium text-gray-600">Criticality</label>
-            <select
+            <Select
               id="criticality"
               value={critFilter}
-              onChange={(e) => setcritFilter(e.target.value)}
-              className="font-semibold text-gray-700 rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setcritFilter(value)}
+              className="w-24"
             >
-              <option value="All">All</option>
-              <option value="critical">Critical</option>
-              <option value="high">High</option>
-              <option value="low">Low</option>
-            </select>
+              <Option value="All">All</Option>
+              <Option value="critical">Critical</Option>
+              <Option value="high">High</Option>
+              <Option value="low">Low</Option>
+            </Select>
           </div>
 
           {/* Status Dropdown */}
           <div className="flex flex-col space-y-1">
             <label htmlFor="status" className="text-sm font-medium text-gray-600">Status</label>
-            <select
+            <Select
               id="status"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="font-semibold text-gray-700 rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setStatusFilter(value)}
+              className="w-24"
             >
-              <option value="All">All</option>
-              <option value="Open">Open</option>
-              <option value="assigned">Assigned</option>
-            </select>
+              <Option value="All">All</Option>
+              <Option value="Open">Open</Option>
+              <Option value="assigned">Assigned</Option>
+            </Select>
           </div>
         </div>
       </div>
@@ -504,7 +511,7 @@ const Incidents = () => {
         </table>
       ) : (
 
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-blue-100 text-sky-500 rounded-full">
               <svg
@@ -624,7 +631,7 @@ const Incidents = () => {
                   setResponseMessage(result.message);
                   setResponseStatus(result.status);
                   if (result.status === 'success') {
-                    setTimeout(() => handleCloseModal(), 2000); // Close modal after 2 seconds
+                    setTimeout(() => handleCloseModal(), 2000);
                   }
                 }}
                 disabled={isLoading} // Disable button while loading

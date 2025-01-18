@@ -165,11 +165,7 @@ const ActionTasks = ({ ticketID, taskID }) => {
                                         >
                                             <FaImage />
                                         </button>
-                                    ) : <p
-                                        className="px-3 py-1 bg-red-100 text-gray-700 font-semibold rounded"
-                                    >
-                                        No Image
-                                    </p>}
+                                    ) : null}
                                     {(task.status != 'approved' && task.status != 'approval pending') && (
                                         <button
                                             onClick={() => navigate('/action-form', { state: { user_report_id: task.user_report_id } })}
