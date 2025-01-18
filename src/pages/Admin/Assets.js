@@ -9,6 +9,7 @@ import Split from "react-split";
 import { Modal, Upload } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { Select } from "antd";
+import constants from '../../const';
 const { Option } = Select;
 
 
@@ -46,7 +47,7 @@ const Assets = () => {
             setinitLoading(true);
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.get(
-                'http://localhost:3001/admin/dashboard/getAssetsandAssetTypes',
+                `${constants.API.BASE_URL}/admin/dashboard/getAssetsandAssetTypes`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -113,7 +114,7 @@ const Assets = () => {
         try {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.post(
-                `http://localhost:3001/admin/dashboard/addAssetType`,
+                `${constants.API.BASE_URL}/admin/dashboard/addAssetType`,
                 {
                     asset_type_desc: assetTypeDesc,
                     has_mac: isMacType
@@ -178,7 +179,7 @@ const Assets = () => {
         try {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.delete(
-                `http://localhost:3001/admin/dashboard/deleteAssetType/${selectedAssetTypeId}`,
+                `${constants.API.BASE_URL}/admin/dashboard/deleteAssetType/${selectedAssetTypeId}`,
 
                 {
                     headers: {
@@ -255,7 +256,7 @@ const Assets = () => {
 
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.put(
-                `http://localhost:3001/admin/dashboard/updateAssetType`,
+                `${constants.API.BASE_URL}/admin/dashboard/updateAssetType`,
                 {
                     asset_type_id: selectedAssetTypeId,
                     asset_type_desc: assetTypeDesc,
@@ -330,7 +331,7 @@ const Assets = () => {
 
             // Fetch Asset Details
             const assetDetailsResponse = await axios.get(
-                `http://localhost:3001/admin/dashboard/fetchAssetDetails/${assetNo}`,
+                `${constants.API.BASE_URL}/admin/dashboard/fetchAssetDetails/${assetNo}`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -341,7 +342,7 @@ const Assets = () => {
 
             // Fetch Asset History
             const ticketHistoryResponse = await axios.get(
-                `http://localhost:3001/analytics/fetchAssetLogs?asset_no=${assetNo}`,
+                `${constants.API.BASE_URL}/analytics/fetchAssetLogs?asset_no=${assetNo}`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -351,7 +352,7 @@ const Assets = () => {
             setTicketHistory(ticketHistoryResponse.data);
             //Fetch Ticket History
             const assetHistoryResponse = await axios.get(
-                `http://localhost:3001/analytics/fetchAssetHistory?asset_no=${assetNo}`,
+                `${constants.API.BASE_URL}/analytics/fetchAssetHistory?asset_no=${assetNo}`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -417,7 +418,7 @@ const Assets = () => {
             }
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.post(
-                `http://localhost:3001/admin/dashboard/addAsset`,
+                `${constants.API.BASE_URL}/admin/dashboard/addAsset`,
                 {
                     asset_name: addAssetName,
                     asset_desc: addAssetDesc,
@@ -487,7 +488,7 @@ const Assets = () => {
             }
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.put(
-                `http://localhost:3001/admin/dashboard/updateLocationAssetAssignment`,
+                `${constants.API.BASE_URL}/admin/dashboard/updateLocationAssetAssignment`,
                 {
                     asset_no: selectedAsset.assetNo,
                     asset_location: assignLoc,
@@ -506,7 +507,7 @@ const Assets = () => {
                 setAssignLocLoading(false);
                 setLocModalOpen(false);
                 setLocModalMessage('')
-                fetchAssetDetails(selectedAsset);
+                fetchAssetDetails(null);
             }, 2000);
 
         } catch (error) {
@@ -562,7 +563,7 @@ const Assets = () => {
 
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.put(
-                `http://localhost:3001/admin/dashboard/updateLocationAssetAssignment`,
+                `${constants.API.BASE_URL}/admin/dashboard/updateLocationAssetAssignment`,
                 {
                     asset_no: selectedAsset.assetNo,
                     asset_location: assignLoc,
@@ -581,7 +582,7 @@ const Assets = () => {
                 setUnassignLocLoading(false);
                 setUnassignLocModalOpen(false);
                 setUnassignLocModalMessage('')
-                fetchAssetDetails(selectedAsset); // Refresh asset types list
+                fetchAssetDetails(null); // Refresh asset types list
             }, 2000);
 
         } catch (error) {
@@ -642,7 +643,7 @@ const Assets = () => {
             }
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.put(
-                `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
+                `${constants.API.BASE_URL}/admin/dashboard/updateUserAssetAssignment`,
                 {
                     asset_no: selectedAsset.assetNo,
                     user_id: assignTo,
@@ -661,7 +662,7 @@ const Assets = () => {
                 setAssignToLoading(false);
                 setAssignModalOpen(false);
                 setAssignModalMessage('')
-                fetchAssetDetails(selectedAsset); // Refresh asset types list
+                fetchAssetDetails(null); // Refresh asset types list
             }, 2000);
 
         } catch (error) {
@@ -696,7 +697,7 @@ const Assets = () => {
         try {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.put(
-                `http://localhost:3001/admin/dashboard/updateUserAssetAssignment`,
+                `${constants.API.BASE_URL}/admin/dashboard/updateUserAssetAssignment`,
                 {
                     asset_no: selectedAsset.assetNo,
                     user_id: assignTo,
@@ -715,7 +716,7 @@ const Assets = () => {
                 setAssignToLoading(false);
                 setUnAssignModalOpen(false);
                 setUnAssignModalMessage('')
-                fetchAssetDetails(selectedAsset); // Refresh asset types list
+                fetchAssetDetails(null); // Refresh asset types list
             }, 2000);
 
         } catch (error) {
@@ -765,7 +766,7 @@ const Assets = () => {
         try {
             const jwtToken = sessionStorage.getItem("jwt");
             const response = await axios.get(
-                "http://localhost:3001/admin/dashboard/getLocationsAndSubLocationsAdmin",
+                `${constants.API.BASE_URL}/admin/dashboard/getLocationsAndSubLocationsAdmin`,
                 {
                     headers: { Authorization: `Bearer ${jwtToken}` },
                 }
@@ -810,7 +811,7 @@ const Assets = () => {
         try {
             const jwtToken = sessionStorage.getItem("jwt");
             const response = await axios.get(
-                "http://localhost:3001/admin/dashboard/fetchUsers",
+                `${constants.API.BASE_URL}/admin/dashboard/fetchUsers`,
                 {
                     headers: { Authorization: `Bearer ${jwtToken}` },
                 }
@@ -847,7 +848,7 @@ const Assets = () => {
         try {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.delete(
-                `http://localhost:3001/admin/dashboard/deleteAsset/${selectedAsset}`,
+                `${constants.API.BASE_URL}/admin/dashboard/deleteAsset/${selectedAsset}`,
 
                 {
                     headers: {
@@ -911,7 +912,7 @@ const Assets = () => {
         try {
             const jwtToken = sessionStorage.getItem('jwt');
             const response = await axios.delete(
-                `http://localhost:3001/admin/dashboard/disposeAsset/${selectedAsset}`,
+                `${constants.API.BASE_URL}/admin/dashboard/disposeAsset/${selectedAsset}`,
 
                 {
                     headers: {
@@ -926,7 +927,7 @@ const Assets = () => {
                 setDisposeLoading(false);
                 setDisposeModalOpen(false);
                 setDisposeModalMessage('')
-                fetchAssetDetails(selectedAsset);
+                fetchAssetDetails(null);
                 //fetchAssetTypes();
             }, 2000);
 
@@ -1035,7 +1036,7 @@ const Assets = () => {
             const jwtToken = sessionStorage.getItem("jwt");
 
             const response = await axios.put(
-                `http://localhost:3001/admin/dashboard/updateAsset`,
+                `${constants.API.BASE_URL}/admin/dashboard/updateAsset`,
                 payload,
                 {
                     headers: { Authorization: `Bearer ${jwtToken}` },
@@ -1049,7 +1050,7 @@ const Assets = () => {
                     setModalOpen(false);
                     setModalMessage(null);
                     setModalErrorMessage(null);
-                    fetchAssetDetails(formData.assetNo); // Refresh the assets details
+                    fetchAssetDetails(null);
                     fetchAssetTypes(); // so if name changed, it is also reflected in Asset (middle) pane
                 }, 3000);
             } else {
@@ -1084,7 +1085,7 @@ const Assets = () => {
 
             const jwtToken = sessionStorage.getItem("jwt");
             const response = await axios.post(
-                'http://localhost:3001/admin/bulkUpload/uploadAssetSheet',
+                `${constants.API.BASE_URL}/admin/bulkUpload/uploadAssetSheet`,
                 formData,
                 {
                     headers: {
