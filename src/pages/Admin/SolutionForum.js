@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaList, FaPen, FaQuestion, FaQuestionCircle, FaResolving, FaRoad, FaStepForward } from 'react-icons/fa';
-
+import constants from '../../const';
 const SolutionForum = () => {
   const [forumEntries, setForumEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ const SolutionForum = () => {
       try {
         const jwtToken = sessionStorage.getItem('jwt');
         const response = await axios.get(
-          'http://localhost:3001/solutionForum/fetchAllSolutions',
+          `${constants.API.BASE_URL}/solutionForum/fetchAllSolutions`,
           {
             headers: {
               Authorization: `Bearer ${jwtToken}`,

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaEllipsisH, FaEllipsisV, FaTrash } from "react-icons/fa";
 import Split from "react-split";
-
+import constants from "../../const";
 const LocationsDirectory = () => {
     const [locations, setLocations] = useState([]);
     const [filteredSublocations, setFilteredSublocations] = useState([]);
@@ -16,7 +16,7 @@ const LocationsDirectory = () => {
         try {
             const jwtToken = sessionStorage.getItem("jwt");
             const response = await axios.get(
-                "http://localhost:3001/admin/dashboard/getLocationsAndSubLocationsAdmin",
+                `${constants.API.BASE_URL}/admin/dashboard/getLocationsAndSubLocationsAdmin`,
                 {
                     headers: { Authorization: `Bearer ${jwtToken}` },
                 }
@@ -133,7 +133,7 @@ const LocationsDirectory = () => {
                 setaddLocLoading(true);
             }
             const response = await axios.post(
-                "http://localhost:3001/admin/dashboard/addLocationOrSubLocation",
+                `${constants.API.BASE_URL}/admin/dashboard/addLocationOrSubLocation`,
                 payload,
                 {
                     headers: {
@@ -230,7 +230,7 @@ const LocationsDirectory = () => {
             setupdateLocLoading(true);
 
             const response = await axios.put(
-                "http://localhost:3001/admin/dashboard/updateLocation",
+                `${constants.API.BASE_URL}/admin/dashboard/updateLocation`,
                 payload,
                 {
                     headers: {
@@ -298,7 +298,7 @@ const LocationsDirectory = () => {
             setdeleteLocLoading(true);
 
             const response = await axios.delete(
-                `http://localhost:3001/admin/dashboard/deleteLocation/${selectedLocation.location_id}`,
+                `${constants.API.BASE_URL}/admin/dashboard/deleteLocation/${selectedLocation.location_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -373,7 +373,7 @@ const LocationsDirectory = () => {
             setupdateSubLocLoading(true);
 
             const response = await axios.put(
-                "http://localhost:3001/admin/dashboard/updateSubLocation",
+                `${constants.API.BASE_URL}/admin/dashboard/updateSubLocation`,
                 payload,
                 {
                     headers: {
@@ -384,7 +384,7 @@ const LocationsDirectory = () => {
             );
 
 
-            setupdateSubLocSuccessMessage("Sub Location added successfully!");
+            setupdateSubLocSuccessMessage("Sub Location updated successfully!");
             setnewSubLocName("");
             setTimeout(() => {
                 setupdateSubLocationModalOpen(false);
@@ -441,7 +441,7 @@ const LocationsDirectory = () => {
             setdeleteSubLocLoading(true);
 
             const response = await axios.delete(
-                `http://localhost:3001/admin/dashboard/deleteSubLocation/${selectedSubLocation.sub_location_id}`,
+                `${constants.API.BASE_URL}/admin/dashboard/deleteSubLocation/${selectedSubLocation.sub_location_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,

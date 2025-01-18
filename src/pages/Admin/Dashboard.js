@@ -6,7 +6,7 @@ import { Divider } from 'antd';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { FaFileExcel } from "react-icons/fa";
 import * as XLSX from "xlsx";
-
+import constants from '../../const';
 const { Option } = Select;
 
 
@@ -93,8 +93,8 @@ const Dashboard = () => {
       const jwtToken = sessionStorage.getItem("jwt");
       let dataRange = dateRange;
       const endpoint = dateRange === "All"
-        ? "http://localhost:3001/analytics/fetchTotalTicketsByUser"
-        : `http://localhost:3001/analytics/fetchTotalTicketsByUser?timestamp=${dateRange}`;
+        ? `${constants.API.BASE_URL}/analytics/fetchTotalTicketsByUser`
+        : `${constants.API.BASE_URL}/analytics/fetchTotalTicketsByUser?timestamp=${dateRange}`;
 
       const response = await axios.get(
         endpoint,
@@ -119,7 +119,7 @@ const Dashboard = () => {
       const jwtToken = sessionStorage.getItem("jwt");
       let dataRange = dateRange;
       const endpoint =
-        "http://localhost:3001/analytics/fetchUserAssetsGrouped"
+        `${constants.API.BASE_URL}/analytics/fetchUserAssetsGrouped`
 
       const response = await axios.get(
         endpoint,
@@ -143,8 +143,8 @@ const Dashboard = () => {
 
       let dataRange = dateRange;
       const endpoint = dateRange === "All"
-        ? "http://localhost:3001/analytics/fetchAnalyticsTimeBound"
-        : `http://localhost:3001/analytics/fetchAnalyticsTimeBound?timestamp=${dateRange}`;
+        ? `${constants.API.BASE_URL}/analytics/fetchAnalyticsTimeBound`
+        : `${constants.API.BASE_URL}/analytics/fetchAnalyticsTimeBound?timestamp=${dateRange}`;
 
       const response = await axios.get(
         endpoint,
@@ -166,7 +166,7 @@ const Dashboard = () => {
     const jwtToken = sessionStorage.getItem('jwt');
 
     try {
-      const response = await axios.get('http://localhost:3001/analytics/fetchAnalyticsNonTimeBound',
+      const response = await axios.get(`${constants.API.BASE_URL}/analytics/fetchAnalyticsNonTimeBound`,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,

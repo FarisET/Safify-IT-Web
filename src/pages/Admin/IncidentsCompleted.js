@@ -5,6 +5,7 @@ import Report from '../../models/UserReport';  // Adjust path as necessary
 import { FaUser, FaTrash, FaArrowRight, FaImage } from 'react-icons/fa';
 import { formatDate } from '../../utils/date';
 import { Select } from 'antd';
+import constants from '../../const';
 
 const IncidentsCompleted = () => {
   const [userReports, setUserReports] = useState([]);
@@ -37,7 +38,7 @@ const IncidentsCompleted = () => {
         try {
           const jwtToken = sessionStorage.getItem('jwt');
           const response = await axios.get(
-            'http://localhost:3001/admin/dashboard/fetchAllActionTeamsWithDepartments?department_id=D1',
+            `${constants.API.BASE_URL}/admin/dashboard/fetchAllActionTeamsWithDepartments?department_id=D1`,
             {
               headers: {
                 Authorization: `Bearer ${jwtToken}`,
@@ -76,7 +77,7 @@ const IncidentsCompleted = () => {
     try {
       const jwtToken = sessionStorage.getItem('jwt');
       const response = await axios.get(
-        'http://localhost:3001/admin/dashboard/Fetchalluserreportscompleted',
+        `${constants.API.BASE_URL}/admin/dashboard/Fetchalluserreportscompleted`,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
@@ -114,7 +115,7 @@ const IncidentsCompleted = () => {
       };
 
       const response = await axios.post(
-        'http://localhost:3001/admin/dashboard/InsertAssignTask',
+        `${constants.API.BASE_URL}/admin/dashboard/InsertAssignTask`,
         payload,
         {
           headers: {
@@ -296,12 +297,12 @@ const IncidentsCompleted = () => {
                   />
                 </td> */}
                 <td className="px-4 py-2 border-b">
-                  <div className="font-semibold text-gray-700 cursor-pointer hover:underline transition">
+                  <div className="font-semibold text-gray-700 cursor-pointer">
                     {report.userReportId}
                   </div>
                 </td>
                 <td className="px-4 py-2 border-b">
-                  <div className="font-semibold text-sky-600 cursor-pointer hover:underline transition">
+                  <div className="font-semibold text-sky-600 cursor-pointer">
                     {report.assetNo || report.assetName ? (
                       <>
                         {report.assetNo}

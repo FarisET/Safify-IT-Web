@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import Report from '../../models/ActionReport';  // Adjust path as necessary
 import { formatDate } from '../../utils/date';
 import { FaChevronDown, FaCheck, FaTrash, FaImage } from 'react-icons/fa';
-
+import constants from '../../const';
 const Approvals = () => {
   const [actionReports, setactionReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +40,7 @@ const Approvals = () => {
     setError(null);
     try {
       const jwtToken = sessionStorage.getItem('jwt');
-      const response = await axios.get('http://localhost:3001/admin/dashboard/fetchAllActionReports', {
+      const response = await axios.get(`${constants.API.BASE_URL}/admin/dashboard/fetchAllActionReports`, {
         headers: {
           'Authorization': `Bearer ${jwtToken}`,
         },
@@ -71,7 +71,7 @@ const Approvals = () => {
     setModalSuccess('');
     try {
       const response = await axios.post(
-        'http://localhost:3001/admin/dashboard/approvedActionReport',
+        `${constants.API.BASE_URL}/admin/dashboard/approvedActionReport`,
         payload,
         {
           headers: {
@@ -98,7 +98,7 @@ const Approvals = () => {
   const handleReject = async () => {
     if (!reportToProcess) return;
     const jwtToken = sessionStorage.getItem('jwt');
-    const url = `http://localhost:3001/admin/dashboard/deleteActionReport/${reportToProcess.actionReportId}`;
+    const url = `${constants.API.BASE_URL}/admin/dashboard/deleteActionReport/${reportToProcess.actionReportId}`;
 
     setModalLoading(true);
     setModalError('');
@@ -144,7 +144,7 @@ const Approvals = () => {
 
   const deleteActionReport = async (actionReportId) => {
     const jwtToken = sessionStorage.getItem('jwt');
-    const url = `http://localhost:3001/admin/dashboard/deleteActionReport/${actionReportId}`;
+    const url = `${constants.API.BASE_URL}/admin/dashboard/deleteActionReport/${actionReportId}`;
 
     try {
       const response = await axios.delete(url, {

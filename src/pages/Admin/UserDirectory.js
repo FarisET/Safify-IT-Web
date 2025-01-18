@@ -4,7 +4,7 @@ import { FaEdit, FaIdCard, FaMailBulk, FaTrash } from "react-icons/fa";
 import Split from "react-split";
 import { Modal, Input, Button } from 'antd';
 import { useLocation } from "react-router-dom";
-
+import constants from "../../const";
 
 const UsersDirectory = () => {
   const location = useLocation();
@@ -20,7 +20,7 @@ const UsersDirectory = () => {
     try {
       const jwtToken = sessionStorage.getItem("jwt");
       const response = await axios.get(
-        "http://localhost:3001/admin/dashboard/fetchUsers",
+        `${constants.API.BASE_URL}/admin/dashboard/fetchUsers`,
         {
           headers: { Authorization: `Bearer ${jwtToken}` },
         }
@@ -103,7 +103,7 @@ const UsersDirectory = () => {
       setisAddLoading(true);
       const jwtToken = sessionStorage.getItem("jwt");
       await axios.post(
-        "http://localhost:3001/admin/dashboard/createUser",
+        `${constants.API.BASE_URL}/admin/dashboard/createUser`,
         {
           user_name: name,
           user_pass: password,
@@ -154,7 +154,7 @@ const UsersDirectory = () => {
     try {
       const jwtToken = sessionStorage.getItem('jwt');
       const response = await axios.delete(
-        `http://localhost:3001/admin/dashboard/deleteUser/${userId}`,
+        `${constants.API.BASE_URL}/admin/dashboard/deleteUser/${userId}`,
 
         {
           headers: {
@@ -206,7 +206,7 @@ const UsersDirectory = () => {
       const jwtToken = sessionStorage.getItem('jwt');
 
       const response = await axios.put(
-        'http://localhost:3001/admin/dashboard/updateUser',
+        `${constants.API.BASE_URL}/admin/dashboard/updateUser`,
         {
           user_id: editUserInput.userId,
           user_name: editUserInput.userName,
@@ -260,7 +260,7 @@ const UsersDirectory = () => {
     try {
       const jwtToken = sessionStorage.getItem('jwt');
       const response = await axios.put(
-        'http://localhost:3001/admin/dashboard/updateUserID',
+        `${constants.API.BASE_URL}/admin/dashboard/updateUserID`,
         {
           user_id_old: changeEmailInput.userId,
           user_id_new: changeEmailInput.newEmail,
