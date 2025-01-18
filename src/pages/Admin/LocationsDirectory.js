@@ -241,7 +241,7 @@ const LocationsDirectory = () => {
             );
 
 
-            setupdateLocSuccessMessage("Location added successfully!");
+            setupdateLocSuccessMessage("Location updated successfully!");
             setLocName("");
             setTimeout(() => {
                 setupdateLocationModalOpen(false);
@@ -328,10 +328,7 @@ const LocationsDirectory = () => {
         }
     };
 
-
     //Update Sub-Location
-
-
     const [updateSubLocationModalOpen, setupdateSubLocationModalOpen] = useState(false);
     const [updateSubLocloading, setupdateSubLocLoading] = useState(false);
     const [newSubLocName, setnewSubLocName] = useState('');
@@ -441,7 +438,7 @@ const LocationsDirectory = () => {
         try {
 
 
-            setdeleteLocLoading(true);
+            setdeleteSubLocLoading(true);
 
             const response = await axios.delete(
                 `http://localhost:3001/admin/dashboard/deleteSubLocation/${selectedSubLocation.sub_location_id}`,
