@@ -33,7 +33,7 @@ const Incidents = () => {
   const [selectedRowToggle, setSelectedRowToggle] = useState(false);
 
   const { Option } = Select;
-  
+
   //Escalate Ticket
   const [isEscalateModalVisible, setIsEscalateModalVisible] = useState(false);
   const [isEscalateLoading, setisEscalateLoading] = useState(false);
@@ -95,6 +95,14 @@ const Incidents = () => {
     setResponseMessage('');
     setResponseStatus('');
   };
+
+  const handleImageClick = (image) => {
+    // Ensure the URL is complete (adjust if needed)
+    const baseURL = "http://192.168.126.1:3001";
+    const fullURL = image.startsWith("http") ? image : `${baseURL}${image}`;
+    setSelectedImage(fullURL);
+  };
+
 
 
 
@@ -465,6 +473,7 @@ const Incidents = () => {
                     <button
                       className="text-sky-600 font-semibold cursor-pointer hover:underline focus:outline-none focus:ring focus:ring-blue-300 transition-all"
                       onClick={() => setSelectedImage(report.image)}
+
                       title="Click to view the image"
                     >
                       <FaImage />
@@ -542,11 +551,20 @@ const Incidents = () => {
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the card
           >
             <div className="flex items-center justify-center h-full">
-              <img src={selectedImage} alt="Report" className="max-w-full max-h-full rounded" />
+              <img
+                src={selectedImage} // Remove surrounding quotes
+                alt="Report"
+                className="max-w-full max-h-full rounded"
+                crossOrigin="anonymous"
+              />
+              
             </div>
           </div>
         </div>
       )}
+
+
+
 
       {isModalOpen && (
         <div

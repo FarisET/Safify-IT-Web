@@ -374,7 +374,8 @@ const Approvals = () => {
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the card
           >
             <div className="flex items-center justify-center h-full">
-              <img src={selectedImage} alt="Report" className="max-w-full max-h-full rounded" />
+              <img src={selectedImage} alt="Report" className="max-w-full max-h-full rounded" crossOrigin="anonymous"
+              />
             </div>
           </div>
         </div>

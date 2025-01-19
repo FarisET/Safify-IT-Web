@@ -27,7 +27,7 @@ const IncidentsCompleted = () => {
   const [responseMessage, setResponseMessage] = useState('');
   const [responseStatus, setResponseStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const {Option} = Select;
+  const { Option } = Select;
 
 
 
@@ -425,7 +425,8 @@ const IncidentsCompleted = () => {
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the card
           >
             <div className="flex items-center justify-center h-full">
-              <img src={selectedImage} alt="Report" className="max-w-full max-h-full rounded" />
+              <img src={selectedImage} alt="Report" className="max-w-full max-h-full rounded" crossOrigin="anonymous"
+              />
             </div>
           </div>
         </div>
@@ -483,16 +484,16 @@ const IncidentsCompleted = () => {
                 Select Criticality
               </label>
               <Select
-              id="criticality"
-              value={critFilter}
-              onChange={(value) => setSelectedCriticality(value)}
-              className="w-24"
-            >
-              <Option value="All">All</Option>
-              <Option value="critical">Critical</Option>
-              <Option value="high">High</Option>
-              <Option value="low">Low</Option>
-            </Select>
+                id="criticality"
+                value={critFilter}
+                onChange={(value) => setSelectedCriticality(value)}
+                className="w-24"
+              >
+                <Option value="All">All</Option>
+                <Option value="critical">Critical</Option>
+                <Option value="high">High</Option>
+                <Option value="low">Low</Option>
+              </Select>
             </div>
 
             {/* Loading Indicator */}

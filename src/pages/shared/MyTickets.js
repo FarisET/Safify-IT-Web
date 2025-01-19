@@ -71,9 +71,9 @@ const MyTickets = () => {
           </svg>
           <p className="text-gray-700 text-lg font-semibold">No Tickets</p>
           <p className="text-gray-500 text-sm text-center mt-2">
-            You have no active tickets. <button 
-            onClick={()=>navigate('/launch-ticket')}
-            className="text-primary underline"> Launch ticket</button>
+            You have no active tickets. <button
+              onClick={() => navigate('/launch-ticket')}
+              className="text-primary underline"> Launch ticket</button>
           </p>
         </div>
       )}
@@ -89,7 +89,8 @@ const MyTickets = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-center h-full">
-              <img src={selectedImage} alt="Image" className="max-w-full max-h-full rounded" />
+              <img src={selectedImage} alt="Image" className="max-w-full max-h-full rounded" crossOrigin="anonymous"
+              />
             </div>
           </div>
         </div>
