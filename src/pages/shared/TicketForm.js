@@ -338,14 +338,20 @@ const TicketForm = () => {
             </div>
             <div className="flex flex-col gap-1">
 
-              <label className="text-gray-700">Attach Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handleFileChange}
-                className="mt-1 block w-full"
-              />
+              <div>
+                <label className="text-gray-700">Attach Image</label>
+                <input
+                  type="file"
+                  accept="image/jpeg, image/png"
+                  capture="environment"
+                  onChange={handleFileChange}
+                  className="mt-1 block w-full"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Allowed file types: <strong>JPG, PNG</strong>
+                </p>
+              </div>
+
             </div>
             {/* Buttons */}
             <div className="flex justify-end space-x-2">

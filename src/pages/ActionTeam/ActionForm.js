@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FaArrowAltCircleLeft } from "react-icons/fa";
 import constants from "../../const";
+import imageCompression from 'browser-image-compression';
+
 const ActionForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({
@@ -16,8 +18,8 @@ const ActionForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user_report_id } = location.state || {};
-    const [role, setRole] = useState(sessionStorage.getItem("role"))
-  
+  const [role, setRole] = useState(sessionStorage.getItem("role"))
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,10 +52,43 @@ const ActionForm = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
+  // const handleFileChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setFormData((prev) => ({ ...prev, attachedImage: file }));
+  //   }
+  // };
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData((prev) => ({ ...prev, attachedImage: file }));
+      try {
+        // Define compression options
+        const options = {
+          maxSizeMB: 0.2, // Target size in MB (e.g., 200KB)
+          maxWidthOrHeight: 1024, // Resize if dimensions exceed 1024px
+          useWebWorker: true, // Use a web worker for better performance
+        };
+
+        // Compress the image
+        const compressedBlob = await imageCompression(file, options);
+
+        // Convert the compressed blob back to a File object with the original name and desired type
+        const compressedFile = new File(
+          [compressedBlob],
+          file.name.replace(/\.\w+$/, file.type.includes('png') ? '.png' : '.jpg'),
+          { type: file.type.includes('png') ? 'image/png' : 'image/jpeg' }
+        );
+
+        // Update the state with the compressed file
+        setFormData((prev) => ({
+          ...prev,
+          attachedImage: compressedFile,
+        }));
+
+        console.log('Compressed image:', compressedFile);
+      } catch (error) {
+        console.error('Error while compressing the image:', error);
+      }
     }
   };
 
@@ -80,28 +115,28 @@ const ActionForm = () => {
     const endpoint = `${constants.API.BASE_URL}/actionTeam/dashboard/${userId}/MakeActionReport`;
 
     const data = {
-    reported_by: formData.reporter,
-    report_description: formData.description,
-    resolution_description: formData.solution,
-    user_report_id: user_report_id,
-     proof_image: formData.attachedImage,
-     question_one: formData.steps[0],
-     question_two: formData.steps[1],
-     question_three: formData.steps[2],
-     question_four: formData.steps[3],
-     question_five: formData.steps[4]
+      reported_by: formData.reporter,
+      report_description: formData.description,
+      resolution_description: formData.solution,
+      user_report_id: user_report_id,
+      proof_image: formData.attachedImage,
+      question_one: formData.steps[0],
+      question_two: formData.steps[1],
+      question_three: formData.steps[2],
+      question_four: formData.steps[3],
+      question_five: formData.steps[4]
     }
 
     try {
       setSubmitFormLoading(true);
-      await axios.post(endpoint, data, 
+      await axios.post(endpoint, data,
         {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-          "Content-Type": "multipart/form-data",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            "Content-Type": "multipart/form-data",
 
-        },
-      });
+          },
+        });
       setSubmissionSuccess(true);
       setTabs((prevTabs) => [
         ...prevTabs,
@@ -241,14 +276,20 @@ const ActionForm = () => {
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-indigo-200"
               placeholder="Enter resolution"
             />
-            <label className="text-gray-700">Attach Image</label>
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileChange}
-              className="mt-1 block w-full"
-            />
+            <div>
+              <label className="text-gray-700">Attach Image</label>
+              <input
+                type="file"
+                accept="image/jpeg, image/png"
+                capture="environment"
+                onChange={handleFileChange}
+                className="mt-1 block w-full"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Allowed file types: <strong>JPG, PNG</strong>
+              </p>
+            </div>
+
           </div>
         )}
 
