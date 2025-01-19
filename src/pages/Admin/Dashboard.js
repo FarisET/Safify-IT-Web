@@ -41,18 +41,18 @@ const Dashboard = () => {
     { text: 'Last Year', value: last365Days.toISOString().split('T')[0] },
   ];
 
-  
+
 
   const exportFlatDataToExcel = (data, sheetName, fileName) => {
     // Create a new workbook
     const workbook = XLSX.utils.book_new();
-  
+
     // Convert the flat data to a worksheet
     const worksheet = XLSX.utils.json_to_sheet(data);
-  
+
     // Append the worksheet to the workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-  
+
     // Trigger download of the Excel file
     XLSX.writeFile(workbook, fileName);
   };
@@ -63,21 +63,21 @@ const Dashboard = () => {
       user.assets
         .filter((asset) => asset.asset_no && asset.asset_name) // Filter out null assets
         .map((asset) => ({
-          User: `User ${index + 1}`,
+          "User": asset.user_name,
           "Asset No": asset.asset_no,
           "Asset Name": asset.asset_name,
         }))
     );
-  
+
     // Create a new workbook
     const workbook = XLSX.utils.book_new();
-  
+
     // Convert flattened data to a worksheet
     const worksheet = XLSX.utils.json_to_sheet(flattenedData);
-  
+
     // Append the worksheet to the workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-  
+
     // Trigger download of the Excel file
     XLSX.writeFile(workbook, fileName);
   };
@@ -479,20 +479,20 @@ const Dashboard = () => {
             {activeTab === "user" && (
               <div>
                 {!error ? (
-                <div className='max-h-[60vh] overflow-y-auto overflow-x-auto max-w-[90vw]'>
+                  <div className='max-h-[60vh] overflow-y-auto overflow-x-auto max-w-[90vw]'>
                     <div className="flex justify-between items-center mb-2 p-4">
                       <div className='md:flex gap-3'>
-                      <h3 className="text-xl font-semibold">User Tickets</h3>
-                      <Button
-                      className='bg-primary'
-                        type="primary"
-                        icon={<FaFileExcel className='text-sm'/>}
-                        onClick={() =>
-                          exportFlatDataToExcel(userTickets, "Tickets", "TicketsData.xlsx")
-                        }
-                      >
-                        Export
-                      </Button>
+                        <h3 className="text-xl font-semibold">User Tickets</h3>
+                        <Button
+                          className='bg-primary'
+                          type="primary"
+                          icon={<FaFileExcel className='text-sm' />}
+                          onClick={() =>
+                            exportFlatDataToExcel(userTickets, "Tickets", "TicketsData.xlsx")
+                          }
+                        >
+                          Export
+                        </Button>
                       </div>
                       <Select
                         value={selectedUserDateRange}
@@ -529,24 +529,24 @@ const Dashboard = () => {
                     {/* Assets Table */}
                     <div className="mt-6">
                       <div className='flex gap-3'>
-                           <h3 className="text-xl font-semibold mb-4">Assigned Assets</h3>
-                      
-                      <Button
-                      className='bg-primary'
-                        type="primary"
-                        icon={<FaFileExcel className='text-sm'/>}
-                        onClick={() =>
-                          exportTableToExcel(userAssets, "Assets", "AssignedAssetsData.xlsx")
-                        }
-                      >
-                        Export
-                      </Button>
+                        <h3 className="text-xl font-semibold mb-4">Assigned Assets</h3>
+
+                        <Button
+                          className='bg-primary'
+                          type="primary"
+                          icon={<FaFileExcel className='text-sm' />}
+                          onClick={() =>
+                            exportTableToExcel(userAssets, "Assets", "AssignedAssetsData.xlsx")
+                          }
+                        >
+                          Export
+                        </Button>
                       </div>
                       <Table
                         dataSource={
                           userAssets?.users?.map((user, index) => ({
                             key: index,
-                            user: `User ${index + 1}`,
+                            user_name: user.user_name, // Corrected to match the column's dataIndex
                             assets:
                               user.assets
                                 ?.filter((asset) => asset.asset_no && asset.asset_name)
@@ -557,8 +557,8 @@ const Dashboard = () => {
                         columns={[
                           {
                             title: "User",
-                            dataIndex: "user",
-                            key: "user",
+                            dataIndex: "user_name", // Corrected to match the dataSource key
+                            key: "user_name",
                           },
                           {
                             title: "Assigned Assets",
@@ -566,7 +566,7 @@ const Dashboard = () => {
                             key: "assets",
                           },
                         ]}
-                        rowKey="user"
+                        rowKey="user_name" // Updated to a unique identifier, assuming `user_name` is unique
                         pagination={{ pageSize: 10 }}
                       />
                     </div>

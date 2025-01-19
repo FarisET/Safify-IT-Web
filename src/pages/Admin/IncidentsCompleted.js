@@ -154,6 +154,15 @@ const IncidentsCompleted = () => {
     return '';
   };
 
+  const getCritClass = (status) => {
+    const normalizedStatus = status.trim().toLowerCase();
+    if (normalizedStatus === 'low') return 'bg-emerald-100';
+    if (normalizedStatus === 'high') return 'bg-amber-100 text-gray-700';
+    if (normalizedStatus === 'critical') return 'bg-red-100 text-gray-700';
+    return '';
+  };
+
+
 
 
   const filteredReports = userReports
@@ -280,6 +289,7 @@ const IncidentsCompleted = () => {
               <th className="px-4 py-2 border-b">Assignee</th>
               <th className="px-4 py-2 border-b">Image</th>
               <th className="px-4 py-2 border-b">Status</th>
+              <th className="px-4 py-2 border-b">Criticality</th>
               <th className="px-4 py-2 border-b">Date</th>
               <th className="px-4 py-2 border-b">Time</th>
 
@@ -369,6 +379,13 @@ const IncidentsCompleted = () => {
                     {report.status}
                   </span>
                 </td>
+
+                <td className="px-4 py-2 border-b whitespace-nowrap">
+                  <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getCritClass(report.incidentCriticalityLevel)}`}>
+                    {report.incidentCriticalityLevel}
+                  </span>
+                </td>
+
 
                 <td className="px-4 py-2 border-b font-semibold">
                   {report.dateTime
