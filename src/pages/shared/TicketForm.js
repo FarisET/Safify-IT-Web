@@ -219,12 +219,13 @@ const TicketForm = () => {
   }, []);
 
   return (
-    <div className="p-4 max-w-lg mx-auto mt-8">
+    <div className="p-4 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold text-center mb-6">Submit a Ticket</h1>
 
       {submitTicketLoading && (
         <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>
       )}
+
       {submitTicketMessage && (
         <p className="mb-4 p-3 rounded text-emerald-600 bg-emerald-100">
           {submitTicketMessage}
@@ -352,7 +353,6 @@ const TicketForm = () => {
         </div>
 
       )}
-
 
     </div>
   );

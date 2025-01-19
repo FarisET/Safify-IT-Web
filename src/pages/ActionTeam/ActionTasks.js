@@ -43,8 +43,8 @@ const ActionTasks = ({ ticketID, taskID }) => {
     }, []);
 
     return (
-        <div className="flex flex-col  max-h-[90vh]">
-            <h2 className="text-2xl font-semibold mb-4 px-4 py-2">My Tasks</h2>
+        <div className="flex flex-col max-h-[90vh]">
+            <h2 className="text-2xl text-center lg:text-left font-semibold mb-4 px-4 py-2">My Tasks</h2>
 
             {loading && (
                 <div className="fixed inset-0 flex items-center justify-center">

@@ -77,8 +77,8 @@ const AppLayout = () => {
       {!isLoginScreen && !isNotFoundPage && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && !isNotActionForm && !isNotMyTickets && <TopNavWrapper />}
 
       {/* Page Content */}
-      <div className={`flex-1 ${isLoginScreen || isNotFoundPage ? "" : "mt-12 p-4 ml-12"}`}>
-        <Routes>
+      <div className={`flex-1 ${isLoginScreen || isNotFoundPage ? "" : "mt-12 p-4 lg:ml-12"}`}>
+      <Routes>
           <Route
             path="/"
             element={

@@ -152,9 +152,8 @@ const ActionTopNav = ({ children }) => {
                 My Tasks
               </span>
               <span
-                className={`cursor-pointer px-3 py-1 rounded ${
-                  isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
-                }`}
+                className={`cursor-pointer px-3 py-1 rounded ${isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
+                  }`}
                 onClick={() => {
                   navigate('/my-tickets');
                   toggleMenu();
@@ -163,9 +162,8 @@ const ActionTopNav = ({ children }) => {
                 My Tickets
               </span>
               <span
-                className={`cursor-pointer px-3 py-1 rounded ${
-                  isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
-                }`}
+                className={`cursor-pointer px-3 py-1 rounded ${isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
+                  }`}
                 onClick={() => {
                   navigate('/launch-ticket');
                   toggleMenu();
@@ -177,8 +175,10 @@ const ActionTopNav = ({ children }) => {
 
             <div className="mt-auto flex flex-col gap-4">
               <button
-                onClick={() => setShowLogoutConfirm(true)}
-                className="flex font-semibold items-center gap-2 hover:bg-red-200 p-2 rounded mb-4"
+                onClick={() => {
+                  toggleMenu();
+                  setShowLogoutConfirm(true);
+                }} className="flex font-semibold items-center gap-2 hover:bg-red-200 p-2 rounded mb-4"
               >
                 <FaPowerOff className='text-red-500' />
                 <span>Logout</span>

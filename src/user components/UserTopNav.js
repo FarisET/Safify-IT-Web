@@ -150,7 +150,10 @@ const UserTopNav = ({ children }) => {
             </nav>
             <div className="mt-auto flex flex-col gap-4">
               <button
-                onClick={() => setShowLogoutConfirm(true)}
+                onClick={() => {
+                  toggleMenu(); 
+                  setShowLogoutConfirm(true);
+                }} 
                 className="flex font-semibold items-center gap-2 hover:bg-red-200 p-2 rounded mb-4"
               >
                 <FaPowerOff className='text-red-500' />
