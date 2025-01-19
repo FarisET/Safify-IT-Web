@@ -6,6 +6,8 @@ import AssetDropdown from "../../components/AssetDropdown";
 import { useNavigate } from 'react-router-dom';
 import { FaArrowAltCircleLeft } from "react-icons/fa";
 import constants from '../../const';
+import imageCompression from 'browser-image-compression';
+
 
 const TicketForm = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +18,7 @@ const TicketForm = () => {
     attachedImage: null,
 
   });
+
 
   const handleFormClose = () => {
     setFormData({
@@ -123,13 +126,46 @@ const TicketForm = () => {
     }
   };
 
-  const handleFileChange = (e) => {
+  // const handleFileChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setFormData((prev) => ({ ...prev, attachedImage: file }));
+  //   }
+  // };
+
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData((prev) => ({ ...prev, attachedImage: file }));
+      try {
+        // Define compression options
+        const options = {
+          maxSizeMB: 0.2, // Target size in MB (e.g., 200KB)
+          maxWidthOrHeight: 1024, // Resize if dimensions exceed 1024px
+          useWebWorker: true, // Use a web worker for better performance
+        };
+
+        // Compress the image
+        const compressedBlob = await imageCompression(file, options);
+
+        // Convert the compressed blob back to a File object with the original name and desired type
+        const compressedFile = new File(
+          [compressedBlob],
+          file.name.replace(/\.\w+$/, file.type.includes('png') ? '.png' : '.jpg'),
+          { type: file.type.includes('png') ? 'image/png' : 'image/jpeg' }
+        );
+
+        // Update the state with the compressed file
+        setFormData((prev) => ({
+          ...prev,
+          attachedImage: compressedFile,
+        }));
+
+        console.log('Compressed image:', compressedFile);
+      } catch (error) {
+        console.error('Error while compressing the image:', error);
+      }
     }
   };
-
   const handleCancel = () => {
     handleFormClose();
     setActiveTab("form");
@@ -163,7 +199,7 @@ const TicketForm = () => {
     // Get current date-time in ISO format (can adjust as needed)
     const dateTime = new Date().toISOString();
 
-  
+
     const data = {
       report_description: formData.description,
       date_time: dateTime,
@@ -172,7 +208,7 @@ const TicketForm = () => {
       incident_criticality_id: formData.criticality,
       image: formData.attachedImage
     };
-    
+
 
     try {
       setSubmitTicketLoading(true);
@@ -193,7 +229,7 @@ const TicketForm = () => {
 
       // Handle successful submission
       if (response.status === 200) {
-        
+
         setActiveTab("nextTab");
         // Delay navigation to allow the success message to be visible
         setTimeout(() => {
