@@ -255,7 +255,7 @@ const TicketForm = () => {
   }, []);
 
   return (
-    <div className="p-4 max-w-lg mx-auto">
+    <div className="p-2 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold text-center mb-6">Submit a Ticket</h1>
 
       {submitTicketLoading && (

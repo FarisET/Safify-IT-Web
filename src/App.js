@@ -15,7 +15,7 @@ import useTokenMonitor from './hooks/useTokenMoniter';
 import { useNavigate } from 'react-router-dom';
 import useLogout from './services/logout';
 import Modal from './components/SessionModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Dashboard from './pages/Admin/Dashboard';
 import NotFound from './pages/shared/NotFound';
 import IncidentsCompleted from './pages/Admin/IncidentsCompleted';
@@ -50,35 +50,62 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const logout = useLogout(); // Call the hook, do not invoke it
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [isTabClosing, setIsTabClosing] = useState(false);
   const { showModal, setShowModal } = useTokenMonitor(logout);
 
   const handleModalClose = async () => {
     setLogoutLoading(true);
-    await logout(); // Logout handles navigation to /login
+    await logout(); // Logout action when confirmed
     setLogoutLoading(false);
-    setShowModal(false);
+    setShowModal(false); // Close session expired modal
   };
 
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      // Trigger browser confirmation dialog
+      event.preventDefault();
+      event.returnValue = ''; // Required for most browsers to show the dialog
 
+      // Mark tab as closing
+      setIsTabClosing(true);
+    };
 
+    const handleUnload = () => {
+      if (isTabClosing) {
+        // Trigger logout only if user confirms "Leave"
+        logout();
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('unload', handleUnload);
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('unload', handleUnload);
+    };
+  }, [isTabClosing, logout]);
 
   return (
 
     <div className="flex h-screen">
-      {(showModal && !isLoginScreen) && (
+      {(showModal && !isLoginScreen && !isTabClosing) && (
         <Modal
           message="Your session has expired."
           onClose={handleModalClose}
           loading={logoutLoading}
         />
       )}
+
       {/* Conditionally render Sidebar and TopNavWrapper */}
       {!isLoginScreen && !isNotFoundPage && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && !isNotActionForm && !isNotMyTickets && <Sidebar />}
       {!isLoginScreen && !isNotFoundPage && !isNotTicketForm && !isNotUnAuthorized && !isNotActionPortal && !isNotActionTasks && !isNotActionForm && !isNotMyTickets && <TopNavWrapper />}
 
       {/* Page Content */}
       <div className={`flex-1 ${isLoginScreen || isNotFoundPage ? "" : "mt-12 p-4 lg:ml-12"}`}>
-      <Routes>
+        <Routes>
           <Route
             path="/"
             element={
