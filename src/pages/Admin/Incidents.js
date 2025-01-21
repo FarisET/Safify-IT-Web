@@ -41,6 +41,12 @@ const Incidents = () => {
   const [escalateError, setEscalateError] = useState('');
   const [comment, setComment] = useState('');
 
+  //Delete Ticket
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isDeleteLoading, setisDeleteLoading] = useState(false);
+  const [DeleteError, setDeleteError] = useState('');
+  const [DeleteMsg, setDeleteMsg] = useState('');
+
 
 
 
@@ -282,6 +288,45 @@ const Incidents = () => {
     }
   };
 
+  //Delete Ticket
+
+  const showDeleteModal = () => {
+    setIsDeleteModalVisible(true);
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalVisible(false);
+    setDeleteError('');
+    setDeleteMsg('');
+  };
+
+  const handleDelete = async () => {
+    try {
+      setisDeleteLoading(true);
+      const jwtToken = sessionStorage.getItem('jwt');
+      const response = await axios.delete(`${constants.API.BASE_URL}/admin/dashboard/deleteUserReport/${selectedRow.userReportId}`,
+      {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+
+      setDeleteMsg('Ticket deleted successfully')
+
+      setTimeout(() => {
+        handleDeleteCancel();
+        fetchUserReports();
+      }, 2000);
+
+    } catch (error) {
+      setDeleteError('Failed to delete ticket. Please try again');
+    } finally {
+      setisDeleteLoading(false); // Hide loading indicator
+    }
+  };
+
+
 
 
 
@@ -343,25 +388,34 @@ const Incidents = () => {
       <div className="mb-4 text-gray-700">{filteredReports.length} ticket{filteredReports.length !== 1 ? 's' : ''}</div>
 
       {/* Action Buttons - Shown when any checkbox is selected */}
-      {(selectedRowToggle && selectedRow.Assignee != 'Unassigned') ? (
+      {selectedRowToggle && (
         <div className="flex gap-6 items-center p-1 mb-1 rounded">
-          <div className="flex gap-2">
-            <button className="flex items-center bg-gray-100 hover:bg-amber-200 px-3 py-1 rounded"
-              onClick={() => showEscalateModal()}
-            >
-              <FaCircleExclamation className="text-sm" />
-              <p className=' text-sm ml-1'>Escalate Ticket</p>
-            </button>
-          </div>
-
-          <div className="flex gap-2">
-            <button className="flex items-center bg-gray-100 hover:bg-red-200 px-3 py-1 rounded">
-              <FaTrash className="text-sm" />
-              <p className=' text-sm ml-1'>Delete Ticket</p>
-            </button>
-          </div>
+          {selectedRow.Assignee === 'Unassigned' ? (
+            // Show delete button only if Assignee is "Unassigned"
+            <div className="flex gap-2">
+              <button
+                className="flex items-center bg-gray-100 hover:bg-red-200 px-3 py-1 rounded"
+                onClick={() => showDeleteModal()}
+              >
+                <FaTrash className="text-sm" />
+                <p className="text-sm ml-1">Delete Ticket</p>
+              </button>
+            </div>
+          ) : (
+            // Show escalate ticket button if Assignee is not "Unassigned"
+            <div className="flex gap-2">
+              <button
+                className="flex items-center bg-gray-100 hover:bg-amber-200 px-3 py-1 rounded"
+                onClick={() => showEscalateModal()}
+              >
+                <FaCircleExclamation className="text-sm" />
+                <p className="text-sm ml-1">Escalate Ticket</p>
+              </button>
+            </div>
+          )}
         </div>
-      ) : []}
+      )}
+
 
 
       {/* Table to display reports */}
@@ -552,7 +606,7 @@ const Incidents = () => {
                 className="max-w-full max-h-full rounded"
                 crossOrigin="anonymous"
               />
-              
+
             </div>
           </div>
         </div>
@@ -705,6 +759,32 @@ const Incidents = () => {
                 disabled={isEscalateLoading} // Disable button while loading
               >
                 Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded shadow-lg">
+            <h3 className="text-lg font-semibold mb-2">Confirm Delete</h3>
+            <p>Are you sure you want to delete this ticket?</p>
+            {isDeleteLoading && <p className="mb-4 mt-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>}
+            {DeleteMsg && <p className="mb-4 mt-4 p-3 rounded text-emerald-600 bg-emerald-100">{DeleteMsg}</p>}
+            {DeleteError && <p className="mb-4 mt-4 p-3 rounded text-red-600 bg-red-100">{DeleteError}</p>}
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => handleDeleteCancel()}
+                className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-sky-200 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-red-200 transition"
+              >
+                Delete
               </button>
             </div>
           </div>
