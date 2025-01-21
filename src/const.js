@@ -1,6 +1,6 @@
 const constants = {
     API: {
-        BASE_URL: "http://192.168.126.1:3001",
+        BASE_URL: "http://localhost:3001",
         TIMEOUT: 5000, // Example: timeout in milliseconds
     },
     APP: {

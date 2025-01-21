@@ -125,7 +125,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-4 bg-white shadow-md rounded-lg">
+      <div className="w-full max-w-md p-8 space-y-4 bg-white shadow-md rounded-lg mx-4 sm:mx-6">
         <div
           className="flex flex-col items-center justify-center gap-3 w-full h-full cursor-pointer"
         >

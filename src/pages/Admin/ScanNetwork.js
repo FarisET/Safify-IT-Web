@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Table, Input, Button, Select, message } from 'antd';
+import { Tooltip, Modal, Table, Input, Button, Select, message } from 'antd';
 import axios from 'axios';
 import { useScan } from '../../state/context/scanContext';
 import jsPDF from 'jspdf';
@@ -12,18 +12,18 @@ const ScanNetwork = () => {
 
     useEffect(() => {
         const handleBeforeUnload = (event) => {
-          event.preventDefault();
-          event.returnValue = ""; // Required for modern browsers to display a warning
+            event.preventDefault();
+            event.returnValue = ""; // Required for modern browsers to display a warning
         };
-    
+
         // Attach the event listener
         window.addEventListener("beforeunload", handleBeforeUnload);
-    
+
         // Cleanup on component unmount
         return () => {
-          window.removeEventListener("beforeunload", handleBeforeUnload);
+            window.removeEventListener("beforeunload", handleBeforeUnload);
         };
-      }, []);
+    }, []);
 
     const { Option } = Select;
     const [ipRange, setIpRange] = useState('');
@@ -55,7 +55,7 @@ const ScanNetwork = () => {
     const [initLoading, setinitLoading] = useState(false);
     const [filterType, setFilterType] = useState('all');
 
-   
+
 
 
     const fetchAssetTypes = async () => {
@@ -87,9 +87,7 @@ const ScanNetwork = () => {
         []);
 
 
-
-
-
+    const isPrivateNetwork = false; // Example condition, replace with your actual check
 
 
     const handleRunScan = async () => {
@@ -388,14 +386,17 @@ const ScanNetwork = () => {
                     onChange={(e) => setIpRange(e.target.value)}
                     style={{ width: '300px' }}
                 />
-                <Button
-                    type="primary"
-                    className='bg-primary'
-                    onClick={() => (isScanning ? handleStopScan() : handleRunScan())}
-                    loading={isScanning ? false : scanState.isLoading} // Allow stop action even during loading
-                >
-                    {isScanning ? 'Stop Scan' : 'Run Scan'}
-                </Button>
+                {/* <Tooltip title={!isPrivateNetwork ? "You are not on a private network" : ""}> */}
+                    <Button
+                        type="primary"
+                        className="bg-primary"
+                        onClick={() => (isScanning ? handleStopScan() : handleRunScan())}
+                        loading={isScanning ? false : scanState.isLoading}
+                        // disabled={!isPrivateNetwork} // Disable if not on a private network
+                    >
+                        {isScanning ? "Stop Scan" : "Run Scan"}
+                    </Button>
+                {/* </Tooltip> */}
 
                 <div style={{ display: 'flex', gap: '10px' }}>
 

@@ -96,12 +96,7 @@ const Incidents = () => {
     setResponseStatus('');
   };
 
-  const handleImageClick = (image) => {
-    // Ensure the URL is complete (adjust if needed)
-    const baseURL = "http://192.168.126.1:3001";
-    const fullURL = image.startsWith("http") ? image : `${baseURL}${image}`;
-    setSelectedImage(fullURL);
-  };
+
 
 
 
