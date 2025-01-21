@@ -196,8 +196,19 @@ const TicketForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.assetNo) {
+      setSubmitTicketError("Asset is required");
+      return;
+    }
+
+    if (!formData.sublocId) {
+      setSubmitTicketError("Location is required");
+      return;
+    }
+
     // Get current date-time in ISO format (can adjust as needed)
     const dateTime = new Date().toISOString();
+
 
 
     const data = {
@@ -285,6 +296,7 @@ const TicketForm = () => {
                 options={filteredAssets}
                 selectedValue={formData.assetNo}
                 onChange={(value) => handleChange({ target: { name: "assetNo", value } })}
+                required
               />
             </div>
 
@@ -295,6 +307,7 @@ const TicketForm = () => {
                 options={filteredSublocations}
                 selectedValue={formData.sublocId}
                 onChange={(value) => handleChange({ target: { name: "sublocId", value } })}
+                required
               />
             </div>
 
@@ -315,6 +328,7 @@ const TicketForm = () => {
                       checked={formData.criticality === option.value}
                       onChange={handleChange}
                       className="focus:ring-sky-500"
+                      required
                     />
                     {option.label} {/* Display with first letter capitalized */}
                   </label>

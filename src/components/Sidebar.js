@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   FaChevronLeft,
+  FaBars, // Import FaBars for the hamburger icon
   FaBookOpen,
   FaChartBar,
   FaUsers,
@@ -12,6 +13,8 @@ import {
   FaSign,
   FaTicketAlt,
   FaNetworkWired,
+  FaEyeSlash,
+  FaEye,
 } from 'react-icons/fa';
 import { ReactComponent as SafifyIcon } from '../assets/images/safify_it_icon.svg';
 import useLogout from '../services/logout';
@@ -19,6 +22,7 @@ import { Tooltip } from 'antd'; // ✅ Import Tooltip from antd
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false); // State to control sidebar visibility
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
 
@@ -37,8 +41,20 @@ const Sidebar = () => {
 
   return (
     <>
+      {/* Hamburger menu for mobile screens */}
+      <div className="fixed top-20 left-3 z-50 md:hidden">
+        <button
+          className="text-gray-700 bg-white p-2 rounded shadow-lg"
+          onClick={() => setShowSidebar(!showSidebar)}
+        >
+          {showSidebar ? <FaEye size={16} /> : <FaEyeSlash size={16} />}
+        </button>
+      </div>
+
+      {/* Sidebar */}
       <div
-        className={`fixed top-12 left-0 h-[calc(93vh)] bg-white border-r shadow-sm z-40 transition-all duration-300 flex flex-col ${isCollapsed ? 'w-16' : 'w-64'}`}
+        className={`fixed top-12 left-0 h-[calc(93vh)] bg-white border-r shadow-sm z-40 transition-transform duration-300 flex flex-col ${showSidebar ? 'translate-x-0' : '-translate-x-full'
+          } md:translate-x-0 ${isCollapsed ? 'w-16' : 'w-64'}`}
       >
         <div className="flex items-center justify-between px-3 mb-2 mt-6">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsCollapsed(!isCollapsed)}>
@@ -49,7 +65,9 @@ const Sidebar = () => {
             className="flex items-center justify-center w-8 h-8 rounded-full cursor-pointer mt-2"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
-            <FaChevronLeft className={`text-gray-600 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} />
+            <FaChevronLeft
+              className={`text-gray-600 transition-transform ${isCollapsed ? 'rotate-180' : ''} hidden sm:block`}
+            />
           </div>
         </div>
 
@@ -116,6 +134,7 @@ const Sidebar = () => {
         </div>
       </div>
 
+      {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded shadow-lg">
@@ -158,7 +177,8 @@ const SidebarSection = ({ title, links, isCollapsed }) => {
             <Tooltip key={to} title={label} placement="right" visible={isCollapsed ? undefined : false}>
               <NavLink
                 to={to}
-                className={`flex items-center gap-2 p-2 rounded hover:bg-gray-200 transition-all ${isActive ? 'bg-blue-500 text-white' : ''}`}
+                className={`flex items-center gap-2 p-2 rounded hover:bg-gray-200 transition-all ${isActive ? 'bg-blue-500 text-white' : ''
+                  }`}
               >
                 <Icon className={`text-lg ${activeClass}`} />
                 {!isCollapsed && <span className={`${activeClass}`}>{label}</span>}

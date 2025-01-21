@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ReactComponent as SafifyIcon } from '../assets/images/safify_it_icon.svg';
-import { FaBars, FaTimes, FaBell, FaQuestionCircle, FaBullhorn } from 'react-icons/fa';
+import { FaBars, FaTimes, FaBell, FaQuestionCircle, FaBullhorn, FaPowerOff } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Notifications from './NotificationsCard';
 import TeamsCard from './ActionTeamsCard';
@@ -24,6 +24,26 @@ const TopNav = ({ teams, fetchTeams }) => {
   const [announcementMsg, setAnnouncementMsg] = useState('');
   const [announcementError, setAnnouncementError] = useState(false);
   const [announcementLoading, setAnnouncementLoading] = useState(false);
+
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+
+  const logout = useLogout();
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    await logout();
+    setLogoutLoading(false);
+  };
+
+
+
+
+  const onCloseLogoutModal = () => {
+    setLogoutLoading(false);
+    setShowLogoutConfirm(false);
+  };
+
 
   // Fetch Teams if not already fetched
   useEffect(() => {
@@ -173,8 +193,36 @@ const TopNav = ({ teams, fetchTeams }) => {
         </Modal>
       )}
 
+{showLogoutConfirm && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-4 rounded shadow-lg">
+                <h3 className="text-lg font-semibold mb-2">Confirm Logout</h3>
+                <p>Are you sure you want to logout?</p>
+                {logoutLoading && (
+                  <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>
+                )}
+                <div className="flex justify-end gap-2 mt-4">
+                  <button
+                    onClick={() => onCloseLogoutModal()}
+                    className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-sky-200 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-1 bg-gray-100 text-gray-700 text-sm font-semibold rounded hover:text-red-500 transition"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+
+
       {isMenuOpen && (
-        <div className="fixed top-0 right-0 h-screen w-64 bg-white shadow-lg z-50 flex flex-col p-4">
+        <div className="fixed top-0 right-0 h-screen w-64 bg-white shadow-lg z-50 flex flex-col p-4 overflow-hidden">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
             <button
@@ -197,9 +245,9 @@ const TopNav = ({ teams, fetchTeams }) => {
               Dashboard
             </span>
             <span
-          className={`cursor-pointer px-3 py-1 rounded ${isActive('/assets') ? 'text-primary' : 'hover:bg-gray-100'
-          }`}
-            onClick={() => {
+              className={`cursor-pointer px-3 py-1 rounded ${isActive('/assets') ? 'text-primary' : 'hover:bg-gray-100'
+                }`}
+              onClick={() => {
                 navigate('/assets');
                 toggleMenu();
               }}
@@ -209,9 +257,9 @@ const TopNav = ({ teams, fetchTeams }) => {
 
 
             <span
-          className={`cursor-pointer px-3 py-1 rounded ${isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
-          }`}
-            onClick={() => {
+              className={`cursor-pointer px-3 py-1 rounded ${isActive('/launch-ticket') ? 'text-primary' : 'hover:bg-gray-100'
+                }`}
+              onClick={() => {
                 navigate('/launch-ticket');
                 toggleMenu();
               }}
@@ -220,9 +268,9 @@ const TopNav = ({ teams, fetchTeams }) => {
             </span>
 
             <span
-          className={`cursor-pointer px-3 py-1 rounded ${isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
-          }`}
-            onClick={() => {
+              className={`cursor-pointer px-3 py-1 rounded ${isActive('/my-tickets') ? 'text-primary' : 'hover:bg-gray-100'
+                }`}
+              onClick={() => {
                 navigate('/my-tickets');
                 toggleMenu();
               }}
@@ -232,14 +280,27 @@ const TopNav = ({ teams, fetchTeams }) => {
 
           </nav>
 
+
           <div className="mt-auto flex flex-col gap-4">
 
-            <button
+            {/* <button
               onClick={() => navigate('/help')}
               className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded mb-4">
               <FaQuestionCircle />
               <span>Help</span>
+            </button> */}
+            <button
+              onClick={() => {
+                toggleMenu();
+                setShowLogoutConfirm(true);
+              }}
+              className="flex font-semibold items-center gap-2 hover:bg-red-200 p-2 rounded mb-4"
+            >
+              <FaPowerOff className='text-red-500' />
+              <span>Logout</span>
             </button>
+
+
 
           </div>
         </div>

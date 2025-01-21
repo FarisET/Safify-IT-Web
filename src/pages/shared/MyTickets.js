@@ -113,22 +113,22 @@ const MyTickets = () => {
               <p className="text-sm text-gray-700">
                 <strong>Criticality: </strong>
                 <span
-                  className={`$ {
-                                        report.incident_criticality_level === 'low'
-                                            ? 'text-emerald-800 font-semibold'
-                                            : report.incident_criticality_level === 'high'
-                                                ? 'text-yellow-800 font-semibold'
-                                                : 'text-red-800 font-semibold'
-                                    }`}
+                  className={`${report.incident_criticality_level === 'low'
+                      ? 'text-emerald-800 font-semibold'
+                      : report.incident_criticality_level === 'high'
+                        ? 'text-yellow-800 font-semibold'
+                        : 'text-red-800 font-semibold'
+                    }`}
                 >
-                  {report.incident_criticality_level.charAt(0).toUpperCase() + report.incident_criticality_level.slice(1).toLowerCase()}
+                  {report.incident_criticality_level
+                    .charAt(0)
+                    .toUpperCase() + report.incident_criticality_level.slice(1).toLowerCase()}
                 </span>
               </p>
               <p className="text-sm text-gray-700">
                 <strong>Status: </strong>
                 <span
-                  className={`$ {
-                                        report.status === 'open'
+                  className={`${report.status === 'open'
                                             ? 'text-emerald-800 font-semibold'
                                             : report.status === 'completed'
                                                 ? 'text-gray-800 font-semibold'

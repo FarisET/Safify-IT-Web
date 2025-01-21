@@ -275,6 +275,7 @@ const ActionForm = () => {
               maxLength={255}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-indigo-200"
               placeholder="Enter resolution"
+              required
             />
             <div>
               <label className="text-gray-700">Attach Image</label>
