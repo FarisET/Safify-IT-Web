@@ -317,6 +317,7 @@ const Incidents = () => {
       setTimeout(() => {
         handleDeleteCancel();
         fetchUserReports();
+        setSelectedRowToggle(false);
       }, 2000);
 
     } catch (error) {
