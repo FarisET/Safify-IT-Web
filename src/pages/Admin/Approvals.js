@@ -131,6 +131,7 @@ const Approvals = () => {
     setModalAction(action);
     setReportToProcess(report);
     setIsModalOpen(true);
+    setIsDropdownOpen(false);
   };
 
   const closeModal = () => {
