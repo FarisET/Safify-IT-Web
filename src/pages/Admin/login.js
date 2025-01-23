@@ -9,15 +9,13 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [retrying,setRetrying] = useState(false);
   const navigate = useNavigate();
-  const defaultTabs = [
-    { key: '/dashboard', title: 'Dashboard' },
-    { key: '/tickets', title: 'Tickets' },
-  ];
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (loading) return;
+    if (loading || retrying) return;
     setLoading(true);
     setError('');
 
@@ -55,11 +53,7 @@ const LoginPage = () => {
         const currentTime = Date.now() / 1000;
         const timeToExpire = decodedToken.exp - currentTime;
 
-        // localStorage.setItem('jwt', token);
-        // localStorage.setItem('role', role);
-        // localStorage.setItem('deviceToken', deviceToken);
-        // localStorage.setItem('userName', userName);
-        // localStorage.setItem('userId', userId);
+        
         localStorage.setItem('jwt', token);
         localStorage.setItem('role', role);
         localStorage.setItem('deviceToken', deviceToken);
@@ -71,7 +65,6 @@ const LoginPage = () => {
         localStorage.setItem('jwtToken', token);
         localStorage.setItem('timeToExpire', timeToExpire);
 
-        saveTabsToLocalStorage(defaultTabs);
 
         if (role == 'admin') {
           navigate('/tickets');
@@ -94,8 +87,11 @@ const LoginPage = () => {
       }
     } catch (err) {
       if (err.response.data.error === "This Account is Already Logged in From Another Device") {
+        setRetrying(true);
         await logoutUserAsync();
-        handleLogin(e); // Retry login without user notification
+        await handleLogin(e); // Retry login without user notification
+        setRetrying(false);
+
       } 
       else if (err.response && err.response.data && err.response.data.error && err.response.data.error != "This Account is Already Logged in From Another Device") {
         setError(err.response.data.error);
@@ -103,7 +99,7 @@ const LoginPage = () => {
         setError("An error occurred. Please try again.");
       }
     } finally {
-      setLoading(false);
+      if (!retrying) setLoading(false);
     }
 
   };
