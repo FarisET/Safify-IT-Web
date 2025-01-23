@@ -16,8 +16,8 @@ const MyTickets = () => {
   // Fetch reports from the API
   const fetchReports = async () => {
     try {
-      const jwtToken = sessionStorage.getItem("jwt");
-      const userId = sessionStorage.getItem("userId");
+      const jwtToken = localStorage.getItem("jwt");
+      const userId = localStorage.getItem("userId");
 
       const response = await axios.get(
         `${constants.API.BASE_URL}/ticket/dashboard/${userId}/reports`,

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as SafifyIcon } from '../../assets/images/safify_it_icon.svg';
-import {getTabsFromLocalStorage, saveTabsToLocalStorage} from '../../utils/tabUtils'
+import { getTabsFromLocalStorage, saveTabsToLocalStorage } from '../../utils/tabUtils'
 import constants from '../../const';
 const LoginPage = () => {
   const [userId, setUserId] = useState('');
@@ -24,7 +24,7 @@ const LoginPage = () => {
 
     try {
       const deviceToken = "webapp";
-        
+
       const response = await axios.post(`${constants.API.BASE_URL}/user/login`, {
         user_id: userId,
         user_pass: password,
@@ -50,16 +50,23 @@ const LoginPage = () => {
           setError('You are not authorized');
           return; // Exit the function if not authorized
         }
-  
+
 
         const currentTime = Date.now() / 1000;
         const timeToExpire = decodedToken.exp - currentTime;
 
-        sessionStorage.setItem('jwt', token);
-        sessionStorage.setItem('role', role);
-        sessionStorage.setItem('deviceToken', deviceToken);
-        sessionStorage.setItem('userName', userName);
-        sessionStorage.setItem('userId', userId);
+        // localStorage.setItem('jwt', token);
+        // localStorage.setItem('role', role);
+        // localStorage.setItem('deviceToken', deviceToken);
+        // localStorage.setItem('userName', userName);
+        // localStorage.setItem('userId', userId);
+        localStorage.setItem('jwt', token);
+        localStorage.setItem('role', role);
+        localStorage.setItem('deviceToken', deviceToken);
+        localStorage.setItem('userName', userName);
+        localStorage.setItem('userId', userId);
+
+
 
         localStorage.setItem('jwtToken', token);
         localStorage.setItem('timeToExpire', timeToExpire);
@@ -68,7 +75,7 @@ const LoginPage = () => {
 
         if (role == 'admin') {
           navigate('/tickets');
-        } else if (role =='user') {
+        } else if (role == 'user') {
           navigate('/my-tickets');
 
         } else if (role == 'action_team') {
@@ -78,7 +85,7 @@ const LoginPage = () => {
           setError('You are not authorized');
         }
 
-        
+
       } else if (response.status === 401) {
         setError("Incorrect credentials, please try again.");
       } else if (response.status === 500 && responseError) {
@@ -130,12 +137,12 @@ const LoginPage = () => {
           className="flex flex-col items-center justify-center gap-3 w-full h-full cursor-pointer"
         >
           <SafifyIcon className="w-16 h-16" />
-          <h1 className="text-lg lg:text-xl px-3 py-1 bg-sky-100 text-gray-700 font-semibold rounded">
+          <h1 className="text-lg lg:text-xl px-3 py-1 bg-sky-100 text-gray-700 font-semibold rounded text-center">
             SAFIFY IT Service Management
           </h1>
         </div>
 
-        <h2 className="text-2xl font-bold text-center">Login</h2>
+        <h2 className="text-xl lg:text-2xl font-bold text-center">Login</h2>
 
         {error && <p className="text-red-500 text-center">{error}</p>}
 

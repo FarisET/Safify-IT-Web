@@ -32,7 +32,7 @@ const ApprovedReports = () => {
     setLoading(true);
     setError(null);
     try {
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
       const response = await axios.get(`${constants.API.BASE_URL}/admin/dashboard/Fetchallactionreportsapproved`, {
         headers: {
           'Authorization': `Bearer ${jwtToken}`,
@@ -48,7 +48,7 @@ const ApprovedReports = () => {
   };
 
   const approveReport = async (reportId, actionReportId) => {
-    const jwtToken = sessionStorage.getItem('jwt');
+    const jwtToken = localStorage.getItem('jwt');
     const payload = {
       user_report_id: reportId,
       action_report_id: actionReportId,
@@ -95,7 +95,7 @@ const ApprovedReports = () => {
   };
 
   const deleteActionReport = async (actionReportId) => {
-    const jwtToken = sessionStorage.getItem('jwt');
+    const jwtToken = localStorage.getItem('jwt');
     const url = `${constants.API.BASE_URL}/admin/dashboard/deleteActionReport/${actionReportId}`;
 
     try {

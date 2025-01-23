@@ -60,33 +60,33 @@ const AppLayout = () => {
     setShowModal(false); // Close session expired modal
   };
 
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      // Trigger browser confirmation dialog
-      event.preventDefault();
-      event.returnValue = ''; // Required for most browsers to show the dialog
+  // useEffect(() => {
+  //   const handleBeforeUnload = (event) => {
+  //     // Trigger browser confirmation dialog
+  //     event.preventDefault();
+  //     event.returnValue = ''; // Required for most browsers to show the dialog
 
-      // Mark tab as closing
-      setIsTabClosing(true);
-    };
+  //     // Mark tab as closing
+  //     setIsTabClosing(true);
+  //   };
 
-    const handleUnload = () => {
-      if (isTabClosing) {
-        // Trigger logout only if user confirms "Leave"
-        logout();
-      }
-    };
+  //   const handleUnload = () => {
+  //     if (isTabClosing) {
+  //       // Trigger logout only if user confirms "Leave"
+  //       logout();
+  //     }
+  //   };
 
-    // Add event listeners
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('unload', handleUnload);
+  //   // Add event listeners
+  //   window.addEventListener('beforeunload', handleBeforeUnload);
+  //   window.addEventListener('unload', handleUnload);
 
-    // Cleanup event listeners
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('unload', handleUnload);
-    };
-  }, [isTabClosing, logout]);
+  //   // Cleanup event listeners
+  //   return () => {
+  //     window.removeEventListener('beforeunload', handleBeforeUnload);
+  //     window.removeEventListener('unload', handleUnload);
+  //   };
+  // }, [isTabClosing, logout]);
 
   return (
 

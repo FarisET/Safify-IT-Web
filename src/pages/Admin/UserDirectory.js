@@ -18,7 +18,7 @@ const UsersDirectory = () => {
   // Fetch users on component mount
   const fetchUsers = async () => {
     try {
-      const jwtToken = sessionStorage.getItem("jwt");
+      const jwtToken = localStorage.getItem("jwt");
       const response = await axios.get(
         `${constants.API.BASE_URL}/admin/dashboard/fetchUsers`,
         {
@@ -101,7 +101,7 @@ const UsersDirectory = () => {
 
     try {
       setisAddLoading(true);
-      const jwtToken = sessionStorage.getItem("jwt");
+      const jwtToken = localStorage.getItem("jwt");
       await axios.post(
         `${constants.API.BASE_URL}/admin/dashboard/createUser`,
         {
@@ -152,7 +152,7 @@ const UsersDirectory = () => {
     setDeleteUserError('');
 
     try {
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
       const response = await axios.delete(
         `${constants.API.BASE_URL}/admin/dashboard/deleteUser/${userId}`,
 
@@ -203,7 +203,7 @@ const UsersDirectory = () => {
     e.preventDefault();
     setEditUserLoading(true);
     try {
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
 
       const response = await axios.put(
         `${constants.API.BASE_URL}/admin/dashboard/updateUser`,
@@ -258,7 +258,7 @@ const UsersDirectory = () => {
 
     setChangeEmailLoading(true);
     try {
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
       const response = await axios.put(
         `${constants.API.BASE_URL}/admin/dashboard/updateUserID`,
         {

@@ -42,7 +42,7 @@ const AssignToDropdown = ({ options, selectedValue, onChange }) => {
         {filteredOptions.length > 0 ? (
           filteredOptions.map((option) => (
             <Option key={option.id} value={option.id}>
-              {option.name}
+              {option.id}
             </Option>
           ))
         ) : (

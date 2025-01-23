@@ -45,7 +45,7 @@ const Assets = () => {
     const fetchAssetTypes = async () => {
         try {
             setinitLoading(true);
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.get(
                 `${constants.API.BASE_URL}/admin/dashboard/getAssetsandAssetTypes`,
                 {
@@ -112,7 +112,7 @@ const Assets = () => {
         setAddTypeSuccessMessage("");
 
         try {
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.post(
                 `${constants.API.BASE_URL}/admin/dashboard/addAssetType`,
                 {
@@ -177,7 +177,7 @@ const Assets = () => {
         setDeleteTypeModalMessage('')
         setDeleteTypeError('');
         try {
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.delete(
                 `${constants.API.BASE_URL}/admin/dashboard/deleteAssetType/${selectedAssetTypeId}`,
 
@@ -254,7 +254,7 @@ const Assets = () => {
         try {
 
 
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.put(
                 `${constants.API.BASE_URL}/admin/dashboard/updateAssetType`,
                 {
@@ -327,7 +327,7 @@ const Assets = () => {
         setLoading(true);
         setError(null);
         try {
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
 
             // Fetch Asset Details
             const assetDetailsResponse = await axios.get(
@@ -416,7 +416,7 @@ const Assets = () => {
                 setaddAssetErrorMessage('Mac Address Invalid.');
                 return;
             }
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.post(
                 `${constants.API.BASE_URL}/admin/dashboard/addAsset`,
                 {
@@ -486,7 +486,7 @@ const Assets = () => {
                 setassignLocError(`Location already assigned to ${currentLoc}`);
                 return;
             }
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.put(
                 `${constants.API.BASE_URL}/admin/dashboard/updateLocationAssetAssignment`,
                 {
@@ -561,7 +561,7 @@ const Assets = () => {
 
         try {
 
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.put(
                 `${constants.API.BASE_URL}/admin/dashboard/updateLocationAssetAssignment`,
                 {
@@ -641,7 +641,7 @@ const Assets = () => {
                 setassignToError(`${assignTo} already assigned to this asset`);
                 return;
             }
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.put(
                 `${constants.API.BASE_URL}/admin/dashboard/updateUserAssetAssignment`,
                 {
@@ -695,7 +695,7 @@ const Assets = () => {
         setUnassignToError('');
 
         try {
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.put(
                 `${constants.API.BASE_URL}/admin/dashboard/updateUserAssetAssignment`,
                 {
@@ -764,7 +764,7 @@ const Assets = () => {
 
     const fetchLocationsAndSublocations = async () => {
         try {
-            const jwtToken = sessionStorage.getItem("jwt");
+            const jwtToken = localStorage.getItem("jwt");
             const response = await axios.get(
                 `${constants.API.BASE_URL}/admin/dashboard/getLocationsAndSubLocationsAdmin`,
                 {
@@ -809,7 +809,7 @@ const Assets = () => {
 
     const fetchUsers = async () => {
         try {
-            const jwtToken = sessionStorage.getItem("jwt");
+            const jwtToken = localStorage.getItem("jwt");
             const response = await axios.get(
                 `${constants.API.BASE_URL}/admin/dashboard/fetchUsers`,
                 {
@@ -846,7 +846,7 @@ const Assets = () => {
         setDeleteModalMessage('')
         setDeleteError('');
         try {
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.delete(
                 `${constants.API.BASE_URL}/admin/dashboard/deleteAsset/${selectedAsset}`,
 
@@ -910,7 +910,7 @@ const Assets = () => {
         setDisposeModalMessage('')
         setDisposeError('');
         try {
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.delete(
                 `${constants.API.BASE_URL}/admin/dashboard/disposeAsset/${selectedAsset}`,
 
@@ -1033,7 +1033,7 @@ const Assets = () => {
             }
 
 
-            const jwtToken = sessionStorage.getItem("jwt");
+            const jwtToken = localStorage.getItem("jwt");
 
             const response = await axios.put(
                 `${constants.API.BASE_URL}/admin/dashboard/updateAsset`,
@@ -1083,7 +1083,7 @@ const Assets = () => {
             const formData = new FormData();
             formData.append('file', selectedFile);
 
-            const jwtToken = sessionStorage.getItem("jwt");
+            const jwtToken = localStorage.getItem("jwt");
             const response = await axios.post(
                 `${constants.API.BASE_URL}/admin/bulkUpload/uploadAssetSheet`,
                 formData,

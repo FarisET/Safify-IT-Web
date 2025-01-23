@@ -83,7 +83,7 @@ const TopNav = ({ teams, fetchTeams }) => {
   const handleAnnouncementSubmit = async () => {
     try {
       setAnnouncementLoading(true);
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
       await axios.post(
         `${constants.API.BASE_URL}/admin/dashboard/alertUsers`,
         { messageTitle: announcementTitle, messageBody: announcementBody },
@@ -193,36 +193,36 @@ const TopNav = ({ teams, fetchTeams }) => {
         </Modal>
       )}
 
-{showLogoutConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white p-4 rounded shadow-lg">
-                <h3 className="text-lg font-semibold mb-2">Confirm Logout</h3>
-                <p>Are you sure you want to logout?</p>
-                {logoutLoading && (
-                  <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>
-                )}
-                <div className="flex justify-end gap-2 mt-4">
-                  <button
-                    onClick={() => onCloseLogoutModal()}
-                    className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-sky-200 transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="px-3 py-1 bg-gray-100 text-gray-700 text-sm font-semibold rounded hover:text-red-500 transition"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded shadow-lg">
+            <h3 className="text-lg font-semibold mb-2">Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            {logoutLoading && (
+              <p className="mb-4 p-3 rounded text-sky-600 bg-sky-100">Loading...</p>
+            )}
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => onCloseLogoutModal()}
+                className="px-3 py-1 bg-gray-100 text-sm text-gray-700 font-semibold rounded hover:bg-sky-200 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1 bg-gray-100 text-gray-700 text-sm font-semibold rounded hover:text-red-500 transition"
+              >
+                Logout
+              </button>
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
 
 
       {isMenuOpen && (
-        <div className="fixed top-0 right-0 h-screen w-64 bg-white shadow-lg z-50 flex flex-col p-4 overflow-hidden">
+        <div className="fixed top-0 right-0 h-[70vh] w-64 bg-white shadow-lg z-50 flex flex-col p-4 overflow-auto">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
             <button
@@ -299,7 +299,6 @@ const TopNav = ({ teams, fetchTeams }) => {
               <FaPowerOff className='text-red-500' />
               <span>Logout</span>
             </button>
-
 
 
           </div>

@@ -9,7 +9,7 @@ const useLogout = () => {
 
   const logout = async () => {
     try {
-      const userId = sessionStorage.getItem('userId');
+      const userId = localStorage.getItem('userId');
       const payload = JSON.stringify({ user_id: userId });
 
       // Use `fetch` for manual logout
@@ -20,7 +20,7 @@ const useLogout = () => {
       });
 
       if (response.ok) {
-        sessionStorage.clear();
+        localStorage.clear();
         localStorage.clear();
         navigate('/login');
       } else {
@@ -48,23 +48,23 @@ const useLogout = () => {
     }
   };
 
-  useEffect(() => {
-    // Add event listener on component mount
-    window.addEventListener('beforeunload', handleTabClose);
+  // useEffect(() => {
+  //   // Add event listener on component mount
+  //   window.addEventListener('beforeunload', handleTabClose);
 
-    // If user confirms closing (Leave), then call logout
-    const onConfirmClose = () => {
-      if (isTabClosing) {
-        logout(); // Call logout when user confirms leave
-      }
-    };
+  //   // If user confirms closing (Leave), then call logout
+  //   const onConfirmClose = () => {
+  //     if (isTabClosing) {
+  //       logout(); // Call logout when user confirms leave
+  //     }
+  //   };
 
-    // Clean up event listener on component unmount
-    return () => {
-      window.removeEventListener('beforeunload', handleTabClose);
-      onConfirmClose();
-    };
-  }, [isTabClosing]); // Re-run when isTabClosing state changes
+  //   // Clean up event listener on component unmount
+  //   return () => {
+  //     window.removeEventListener('beforeunload', handleTabClose);
+  //     onConfirmClose();
+  //   };
+  // }, [isTabClosing]); // Re-run when isTabClosing state changes
 
   return logout;
 };

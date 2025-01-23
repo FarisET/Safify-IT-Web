@@ -12,7 +12,7 @@ const useFetch = (url, method = 'GET', body = null, config = {}) => {
             setLoading(true);
             setError(null);
             try {
-                const jwtToken = sessionStorage.getItem('jwt');
+                const jwtToken = localStorage.getItem('jwt');
                 const headers = {
                     'Authorization': `Bearer ${jwtToken}`,
                     'Content-Type': 'application/json', // Default Content-Type

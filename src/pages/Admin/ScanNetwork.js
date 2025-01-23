@@ -10,20 +10,20 @@ import { useTimer } from "../../state/context/useTimer";
 import constants from '../../const';
 const ScanNetwork = () => {
 
-    useEffect(() => {
-        const handleBeforeUnload = (event) => {
-            event.preventDefault();
-            event.returnValue = ""; // Required for modern browsers to display a warning
-        };
+    // useEffect(() => {
+    //     const handleBeforeUnload = (event) => {
+    //         event.preventDefault();
+    //         event.returnValue = ""; // Required for modern browsers to display a warning
+    //     };
 
-        // Attach the event listener
-        window.addEventListener("beforeunload", handleBeforeUnload);
+    //     // Attach the event listener
+    //     window.addEventListener("beforeunload", handleBeforeUnload);
 
-        // Cleanup on component unmount
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, []);
+    //     // Cleanup on component unmount
+    //     return () => {
+    //         window.removeEventListener("beforeunload", handleBeforeUnload);
+    //     };
+    // }, []);
 
     const { Option } = Select;
     const [ipRange, setIpRange] = useState('');
@@ -61,7 +61,7 @@ const ScanNetwork = () => {
     const fetchAssetTypes = async () => {
         try {
             setinitLoading(true);
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.get(
                 `${constants.API.BASE_URL}/admin/dashboard/fetchAssetTypes`,
                 {
@@ -100,7 +100,7 @@ const ScanNetwork = () => {
         try {
             setTimerVisible(true);
             setElapsedTime(0);
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.post(
                 `${constants.API.BASE_URL}/network/runScan`,
                 { iprange: ipRange },
@@ -223,7 +223,7 @@ const ScanNetwork = () => {
         setAddAssetLoading(true);
 
         try {
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.post(
                 `${constants.API.BASE_URL}/admin/dashboard/addAsset`,
                 {

@@ -90,7 +90,7 @@ const Dashboard = () => {
 
   const fetchUserTickets = async (dateRange) => {
     try {
-      const jwtToken = sessionStorage.getItem("jwt");
+      const jwtToken = localStorage.getItem("jwt");
       let dataRange = dateRange;
       const endpoint = dateRange === "All"
         ? `${constants.API.BASE_URL}/analytics/fetchTotalTicketsByUser`
@@ -116,7 +116,7 @@ const Dashboard = () => {
 
   const fetchUserAssets = async (dateRange) => {
     try {
-      const jwtToken = sessionStorage.getItem("jwt");
+      const jwtToken = localStorage.getItem("jwt");
       let dataRange = dateRange;
       const endpoint =
         `${constants.API.BASE_URL}/analytics/fetchUserAssetsGrouped`
@@ -139,7 +139,7 @@ const Dashboard = () => {
   // Fetch Time-Bound Analytics
   const fetchTimeBoundAnalytics = async (dateRange) => {
     try {
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
 
       let dataRange = dateRange;
       const endpoint = dateRange === "All"
@@ -163,7 +163,7 @@ const Dashboard = () => {
 
   // Fetch Non-Time-Bound Analytics
   const fetchNonTimeBoundAnalytics = async () => {
-    const jwtToken = sessionStorage.getItem('jwt');
+    const jwtToken = localStorage.getItem('jwt');
 
     try {
       const response = await axios.get(`${constants.API.BASE_URL}/analytics/fetchAnalyticsNonTimeBound`,
@@ -501,7 +501,7 @@ const Dashboard = () => {
                       >
                         {dateOptions.map((option) => (
                           <Option key={option.value} value={option.value}>
-                            {option.text}
+                            {option.value}
                           </Option>
                         ))}
                       </Select>
@@ -513,8 +513,8 @@ const Dashboard = () => {
                       columns={[
                         {
                           title: "User",
-                          dataIndex: "user_name",
-                          key: "user_name",
+                          dataIndex: "user_id",
+                          key: "user_id",
                         },
                         {
                           title: "Total Tickets",
@@ -522,7 +522,7 @@ const Dashboard = () => {
                           key: "tickets",
                         },
                       ]}
-                      rowKey="user_name"
+                      rowKey="user_id"
                       pagination={{ pageSize: 10 }}
                     />
 
@@ -557,8 +557,8 @@ const Dashboard = () => {
                         columns={[
                           {
                             title: "User",
-                            dataIndex: "user_name", // Corrected to match the dataSource key
-                            key: "user_name",
+                            dataIndex: "user_id", // Corrected to match the dataSource key
+                            key: "user_id",
                           },
                           {
                             title: "Assigned Assets",
@@ -566,7 +566,7 @@ const Dashboard = () => {
                             key: "assets",
                           },
                         ]}
-                        rowKey="user_name" // Updated to a unique identifier, assuming `user_name` is unique
+                        rowKey="user_id" // Updated to a unique identifier, assuming `user_name` is unique
                         pagination={{ pageSize: 10 }}
                       />
                     </div>

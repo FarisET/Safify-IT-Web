@@ -14,7 +14,7 @@ const LocationsDirectory = () => {
     // Fetch locations and sublocations on component mount
     const fetchLocationsAndSublocations = async () => {
         try {
-            const jwtToken = sessionStorage.getItem("jwt");
+            const jwtToken = localStorage.getItem("jwt");
             const response = await axios.get(
                 `${constants.API.BASE_URL}/admin/dashboard/getLocationsAndSubLocationsAdmin`,
                 {
@@ -112,7 +112,7 @@ const LocationsDirectory = () => {
 
     // Common handler to add location or sublocation
     const handleAddLocationOrSubLocation = async (isSubLocation = false) => {
-        const jwtToken = sessionStorage.getItem("jwt");
+        const jwtToken = localStorage.getItem("jwt");
         const payload = isSubLocation
             ? {
                 location_name: null,
@@ -211,7 +211,7 @@ const LocationsDirectory = () => {
 
 
     const handleUpdateLocation = async () => {
-        const jwtToken = sessionStorage.getItem("jwt");
+        const jwtToken = localStorage.getItem("jwt");
         const payload =
         {
             location_name: newlocName,
@@ -290,7 +290,7 @@ const LocationsDirectory = () => {
 
 
     const handleDeleteLocation = async () => {
-        const jwtToken = sessionStorage.getItem("jwt");
+        const jwtToken = localStorage.getItem("jwt");
 
         try {
 
@@ -353,7 +353,7 @@ const LocationsDirectory = () => {
 
 
     const handleUpdateSubLocation = async () => {
-        const jwtToken = sessionStorage.getItem("jwt");
+        const jwtToken = localStorage.getItem("jwt");
         const payload =
         {
             sub_location_name: newSubLocName,
@@ -432,7 +432,7 @@ const LocationsDirectory = () => {
 
 
     const handleDeleteSubLocation = async () => {
-        const jwtToken = sessionStorage.getItem("jwt");
+        const jwtToken = localStorage.getItem("jwt");
 
 
         try {

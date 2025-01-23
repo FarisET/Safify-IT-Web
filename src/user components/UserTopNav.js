@@ -116,7 +116,7 @@ const UserTopNav = ({ children }) => {
 
         {/* Hamburger Menu for Small Screens */}
         {isMenuOpen && (
-          <div className="fixed top-0 right-0 h-screen w-64 bg-white shadow-lg z-50 flex flex-col p-4 overflow-hidden">
+          <div className="fixed top-0 right-0 h-[70vh] w-64 bg-white shadow-lg z-50 flex flex-col p-4 overflow-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
               <button
@@ -148,6 +148,7 @@ const UserTopNav = ({ children }) => {
                 Launch Ticket
               </span>
             </nav>
+
             <div className="mt-auto flex flex-col gap-4">
               <button
                 onClick={() => {

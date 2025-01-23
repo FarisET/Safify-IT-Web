@@ -36,7 +36,7 @@ const IncidentsCompleted = () => {
       const fetchActionTeams = async () => {
         setLoadingTeams(true);
         try {
-          const jwtToken = sessionStorage.getItem('jwt');
+          const jwtToken = localStorage.getItem('jwt');
           const response = await axios.get(
             `${constants.API.BASE_URL}/admin/dashboard/fetchAllActionTeamsWithDepartments?department_id=D1`,
             {
@@ -75,7 +75,7 @@ const IncidentsCompleted = () => {
   // Define fetchUserReports outside of useEffect so it can be reused
   const fetchUserReports = async () => {
     try {
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
       const response = await axios.get(
         `${constants.API.BASE_URL}/admin/dashboard/Fetchalluserreportscompleted`,
         {
@@ -106,7 +106,7 @@ const IncidentsCompleted = () => {
 
     setIsLoading(true); // Show loading indicator
     try {
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
       const payload = {
         user_report_id: selectedReportId,
         user_id: selectedUserId,

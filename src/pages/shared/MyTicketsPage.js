@@ -5,7 +5,7 @@ import UserTopNav  from "../../user components/UserTopNav"; // Default top navig
 import MyTickets from "../shared/MyTickets";
 
 const MyTicketPage = () => {
-  const role = sessionStorage.getItem("role");
+  const role = localStorage.getItem("role");
 
   return (
     <>

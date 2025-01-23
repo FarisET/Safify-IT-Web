@@ -17,8 +17,8 @@ const ActionTasks = ({ ticketID, taskID }) => {
     const fetchAssignedReports = async () => {
         try {
             // Fetch JWT token from localStorage
-            const jwtToken = sessionStorage.getItem("jwt");
-            const userId = sessionStorage.getItem("userId");
+            const jwtToken = localStorage.getItem("jwt");
+            const userId = localStorage.getItem("userId");
 
             const response = await axios.get(
                 `${constants.API.BASE_URL}/actionTeam/dashboard/${userId}/fetchAssignedTasks`,

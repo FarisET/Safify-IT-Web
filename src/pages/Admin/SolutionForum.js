@@ -14,7 +14,7 @@ const SolutionForum = () => {
   useEffect(() => {
     const fetchForumEntries = async () => {
       try {
-        const jwtToken = sessionStorage.getItem('jwt');
+        const jwtToken = localStorage.getItem('jwt');
         const response = await axios.get(
           `${constants.API.BASE_URL}/solutionForum/fetchAllSolutions`,
           {

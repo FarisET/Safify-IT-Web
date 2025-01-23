@@ -39,7 +39,7 @@ const Approvals = () => {
     setLoading(true);
     setError(null);
     try {
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
       const response = await axios.get(`${constants.API.BASE_URL}/admin/dashboard/fetchAllActionReports`, {
         headers: {
           'Authorization': `Bearer ${jwtToken}`,
@@ -59,7 +59,7 @@ const Approvals = () => {
 
   const handleApprove = async () => {
     if (!reportToProcess) return;
-    const jwtToken = sessionStorage.getItem('jwt');
+    const jwtToken = localStorage.getItem('jwt');
     const payload = {
       user_report_id: reportToProcess.userReportId,
       action_report_id: reportToProcess.actionReportId,
@@ -97,7 +97,7 @@ const Approvals = () => {
 
   const handleReject = async () => {
     if (!reportToProcess) return;
-    const jwtToken = sessionStorage.getItem('jwt');
+    const jwtToken = localStorage.getItem('jwt');
     const url = `${constants.API.BASE_URL}/admin/dashboard/deleteActionReport/${reportToProcess.actionReportId}`;
 
     setModalLoading(true);
@@ -144,7 +144,7 @@ const Approvals = () => {
 
 
   const deleteActionReport = async (actionReportId) => {
-    const jwtToken = sessionStorage.getItem('jwt');
+    const jwtToken = localStorage.getItem('jwt');
     const url = `${constants.API.BASE_URL}/admin/dashboard/deleteActionReport/${actionReportId}`;
 
     try {

@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children, requiredRole, allowAll = false }) => {
 
   useEffect(() => {
     const jwtToken = localStorage.getItem('jwtToken');
-    const role = sessionStorage.getItem('role');
+    const role = localStorage.getItem('role');
 
     if (!jwtToken || !role) {
       setRedirect(true);

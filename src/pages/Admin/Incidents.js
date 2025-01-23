@@ -55,7 +55,7 @@ const Incidents = () => {
       const fetchActionTeams = async () => {
         setLoadingTeams(true);
         try {
-          const jwtToken = sessionStorage.getItem('jwt');
+          const jwtToken = localStorage.getItem('jwt');
           const response = await axios.get(
             `${constants.API.BASE_URL}/admin/dashboard/fetchAllActionTeamsWithDepartments?department_id=D1`,
             {
@@ -110,7 +110,7 @@ const Incidents = () => {
   // Define fetchUserReports outside of useEffect so it can be reused
   const fetchUserReports = async () => {
     try {
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
       const response = await axios.get(
         `${constants.API.BASE_URL}/admin/dashboard/fetchAllUserReports`,
         {
@@ -141,7 +141,7 @@ const Incidents = () => {
 
     setIsLoading(true); // Show loading indicator
     try {
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
       const payload = {
         user_report_id: selectedReportId,
         user_id: selectedUserId,
@@ -257,7 +257,7 @@ const Incidents = () => {
   const handleEscalate = async () => {
     try {
       setisEscalateLoading(true);
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
 
       const response = await axios.post(`${constants.API.BASE_URL}/admin/dashboard/escalateReport`,
         {
@@ -303,7 +303,7 @@ const Incidents = () => {
   const handleDelete = async () => {
     try {
       setisDeleteLoading(true);
-      const jwtToken = sessionStorage.getItem('jwt');
+      const jwtToken = localStorage.getItem('jwt');
       const response = await axios.delete(`${constants.API.BASE_URL}/admin/dashboard/deleteUserReport/${selectedRow.userReportId}`,
       {
           headers: {

@@ -23,20 +23,20 @@ const BulkUpload = () => {
     const [uploadSummary, setUploadSummary] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        const handleBeforeUnload = (event) => {
-          event.preventDefault();
-          event.returnValue = ""; // Required for modern browsers to display a warning
-        };
+    // useEffect(() => {
+    //     const handleBeforeUnload = (event) => {
+    //       event.preventDefault();
+    //       event.returnValue = ""; // Required for modern browsers to display a warning
+    //     };
     
-        // Attach the event listener
-        window.addEventListener("beforeunload", handleBeforeUnload);
+    //     // Attach the event listener
+    //     window.addEventListener("beforeunload", handleBeforeUnload);
     
-        // Cleanup on component unmount
-        return () => {
-          window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-      }, []);
+    //     // Cleanup on component unmount
+    //     return () => {
+    //       window.removeEventListener("beforeunload", handleBeforeUnload);
+    //     };
+    //   }, []);
 
 
     const downloadTemplate = () => {
@@ -231,7 +231,7 @@ const BulkUpload = () => {
 
         setUploadLoading(true);
         try {
-            const jwtToken = sessionStorage.getItem('jwt');
+            const jwtToken = localStorage.getItem('jwt');
             const response = await axios.post(
                 `${constants.API.BASE_URL}/admin/bulkUpload/uploadAssetJson`,
                 { jsonAssetData: data },

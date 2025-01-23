@@ -18,7 +18,7 @@ const ActionForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user_report_id } = location.state || {};
-  const [role, setRole] = useState(sessionStorage.getItem("role"))
+  const [role, setRole] = useState(localStorage.getItem("role"))
 
 
   const handleChange = (e) => {
@@ -111,7 +111,7 @@ const ActionForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const userId = sessionStorage.getItem("userId"); // Assuming userid is stored in sessionStorage
+    const userId = localStorage.getItem("userId"); // Assuming userid is stored in localStorage
     const endpoint = `${constants.API.BASE_URL}/actionTeam/dashboard/${userId}/MakeActionReport`;
 
     const data = {
