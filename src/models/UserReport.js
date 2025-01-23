@@ -15,6 +15,7 @@ class UserReport {
       this.assetName = data['asset_name'];
       this.assetNo = data['asset_no'];
       this.Assignee = data['Assignee'];
+      this.duration = data['completion_time_hrs'];
 
     }
   

@@ -281,23 +281,24 @@ const Dashboard = () => {
 
                   {/* Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 mr-4">
+                  
                     <Card title="Total Tickets" tooltipContent="Total tickets launched. Based on date filter">
                       <p className="text-lg font-bold">{timeBoundData.incidentsReported || 0}</p>
                     </Card>
-                    <Card title="Tickets Resolved" tooltipContent="Total tickets closed based on date filter">
+                    <Card title="Tickets Closed" tooltipContent="Total tickets closed based on date filter">
                       <p className="text-lg font-bold">{timeBoundData.incidentsResolved || 0}</p>
                     </Card>
-                    <Card title="Ticket by Criticality" tooltipContent="Total tickets categorized by criticality of issue. Based on date filter">
+                    <Card title="Open Tickets by Criticality" tooltipContent="Open tickets categorized by criticality of issue. Based on date filter">
                       <div className="flex flex-wrap gap-4">
-                        {timeBoundData.totalTicketsByIncidentCriticality?.length > 0 ? (
-                          timeBoundData.totalTicketsByIncidentCriticality.map((item, index) => {
+                        {timeBoundData.pendingTicketsByCriticality?.length > 0 ? (
+                          timeBoundData.pendingTicketsByCriticality.map((item, index) => {
                             // Assign background color based on the Criticality Level
                             const bgColor =
-                              item['Criticality Level'] === 'low'
+                              item['incident_criticality_level'] === 'low'
                                 ? 'px-3 py-1 text-gray-700 font-semibold rounded bg-emerald-100'
-                                : item['Criticality Level'] === 'high'
+                                : item['incident_criticality_level'] === 'high'
                                   ? 'px-3 py-1 text-gray-700 font-semibold rounded bg-yellow-100'
-                                  : item['Criticality Level'] === 'critical'
+                                  : item['incident_criticality_level'] === 'critical'
                                     ? 'px-3 py-1 text-gray-700 font-semibold rounded bg-red-100'
                                     : 'px-3 py-1 text-gray-700 font-semibold rounded bg-gray-100'; // Default color if no match
 
@@ -306,7 +307,7 @@ const Dashboard = () => {
                                 key={index}
                                 className={`text-lg font-bold px-4 py-2 rounded ${bgColor}`}
                               >
-                                {`${item['Criticality Level']}: ${item['Ticket Count']}`}
+                                {`${item['incident_criticality_level']}: ${item['report_count']}`}
                               </div>
                             );
                           })
@@ -546,7 +547,7 @@ const Dashboard = () => {
                         dataSource={
                           userAssets?.users?.map((user, index) => ({
                             key: index,
-                            user_name: user.user_name, // Corrected to match the column's dataIndex
+                            user_id: user.user_id, // Corrected to match the column's dataIndex
                             assets:
                               user.assets
                                 ?.filter((asset) => asset.asset_no && asset.asset_name)
@@ -557,8 +558,8 @@ const Dashboard = () => {
                         columns={[
                           {
                             title: "User",
-                            dataIndex: "user_name", // Corrected to match the dataSource key
-                            key: "user_name",
+                            dataIndex: "user_id", // Corrected to match the dataSource key
+                            key: "user_id",
                           },
                           {
                             title: "Assigned Assets",

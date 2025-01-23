@@ -290,9 +290,11 @@ const IncidentsCompleted = () => {
               <th className="px-4 py-2 border-b">Image</th>
               <th className="px-4 py-2 border-b">Status</th>
               <th className="px-4 py-2 border-b">Criticality</th>
+              <th className="px-4 py-2 border-b">Duration</th>
               <th className="px-4 py-2 border-b">Date</th>
               <th className="px-4 py-2 border-b">Time</th>
 
+              
               {/* <th className="px-4 py-2 border-b">Urgency</th> */}
             </tr>
           </thead>
@@ -385,8 +387,12 @@ const IncidentsCompleted = () => {
                     {report.incidentCriticalityLevel}
                   </span>
                 </td>
-
-
+                
+                <td className="px-4 py-2 border-b font-semibold">
+                  {report.duration
+                    ? `${report.duration} hrs` // Display formatted date
+                    : <span className="text-gray-700 font-bold">X</span>}
+                </td>
                 <td className="px-4 py-2 border-b font-semibold">
                   {report.dateTime
                     ? formatDate(report.dateTime).date // Display formatted date

@@ -206,14 +206,11 @@ const TicketForm = () => {
       return;
     }
 
-    // Get current date-time in ISO format (can adjust as needed)
-    const dateTime = new Date().toISOString();
 
 
 
     const data = {
       report_description: formData.description,
-      date_time: dateTime,
       asset_no: formData.assetNo,
       sub_location_id: formData.sublocId,
       incident_criticality_id: formData.criticality,

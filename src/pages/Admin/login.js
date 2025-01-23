@@ -89,7 +89,7 @@ const LoginPage = () => {
       if (err.response.data.error === "This Account is Already Logged in From Another Device") {
         setRetrying(true);
         await logoutUserAsync();
-        await handleLogin(e); // Retry login without user notification
+        await handleLogin(e);
         setRetrying(false);
 
       } 

@@ -47,12 +47,15 @@ const Help = () => {
       <section id="features" className="mb-12">
         <h2 className="text-lg font-semibold mb-4 text-gray-800">Features</h2>
         {[
-          { title: 'Ticket Management', description: 'Create and manage tickets efficiently, assign them to support persons, and monitor progress.' },
-          { title: 'Asset Management', description: 'Track and manage IT assets, assign them to users, and keep a history of activities.' },
-          { title: 'User Directory', description: 'Manage user roles and view detailed user information.' },
+          { title: 'Ticket Management', description: 'All roles can launch a ticket. For assigning, simply navigate to Open Tickets (Admin home page) and find the ticket you want to assign. Click in Unassigned --> (in Blue) and select the action team from the list loaded. Finally Assign' },
+          { title: 'Asset Management', description: 'Create, Update & Delete Asset types and Assets. Assign assets to user. User can only report tickets on asset assigned to them. Track asset history and edit asset details. Assign location, dispose, unassign and assets' },
+          { title: 'Location Directory', description: 'Manage locations and sublocations. Add, Update & Delete' },
+          { title: 'User Directory', description: 'Manage user roles and view detailed user information. Add, Update & Delete' },
           { title: 'Solution Forum', description: 'Collaborate with others to build a knowledge base for common issues.' },
-          { title: 'Approvals', description: 'Review and approve action reports submitted by support persons.' },
-          { title: 'Reports', description: 'Generate insights on ticket statuses, asset usage, and user activities.' },
+          { title: 'Scan Network', description: 'Great for adding new assets directly from the network and track on-network assets in real-time. Enter a private network ip and run scan. Approximate wait time can vary form 30 seconds up till 10 minutes based on network size. Let scan run in the backgound while you enjoy multi tasking.' },
+          { title: 'Approvals', description: 'Once an action team submits his action report, admin can approve from Pending Approvals page. Simply locate the report from the tab and approve or reject from the action dropdown' },
+          { title: 'Email alerts', description: 'Each role receives an email on every step of the ticket cycle to keep everyone updated.' },
+
         ].map((feature, index) => (
           <div key={index} className="mb-6">
             <button
