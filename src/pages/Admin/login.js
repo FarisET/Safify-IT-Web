@@ -86,13 +86,18 @@ const LoginPage = () => {
         }
 
 
-      } else if (response.status === 401) {
+      }
+      else if (response.status === 401) {
         setError("Incorrect credentials, please try again.");
       } else if (response.status === 500 && responseError) {
         handleServerError(responseError);
       }
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.error) {
+      if (err.response.data.error === "This Account is Already Logged in From Another Device") {
+        await logoutUserAsync();
+        handleLogin(e); // Retry login without user notification
+      } 
+      else if (err.response && err.response.data && err.response.data.error && err.response.data.error != "This Account is Already Logged in From Another Device") {
         setError(err.response.data.error);
       } else {
         setError("An error occurred. Please try again.");
@@ -106,9 +111,8 @@ const LoginPage = () => {
 
 
   const handleServerError = (errorMessage) => {
-    if (errorMessage.includes("Already logged in from another device")) {
-      setError("Already logged in from another device.");
-    } else if (errorMessage.includes("Authentication failed")) {
+
+    if (errorMessage.includes("Authentication failed")) {
       setError("Authentication failed.");
     } else if (errorMessage.includes("Wrong Password")) {
       setError("Incorrect password.");
@@ -127,6 +131,27 @@ const LoginPage = () => {
       return JSON.parse(window.atob(base64));
     } catch (e) {
       return null;
+    }
+  };
+
+  const logoutUserAsync = async () => {
+    try {
+      const response = await fetch(`${constants.API.BASE_URL}/user/logout`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId || '' }), // Use entered userId if localStorage is not set
+      });
+
+      if (response.ok) {
+        localStorage.clear();
+        // ... rest of your logout logic (e.g., navigate to login)
+      } else {
+        const errorData = await response.json();
+        setError.error("Logout failed:", errorData.message || 'Please try again.');
+      }
+    } catch (error) {
+      setError.error("Logout error:", error);
+      // Handle logout errors (optional: display error message to user)
     }
   };
 

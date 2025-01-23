@@ -71,22 +71,22 @@ const AppLayout = () => {
   //   };
 
   //   const handleUnload = () => {
-  //     if (isTabClosing) {
+  //     // if (isTabClosing) {
   //       // Trigger logout only if user confirms "Leave"
   //       logout();
-  //     }
+  //     // }
   //   };
 
   //   // Add event listeners
-  //   window.addEventListener('beforeunload', handleBeforeUnload);
-  //   window.addEventListener('unload', handleUnload);
+  //   // window.addEventListener('beforeunload', handleBeforeUnload);
+  //   window.addEventListener('onbeforeunload', handleUnload);
 
   //   // Cleanup event listeners
   //   return () => {
-  //     window.removeEventListener('beforeunload', handleBeforeUnload);
-  //     window.removeEventListener('unload', handleUnload);
+  //     // window.removeEventListener('beforeunload', handleBeforeUnload);
+  //     window.removeEventListener('onbeforeunload', handleUnload);
   //   };
-  // }, [isTabClosing, logout]);
+  // }, [logout]);
 
   return (
 

@@ -305,7 +305,7 @@ const Incidents = () => {
       setisDeleteLoading(true);
       const jwtToken = localStorage.getItem('jwt');
       const response = await axios.delete(`${constants.API.BASE_URL}/admin/dashboard/deleteUserReport/${selectedRow.userReportId}`,
-      {
+        {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
           },
@@ -457,13 +457,7 @@ const Incidents = () => {
                 onDoubleClick={() => handleRowDoubleClick(report)}
               >
 
-                {/* <td className="px-4 py-2 border-b">
-                  <input
-                    type="checkbox"
-                    checked={selectedReports.includes(report.userReportId)}
-                    onChange={() => toggleReportSelection(report.userReportId)}
-                  />
-                </td> */}
+          
                 <td className="px-4 py-2 border-b">
                   <div className="font-semibold text-gray-700 cursor-pointer">
                     {report.userReportId}
@@ -485,15 +479,31 @@ const Incidents = () => {
                 </td>
 
 
-                <td className="px-4 py-2 border-b font-semibold text-gray-700">
-                  {report.reportDescription ? report.reportDescription : <span className="text-gray-700 font-bold">X</span>}
+                <td className="px-4 py-2 border-b font-semibold text-gray-700 relative group">
+                  {report.reportDescription ? (
+                    <>
+                      {/* Display truncated description */}
+                      <span>
+                        {report.reportDescription.length > 50
+                          ? `${report.reportDescription.substring(0, 50)}...`
+                          : report.reportDescription}
+                      </span>
+
+                      {/* Tooltip for full description */}
+                      <div className="absolute hidden group-hover:block z-10 bg-gray-800 text-white text-sm rounded p-2 shadow-lg max-w-sm w-auto">
+                        {report.reportDescription}
+                      </div>
+                    </>
+                  ) : (
+                    <span className="text-gray-700 font-bold">X</span>
+                  )}
                 </td>
                 <td className="px-4 py-2 border-b font-semibold text-gray-700">
                   {report.userId ? report.userId : <span className="text-gray-700 font-bold">X</span>}
                 </td>
                 <td className="px-4 py-2 border-b font-semibold text-gray-700">
                   {report.subLocationName ? report.subLocationName : <span className="text-gray-700 font-bold">X</span>}
-                </td>
+                </td> 
 
                 <td className="px-4 py-2 border-b">
                   <div

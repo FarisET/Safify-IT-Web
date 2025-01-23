@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { FaArrowAltCircleLeft } from "react-icons/fa";
 import constants from '../../const';
 import imageCompression from 'browser-image-compression';
-import { FaPaperclip } from "react-icons/fa6";
 
 
 const TicketForm = () => {
@@ -41,7 +40,7 @@ const TicketForm = () => {
   const [locations, setLocations] = useState([]);
   const [filteredSublocations, setFilteredSublocations] = useState([]);
   const [sublocations, setSublocations] = useState([]);
-  const [role, setRole] = useState(localStorage.getItem("role"))
+  const [role, setRole] = useState(sessionStorage.getItem("role"))
   const [activeTab, setActiveTab] = useState("form");
 
   useEffect(() => {
@@ -57,7 +56,7 @@ const TicketForm = () => {
 
   const fetchLocationsAndSublocations = async () => {
     try {
-      const jwtToken = localStorage.getItem("jwt");
+      const jwtToken = sessionStorage.getItem("jwt");
       const response = await axios.get(
         `${constants.API.BASE_URL}/ticket/dashboard/getLocationsAndSubLocations`,
         {
@@ -101,8 +100,8 @@ const TicketForm = () => {
 
   const fetchAssetTypesAndAssets = async () => {
     try {
-      const jwtToken = localStorage.getItem("jwt");
-      const userId = localStorage.getItem("userId");
+      const jwtToken = sessionStorage.getItem("jwt");
+      const userId = sessionStorage.getItem("userId");
 
       const response = await axios.get(
         `${constants.API.BASE_URL}/ticket/dashboard/getAssetsandAssetTypes/${userId}`,
@@ -225,7 +224,7 @@ const TicketForm = () => {
     try {
       setSubmitTicketLoading(true);
 
-      const userId = localStorage.getItem("userId");
+      const userId = sessionStorage.getItem("userId");
 
       // Send the data to the backend using axios
       const response = await axios.post(
@@ -233,7 +232,7 @@ const TicketForm = () => {
         data,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("jwt")}`,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -355,18 +354,13 @@ const TicketForm = () => {
 
               <div>
                 <label className="text-gray-700">Add Image</label>
-                <label htmlFor="file-input" className="mt-1 block w-full flex items-center justify-center text-gray-700 bg-transparent border rounded py-2 px-4 cursor-pointer hover:bg-gray-200">
-                  <FaPaperclip className="text-gray-700 mr-1" /> Click here to add an image
-                </label>
                 <input
                   type="file"
                   accept="image/jpeg, image/png"
                   capture="environment"
                   onChange={handleFileChange}
-                  id="file-input"
-                  className="hidden"
+                  className="mt-1 block w-full"
                 />
-
                 <p className="text-sm text-gray-500 mt-1">
                   Allowed file types: <strong>JPG, PNG</strong>
                 </p>

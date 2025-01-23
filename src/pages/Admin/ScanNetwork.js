@@ -86,9 +86,7 @@ const ScanNetwork = () => {
     },
         []);
 
-
-    const isPrivateNetwork = false; // Example condition, replace with your actual check
-
+    const isPrivateNetwork = false;
 
     const handleRunScan = async () => {
         if (!ipRange) {
@@ -386,17 +384,17 @@ const ScanNetwork = () => {
                     onChange={(e) => setIpRange(e.target.value)}
                     style={{ width: '300px' }}
                 />
-                {/* <Tooltip title={!isPrivateNetwork ? "You are not on a private network" : ""}> */}
+                <Tooltip title={!isPrivateNetwork ? "You are not on a private network" : ""}>
                     <Button
                         type="primary"
                         className="bg-primary"
                         onClick={() => (isScanning ? handleStopScan() : handleRunScan())}
                         loading={isScanning ? false : scanState.isLoading}
-                        // disabled={!isPrivateNetwork} // Disable if not on a private network
+                        disabled={!isPrivateNetwork} // Disable if not on a private network
                     >
                         {isScanning ? "Stop Scan" : "Run Scan"}
                     </Button>
-                {/* </Tooltip> */}
+                </Tooltip>
 
                 <div style={{ display: 'flex', gap: '10px' }}>
 

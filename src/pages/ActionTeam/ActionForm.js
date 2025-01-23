@@ -278,7 +278,7 @@ const ActionForm = () => {
               required
             />
             <div>
-              <label className="text-gray-700">Attach Image</label>
+              <label className="text-gray-700">Add Image</label>
               <input
                 type="file"
                 accept="image/jpeg, image/png"

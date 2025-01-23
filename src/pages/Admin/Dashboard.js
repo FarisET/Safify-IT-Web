@@ -557,8 +557,8 @@ const Dashboard = () => {
                         columns={[
                           {
                             title: "User",
-                            dataIndex: "user_id", // Corrected to match the dataSource key
-                            key: "user_id",
+                            dataIndex: "user_name", // Corrected to match the dataSource key
+                            key: "user_name",
                           },
                           {
                             title: "Assigned Assets",
