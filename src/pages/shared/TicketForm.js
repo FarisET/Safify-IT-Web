@@ -40,7 +40,7 @@ const TicketForm = () => {
   const [locations, setLocations] = useState([]);
   const [filteredSublocations, setFilteredSublocations] = useState([]);
   const [sublocations, setSublocations] = useState([]);
-  const [role, setRole] = useState(sessionStorage.getItem("role"))
+  const [role, setRole] = useState(localStorage.getItem("role"))
   const [activeTab, setActiveTab] = useState("form");
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const TicketForm = () => {
 
   const fetchLocationsAndSublocations = async () => {
     try {
-      const jwtToken = sessionStorage.getItem("jwt");
+      const jwtToken = localStorage.getItem("jwt");
       const response = await axios.get(
         `${constants.API.BASE_URL}/ticket/dashboard/getLocationsAndSubLocations`,
         {
@@ -100,8 +100,8 @@ const TicketForm = () => {
 
   const fetchAssetTypesAndAssets = async () => {
     try {
-      const jwtToken = sessionStorage.getItem("jwt");
-      const userId = sessionStorage.getItem("userId");
+      const jwtToken = localStorage.getItem("jwt");
+      const userId = localStorage.getItem("userId");
 
       const response = await axios.get(
         `${constants.API.BASE_URL}/ticket/dashboard/getAssetsandAssetTypes/${userId}`,
@@ -221,7 +221,7 @@ const TicketForm = () => {
     try {
       setSubmitTicketLoading(true);
 
-      const userId = sessionStorage.getItem("userId");
+      const userId = localStorage.getItem("userId");
 
       // Send the data to the backend using axios
       const response = await axios.post(
@@ -229,7 +229,7 @@ const TicketForm = () => {
         data,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("jwt")}`,
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
             "Content-Type": "multipart/form-data",
           },
         }

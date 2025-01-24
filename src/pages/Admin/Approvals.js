@@ -238,9 +238,26 @@ const Approvals = () => {
               <tr key={report.userReportId} className="bg-white hover:bg-gray-100">
                 <td className="px-4 py-2 border-b">{report.userReportId}</td>
                 <td className="px-4 py-2 border-b">{report.assetName}</td>
-                <td className="px-4 py-2 border-b font-semibold text-gray-700">
-                  <span className="block text-gray-800">⚠️ {report.reportDescription}</span>
-                  <span className="block text-gray-500 text-sm">💬 {report.resolutionDescription}</span>
+                <td className="px-4 py-2 border-b font-semibold text-gray-700 cursor-pointer">
+                  {/* Truncated report description */}
+                  <span
+                    className="block text-gray-800"
+                    title={report.reportDescription}
+                  >
+                    ⚠️ {report.reportDescription.length > 25
+                      ? report.reportDescription.substring(0, 25) + "..."
+                      : report.reportDescription}
+                  </span>
+
+                  {/* Truncated resolution description */}
+                  <span
+                    className="block text-gray-500 text-sm"
+                    title={report.resolutionDescription} // Tooltip with full content
+                  >
+                    💬 {report.resolutionDescription.length > 25
+                      ? report.resolutionDescription.substring(0, 25) + "..."
+                      : report.resolutionDescription}
+                  </span>
                 </td>
                 <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportedBy}</td>
                 <td className="px-4 py-2 border-b">{report.actionTeamName}</td>

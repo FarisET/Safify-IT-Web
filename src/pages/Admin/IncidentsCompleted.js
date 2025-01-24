@@ -294,7 +294,7 @@ const IncidentsCompleted = () => {
               <th className="px-4 py-2 border-b">Date</th>
               <th className="px-4 py-2 border-b">Time</th>
 
-              
+
               {/* <th className="px-4 py-2 border-b">Urgency</th> */}
             </tr>
           </thead>
@@ -329,8 +329,24 @@ const IncidentsCompleted = () => {
                 </td>
 
 
-                <td className="px-4 py-2 border-b font-semibold text-gray-700">
-                  {report.reportDescription ? report.reportDescription : <span className="text-gray-700 font-bold">X</span>}
+                <td className="px-4 py-2 border-b font-semibold text-gray-700 relative group">
+                  {report.reportDescription ? (
+                    <>
+                      {/* Display truncated description */}
+                      <span>
+                        {report.reportDescription.length > 25
+                          ? `${report.reportDescription.substring(0, 25)}...`
+                          : report.reportDescription}
+                      </span>
+
+                      {/* Tooltip for full description */}
+                      <div className="absolute hidden group-hover:block z-10 bg-gray-800 text-white text-sm rounded p-2 shadow-lg max-w-sm w-auto">
+                        {report.reportDescription}
+                      </div>
+                    </>
+                  ) : (
+                    <span className="text-gray-700 font-bold">X</span>
+                  )}
                 </td>
                 <td className="px-4 py-2 border-b font-semibold text-gray-700">
                   {report.userId ? report.userId : <span className="text-gray-700 font-bold">X</span>}
@@ -387,7 +403,7 @@ const IncidentsCompleted = () => {
                     {report.incidentCriticalityLevel}
                   </span>
                 </td>
-                
+
                 <td className="px-4 py-2 border-b font-semibold">
                   {report.duration
                     ? `${report.duration} hrs` // Display formatted date
