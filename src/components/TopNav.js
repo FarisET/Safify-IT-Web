@@ -27,6 +27,9 @@ const TopNav = ({ teams, fetchTeams }) => {
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [showProfileCard, setShowProfileCard] = useState(false);
+  const toggleProfileCard = () => setShowProfileCard((prev) => !prev);
+
 
   const logout = useLogout();
 
@@ -35,8 +38,6 @@ const TopNav = ({ teams, fetchTeams }) => {
     await logout();
     setLogoutLoading(false);
   };
-
-
 
 
   const onCloseLogoutModal = () => {
@@ -65,6 +66,7 @@ const TopNav = ({ teams, fetchTeams }) => {
   const toggleTeams = () => {
     setShowTeams((prev) => !prev);
     if (showNotifications) setShowNotifications(false);
+    if (showProfileCard) setShowProfileCard(false);
   };
 
   // Announcement Modal Handlers
@@ -106,6 +108,17 @@ const TopNav = ({ teams, fetchTeams }) => {
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
+
+
+  const user = {
+    name: localStorage.getItem('userName'),
+    email: localStorage.getItem('userId'),
+    role: localStorage.getItem('role')
+  };
+
+
+
 
   return (
     <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 h-16 flex items-center px-4 md:px-6 z-50">
@@ -157,18 +170,57 @@ const TopNav = ({ teams, fetchTeams }) => {
 
       {/* Right-Side Icons */}
       <div className="hidden md:flex items-center gap-4">
-        <span className="relative cursor-pointer hover:bg-gray-200 p-2 rounded-full group" onClick={openAnnouncementModal}>
+        <span
+          className="relative cursor-pointer hover:bg-gray-200 p-2 rounded-full group"
+          onClick={openAnnouncementModal}
+        >
           <FaBullhorn />
           <span className="absolute top-full right-0 mt-2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition">
             Announcement
           </span>
         </span>
-        <span className="relative cursor-pointer hover:bg-gray-200 p-2 rounded-full group" onClick={() => navigate('/help')}>
+        <span
+          className="relative cursor-pointer hover:bg-gray-200 p-2 rounded-full group"
+          onClick={() => navigate('/help')}
+        >
           <FaQuestionCircle />
           <span className="absolute top-full right-0 mt-2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition">
             Help
           </span>
         </span>
+        <div className="relative">
+          <button
+            className="p-2 rounded-full hover:bg-gray-200 transition"
+            onClick={toggleProfileCard}
+          >
+            <div
+              className={`w-7 h-7 rounded-full flex items-center justify-center bg-primary text-white text-md font-medium`}
+            >
+              {user.email.charAt(0).toUpperCase()}
+            </div>
+          </button>
+
+          {/* Profile Details Card */}
+          {showProfileCard && (
+            <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
+              <h3 className="text-lg font-semibold">{user.email}</h3>
+              {/* <p className="text-sm text-gray-600">{user.email}</p> */}
+              <p className="text-sm text-gray-600">Role: {user.role}</p>
+              <button
+                onClick={() => {
+                  setShowLogoutConfirm(true);
+                }}
+                className="mt-1 px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded hover:text-red-500 transition"
+              >
+                <span className="flex gap-2 items-center justify-center">
+                  <FaPowerOff />
+                  <p>Logout</p>
+                </span>
+
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Announcement Modal */}
@@ -309,3 +361,6 @@ const TopNav = ({ teams, fetchTeams }) => {
 };
 
 export default TopNav;
+
+
+

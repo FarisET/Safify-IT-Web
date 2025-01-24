@@ -15,6 +15,15 @@ const UserTopNav = ({ children }) => {
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [showProfileCard, setShowProfileCard] = useState(false);
+  const toggleProfileCard = () => setShowProfileCard((prev) => !prev);
+
+  const user = {
+    name: localStorage.getItem('userName'),
+    email: localStorage.getItem('userId'),
+    role: localStorage.getItem('role')
+  };
+
 
   // Use the custom hook inside the component
   const logout = useLogout();
@@ -48,7 +57,42 @@ const UserTopNav = ({ children }) => {
         </div>
 
         {/* Hamburger Menu Button */}
-        <div className="flex md:hidden">
+        <div className="flex md:hidden gap-2">
+          <div className="relative">
+            <button
+              className="p-2 rounded-full hover:bg-gray-200 transition"
+              onClick={toggleProfileCard}
+            >
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center bg-primary text-white text-md font-medium`}
+              >
+                {user.email.charAt(0).toUpperCase()}
+              </div>
+            </button>
+
+            {/* Profile Details Card */}
+            {showProfileCard && (
+              <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
+                <h3 className="text-lg font-semibold">{user.email}</h3>
+                {/* <p className="text-sm text-gray-600">{user.email}</p> */}
+                <p className="text-sm text-gray-600">Role: {user.role}</p>
+                <button
+                  onClick={() => {
+                    setShowLogoutConfirm(true);
+                  }}
+                  className="mt-1 px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded hover:text-red-500 transition"
+                >
+                  <span className="flex gap-2 items-center justify-center">
+                    <FaPowerOff />
+                    <p>Logout</p>
+                  </span>
+
+                </button>
+              </div>
+            )}
+            </div>
+
+
           <button
             className="p-2 rounded-full hover:bg-gray-200 transition"
             onClick={toggleMenu}
@@ -77,15 +121,39 @@ const UserTopNav = ({ children }) => {
         </div>
 
         <div className="hidden md:flex items-center gap-4 w-auto justify-end">
-          <span
-            onClick={() => setShowLogoutConfirm(true)}
-            className="relative cursor-pointer hover:text-red-500 rounded-full group"
-          >
-            <FaPowerOff />
-            <span className="absolute top-full right-0 mt-2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition">
-              Logout
-            </span>
-          </span>
+          <div className="relative">
+            <button
+              className="p-2 rounded-full hover:bg-gray-200 transition"
+              onClick={toggleProfileCard}
+            >
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center bg-primary text-white text-md font-medium`}
+              >
+                {user.email.charAt(0).toUpperCase()}
+              </div>
+            </button>
+
+            {/* Profile Details Card */}
+            {showProfileCard && (
+              <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
+                <h3 className="text-lg font-semibold">{user.email}</h3>
+                {/* <p className="text-sm text-gray-600">{user.email}</p> */}
+                <p className="text-sm text-gray-600">Role: {user.role}</p>
+                <button
+                  onClick={() => {
+                    setShowLogoutConfirm(true);
+                  }}
+                  className="mt-1 px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded hover:text-red-500 transition"
+                >
+                  <span className="flex gap-2 items-center justify-center">
+                    <FaPowerOff />
+                    <p>Logout</p>
+                  </span>
+
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {showLogoutConfirm && (
@@ -152,9 +220,9 @@ const UserTopNav = ({ children }) => {
             <div className="mt-auto flex flex-col gap-4">
               <button
                 onClick={() => {
-                  toggleMenu(); 
+                  toggleMenu();
                   setShowLogoutConfirm(true);
-                }} 
+                }}
                 className="flex font-semibold items-center gap-2 hover:bg-red-200 p-2 rounded mb-4"
               >
                 <FaPowerOff className='text-red-500' />
