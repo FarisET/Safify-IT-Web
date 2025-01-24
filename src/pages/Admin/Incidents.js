@@ -400,7 +400,7 @@ const Incidents = () => {
 
 
   const handleScrollChange = (enable) => {
-    setScroll(enable ? { y: 480 } : undefined);
+    setScroll(enable ? { y: 280 } : undefined);
   };
 
 
@@ -441,8 +441,8 @@ const Incidents = () => {
       key: 'summary',
       render: (text) => (
         <Tooltip title={text}>
-          <span>
-            {text.length > 50 ? `${text.substring(0, 50)}...` : text}
+          <span className='cursor-pointer'>
+            {text.length > 20 ? `${text.substring(0, 20)}...` : text}
           </span>
         </Tooltip>
       ),

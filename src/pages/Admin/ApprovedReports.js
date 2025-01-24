@@ -322,7 +322,7 @@ const ApprovedReports = () => {
           expandedRowRender={record => <p style={{ margin: 0 }}>
             <div>
               <span className="block text-gray-800">⚠️ Problem: {record.reportDescription}</span>
-              <span className="block text-gray-500 text-sm">💬Comment: {record.resolutionDescription}</span>
+              <span className="block text-gray-500 text-sm">💬 Comment: {record.resolutionDescription}</span>
             </div>
 
           </p>}

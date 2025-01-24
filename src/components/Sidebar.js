@@ -120,16 +120,15 @@ const Sidebar = () => {
             title="Network Discovery"
             links={[{ to: '/scan-network', icon: FaNetworkWired, label: 'Scan Network' }]}
           />
-          <div className="border-t border-gray-200 my-1"></div>
         </div>
 
-        <div className="w-full px-3">
+        <div className="w-full border-t px-3 border-gray-200 backdrop-blur-lg bg-white/70">
           <button
             onClick={() => setShowLogoutConfirm(true)}
             className="flex items-center gap-2 text-red-600 p-2 rounded hover:text-gray-700 transition-all"
           >
-            <FaPowerOff />
-            {!isCollapsed && <span>Logout</span>}
+            <FaPowerOff className='text-center' />
+            {!isCollapsed && <span className=''>Logout</span>}
           </button>
         </div>
       </div>
