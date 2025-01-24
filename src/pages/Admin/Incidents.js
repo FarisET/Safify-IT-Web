@@ -76,6 +76,35 @@ const Incidents = () => {
     }
   }, [isModalOpen]);
 
+  //Row Selection
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    // Allow only a single selection
+    setSelectedRowKeys(newSelectedRowKeys.slice(-1)); // Keep only the latest selected key
+  };
+
+  const onSelect = (record, selected) => {
+    if (selected) {
+      setSelectedRowKeys([record.userReportId]); // Allow only one selection
+      setSelectedRow(record); // Set the selected row
+      setSelectedRowToggle(true); // Show buttons
+    } else {
+      setSelectedRowKeys([]); // Clear selection
+      setSelectedRow(null); // Clear selected row
+      setSelectedRowToggle(false); // Hide buttons
+    }
+  };
+  
+  const rowSelection = {
+    type: 'checkbox',
+    selectedRowKeys,
+    onChange: onSelectChange,
+    onSelect, // Trigger selection logic
+  };
+
+  
+
   const handleRowDoubleClick = (row) => {
     if (selectedRow?.userReportId === row.userReportId) {
       // Deselect if the same row is clicked
@@ -87,6 +116,8 @@ const Incidents = () => {
       setSelectedRowToggle(true);
     }
   };
+
+  
 
 
   const handleAssignClick = (reportId, userId) => {
@@ -378,7 +409,7 @@ const Incidents = () => {
       render: (text) => text || <span className="text-gray-700 font-bold">X</span>,
     },
     {
-      title: 'Assignee',
+      title: 'Team',
       dataIndex: 'Assignee',
       key: 'assignee',
       render: (text, record) => (
@@ -412,8 +443,9 @@ const Incidents = () => {
             <FaImage />
           </Button>
         ) : (
-          <span className="text-gray-700 font-bold">X</span>
-        )
+          <div className="flex justify-center items-center h-full">
+            <span className="text-gray-700 font-bold">X</span>
+          </div>)
       ),
     },
     {
@@ -548,170 +580,26 @@ const Incidents = () => {
 
       {/* Table to display reports */}
       {filteredReports.length != 0 ? (
-
-        // <table className="table-auto w-full border-collapse shadow-lg rounded-md">
-        //   <thead className="text-black text-left">
-        //     <tr>
-        //       {/* <th className="px-4 py-2 border-b">
-        //         <input
-        //           type="checkbox"
-        //           onChange={(e) => setSelectedReports(e.target.checked ? filteredReports.map(r => r.userReportId) : [])}
-        //           checked={selectedReports.length === filteredReports.length && filteredReports.length > 0}
-        //           />
-        //       </th> */}
-        //       <th className="px-4 py-2 border-b">Ticket</th>
-        //       <th className="px-4 py-2 border-b">Asset</th>
-        //       {/* <th className="px-4 py-2 border-b">Asset.No</th> */}
-        //       <th className="px-4 py-2 border-b">Summary</th>
-        //       <th className="px-4 py-2 border-b">Reporter</th>
-        //       <th className="px-4 py-2 border-b">Location</th>
-        //       <th className="px-4 py-2 border-b">Assignee</th>
-        //       <th className="px-4 py-2 border-b">Image</th>
-        //       <th className="px-4 py-2 border-b">Status</th>
-        //       <th className="px-4 py-2 border-b">Criticality</th>
-        //       <th className="px-4 py-2 border-b">Date</th>
-        //       <th className="px-4 py-2 border-b">Time</th>
-
-        //       {/* <th className="px-4 py-2 border-b">Urgency</th> */}
-        //     </tr>
-        //   </thead>
-        //   <tbody className="text-left">
-        //     {filteredReports.map((report) => (
-
-        //       <tr
-        //         key={report.userReportId}
-        //         className={`hover:bg-gray-100 cursor-pointer ${selectedRow && selectedRow.userReportId === report.userReportId ? 'bg-gray-200' : ''}`}
-        //         onDoubleClick={() => handleRowDoubleClick(report)}
-        //       >
+        // <Table
+        //   dataSource={filteredReports}
+        //   columns={columns}
+        //   rowKey="userReportId"
+        //   rowSelection={rowSelection} // Enable row selection
+        //   onRow={(record) => ({
+        //     onDoubleClick: () => {
+        //       handleRowDoubleClick(record);
+        //       setSelectedRowKeys([record.userReportId]);
+        //     }
+        //   })}
+        //   pagination={{ pageSize: 10 }}
+        // />
 
 
-        //         <td className="px-4 py-2 border-b">
-        //           <div className="font-semibold text-gray-700 cursor-pointer">
-        //             {report.userReportId}
-        //           </div>
-        //         </td>
-        //         <td className="px-4 py-2 border-b">
-        //           <div className="font-semibold text-sky-600 cursor-pointer">
-        //             {report.assetNo || report.assetName ? (
-        //               <>
-        //                 {report.assetNo}
-        //                 <div className="text-sm text-gray-500 mt-1">
-        //                   {report.assetName}
-        //                 </div>
-        //               </>
-        //             ) : (
-        //               <span className="text-gray-700 font-bold">X</span>
-        //             )}
-        //           </div>
-        //         </td>
-
-
-        //         <td className="px-4 py-2 border-b font-semibold text-gray-700 relative group">
-        //           {report.reportDescription ? (
-        //             <>
-        //               {/* Display truncated description */}
-        //               <span>
-        //                 {report.reportDescription.length > 50
-        //                   ? `${report.reportDescription.substring(0, 50)}...`
-        //                   : report.reportDescription}
-        //               </span>
-
-        //               {/* Tooltip for full description */}
-        //               <div className="absolute hidden group-hover:block z-10 bg-gray-800 text-white text-sm rounded p-2 shadow-lg max-w-sm w-auto">
-        //                 {report.reportDescription}
-        //               </div>
-        //             </>
-        //           ) : (
-        //             <span className="text-gray-700 font-bold">X</span>
-        //           )}
-        //         </td>
-        //         <td className="px-4 py-2 border-b font-semibold text-gray-700">
-        //           {report.userId ? report.userId : <span className="text-gray-700 font-bold">X</span>}
-        //         </td>
-        //         <td className="px-4 py-2 border-b font-semibold text-gray-700">
-        //           {report.subLocationName ? report.subLocationName : <span className="text-gray-700 font-bold">X</span>}
-        //         </td> 
-
-        //         <td className="px-4 py-2 border-b">
-        //           <div
-        //             className={`flex ${report.Assignee === 'Unassigned' ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} font-semibold`}
-        //             onClick={report.Assignee === 'Unassigned' ? () => handleAssignClick(report.userReportId, report.userId) : undefined}
-        //           >
-        //             {/* User Icon */}
-        //             <span className={`text-gray-700 p-1 mr-2 `}>
-        //               <FaUser />
-        //             </span>
-
-        //             {/* Assignee Text */}
-        //             <span className={report.Assignee === 'Unassigned' ? 'text-sky-600' : 'text-gray-900'}>
-        //               {report.Assignee}
-        //             </span>
-
-        //             {report.Assignee === 'Unassigned' && (
-        //               <span className="text-gray-700 p-1 mr-2">
-        //                 <FaArrowRight />
-        //               </span>
-        //             )}
-        //           </div>
-        //         </td>
-
-        //         <td className="px-4 py-2 border-b text-center">
-        //           {report.image ? (
-        //             <button
-        //               className="text-sky-600 font-semibold cursor-pointer hover:underline focus:outline-none focus:ring focus:ring-blue-300 transition-all"
-        //               onClick={() => setSelectedImage(report.image)}
-
-        //               title="Click to view the image"
-        //             >
-        //               <FaImage />
-        //             </button>
-        //           ) : (
-        //             <span className="text-gray-700 font-bold">X</span>
-        //           )}
-        //         </td>
-
-        //         <td className="px-4 py-2 border-b whitespace-nowrap">
-        //           <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getStatusClass(report.status)}`}>
-        //             {report.status}
-        //           </span>
-        //         </td>
-
-        //         <td className="px-4 py-2 border-b whitespace-nowrap">
-        //           <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getCritClass(report.incidentCriticalityLevel)}`}>
-        //             {report.incidentCriticalityLevel}
-        //           </span>
-        //         </td>
-
-
-        //         <td className="px-4 py-2 border-b font-semibold">
-        //           {report.dateTime
-        //             ? formatDate(report.dateTime).date // Display formatted date
-        //             : <span className="text-gray-700 font-bold">X</span>}
-        //         </td>
-        //         <td className="px-4 py-2 border-b font-semibold">
-        //           {report.dateTime
-        //             ? `${report.dateTime.split(' ')[1]} ${report.dateTime.split(' ')[2]}` // Extract and display the time and period
-        //             : <span className="text-gray-700 font-bold">X</span>}
-        //         </td>
-
-
-
-
-
-
-        //       </tr>
-
-        //     ))}
-        //   </tbody>
-
-        // </table>
         <Table
           dataSource={filteredReports}
           columns={columns}
           rowKey="userReportId"
-          onRow={(record) => ({
-            onDoubleClick: () => handleRowDoubleClick(record),
-          })}
+          rowSelection={rowSelection}
           pagination={{ pageSize: 10 }}
         />
 

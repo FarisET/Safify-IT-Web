@@ -6,6 +6,8 @@ import { FaUser, FaTrash, FaArrowRight, FaImage } from 'react-icons/fa';
 import { formatDate } from '../../utils/date';
 import { Select } from 'antd';
 import constants from '../../const';
+import { Table, Button } from 'antd';
+
 
 const IncidentsCompleted = () => {
   const [userReports, setUserReports] = useState([]);
@@ -206,6 +208,162 @@ const IncidentsCompleted = () => {
   //   setComment('');
   // };
 
+  const columns = [
+    {
+      title: 'Ticket',
+      dataIndex: 'userReportId',
+      key: 'userReportId',
+      render: (text) => <div className="font-semibold text-gray-700">{text}</div>,
+    },
+    {
+      title: 'Asset',
+      key: 'asset',
+      render: (_, record) => (
+        <div className="font-semibold text-sky-600">
+          {record.assetNo || record.assetName ? (
+            <>
+              {record.assetNo}
+              <div className="text-sm text-gray-500 mt-1">{record.assetName}</div>
+            </>
+          ) : (
+            <span className="text-gray-700 font-bold">X</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: 'Summary',
+      dataIndex: 'reportDescription',
+      key: 'reportDescription',
+      render: (text) =>
+        text ? (
+          <span className='cursor-pointer' title={text}>
+            {text.length > 25 ? `${text.substring(0, 25)}...` : text}
+          </span>
+        ) : (
+          <span className="text-gray-700 font-bold">X</span>
+        ),
+    },
+    {
+      title: 'Reporter',
+      dataIndex: 'userId',
+      key: 'userId',
+      render: (text) => text || <span className="text-gray-700 font-bold">X</span>,
+    },
+    {
+      title: 'Location',
+      dataIndex: 'subLocationName',
+      key: 'subLocationName',
+      render: (text) => text || <span className="text-gray-700 font-bold">X</span>,
+    },
+    {
+      title: 'Assignee',
+      key: 'assignee',
+      render: (_, record) => (
+        <div
+          className={`flex ${record.Assignee === 'Unassigned'
+              ? 'cursor-pointer hover:bg-gray-100'
+              : 'cursor-default'
+            } font-semibold`}
+          onClick={
+            record.Assignee === 'Unassigned'
+              ? () => handleAssignClick(record.userReportId, record.userId)
+              : undefined
+          }
+        >
+          <span className="text-gray-700 p-1 mr-2">
+            <FaUser />
+          </span>
+          <span
+            className={
+              record.Assignee === 'Unassigned' ? 'text-sky-600' : 'text-gray-900'
+            }
+          >
+            {record.Assignee}
+          </span>
+          {record.Assignee === 'Unassigned' && (
+            <span className="text-gray-700 p-1">
+              <FaArrowRight />
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: 'Image',
+      key: 'image',
+      render: (_, record) =>
+        record.image ? (
+          <Button
+            type="link"
+            className="text-sky-600 font-semibold"
+            onClick={() => setSelectedImage(record.image)}
+          >
+            <FaImage />
+          </Button>
+        ) : (
+          <span className="text-gray-700 font-bold">X</span>
+        ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text) => (
+        <span
+          className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getStatusClass(
+            text
+          )}`}
+        >
+          {text}
+        </span>
+      ),
+    },
+    {
+      title: 'Criticality',
+      dataIndex: 'incidentCriticalityLevel',
+      key: 'incidentCriticalityLevel',
+      render: (text) => (
+        <span
+          className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getCritClass(
+            text
+          )}`}
+        >
+          {text}
+        </span>
+      ),
+    },
+    {
+      title: 'Duration',
+      dataIndex: 'duration',
+      key: 'duration',
+      render: (text) =>
+        text ? `${text} hrs` : <span className="text-gray-700 font-bold">X</span>,
+    },
+    {
+      title: 'Date',
+      dataIndex: 'dateTime',
+      key: 'dateTime',
+      render: (text) =>
+        text
+          ? formatDate(text).date
+          : <span className="text-gray-700 font-bold">X</span>,
+    },
+    {
+      title: 'Time',
+      dataIndex: 'dateTime',
+      key: 'time',
+      render: (text) =>
+        text ? (
+          <span>
+            {text.split(' ')[1]} {text.split(' ')[2]}
+          </span>
+        ) : (
+          <span className="text-gray-700 font-bold">X</span>
+        ),
+    },
+  ];
+
 
 
   return (
@@ -270,167 +428,173 @@ const IncidentsCompleted = () => {
       {/* Table to display reports */}
       {filteredReports.length != 0 ? (
 
-        <table className="table-auto w-full border-collapse shadow-lg rounded-md">
-          <thead className="text-black text-left">
-            <tr>
-              {/* <th className="px-4 py-2 border-b">
-                <input
-                  type="checkbox"
-                  onChange={(e) => setSelectedReports(e.target.checked ? filteredReports.map(r => r.userReportId) : [])}
-                  checked={selectedReports.length === filteredReports.length}
-                />
-              </th> */}
-              <th className="px-4 py-2 border-b">Ticket</th>
-              <th className="px-4 py-2 border-b">Asset</th>
-              {/* <th className="px-4 py-2 border-b">Asset.No</th> */}
-              <th className="px-4 py-2 border-b">Summary</th>
-              <th className="px-4 py-2 border-b">Reporter</th>
-              <th className="px-4 py-2 border-b">Location</th>
-              <th className="px-4 py-2 border-b">Assignee</th>
-              <th className="px-4 py-2 border-b">Image</th>
-              <th className="px-4 py-2 border-b">Status</th>
-              <th className="px-4 py-2 border-b">Criticality</th>
-              <th className="px-4 py-2 border-b">Duration</th>
-              <th className="px-4 py-2 border-b">Date</th>
-              <th className="px-4 py-2 border-b">Time</th>
+        // <table className="table-auto w-full border-collapse shadow-lg rounded-md">
+        //   <thead className="text-black text-left">
+        //     <tr>
+        //       {/* <th className="px-4 py-2 border-b">
+        //         <input
+        //           type="checkbox"
+        //           onChange={(e) => setSelectedReports(e.target.checked ? filteredReports.map(r => r.userReportId) : [])}
+        //           checked={selectedReports.length === filteredReports.length}
+        //         />
+        //       </th> */}
+        //       <th className="px-4 py-2 border-b">Ticket</th>
+        //       <th className="px-4 py-2 border-b">Asset</th>
+        //       {/* <th className="px-4 py-2 border-b">Asset.No</th> */}
+        //       <th className="px-4 py-2 border-b">Summary</th>
+        //       <th className="px-4 py-2 border-b">Reporter</th>
+        //       <th className="px-4 py-2 border-b">Location</th>
+        //       <th className="px-4 py-2 border-b">Assignee</th>
+        //       <th className="px-4 py-2 border-b">Image</th>
+        //       <th className="px-4 py-2 border-b">Status</th>
+        //       <th className="px-4 py-2 border-b">Criticality</th>
+        //       <th className="px-4 py-2 border-b">Duration</th>
+        //       <th className="px-4 py-2 border-b">Date</th>
+        //       <th className="px-4 py-2 border-b">Time</th>
 
 
-              {/* <th className="px-4 py-2 border-b">Urgency</th> */}
-            </tr>
-          </thead>
-          <tbody className="text-left">
-            {filteredReports.map((report) => (
-              <tr key={report.userReportId} className="bg-white hover:bg-gray-100">
-                {/* <td className="px-4 py-2 border-b">
-                  <input
-                    type="checkbox"
-                    checked={selectedReports.includes(report.userReportId)}
-                    onChange={() => toggleReportSelection(report.userReportId)}
-                  />
-                </td> */}
-                <td className="px-4 py-2 border-b">
-                  <div className="font-semibold text-gray-700 cursor-pointer">
-                    {report.userReportId}
-                  </div>
-                </td>
-                <td className="px-4 py-2 border-b">
-                  <div className="font-semibold text-sky-600 cursor-pointer">
-                    {report.assetNo || report.assetName ? (
-                      <>
-                        {report.assetNo}
-                        <div className="text-sm text-gray-500 mt-1">
-                          {report.assetName}
-                        </div>
-                      </>
-                    ) : (
-                      <span className="text-gray-700 font-bold">X</span>
-                    )}
-                  </div>
-                </td>
+        //       {/* <th className="px-4 py-2 border-b">Urgency</th> */}
+        //     </tr>
+        //   </thead>
+        //   <tbody className="text-left">
+        //     {filteredReports.map((report) => (
+        //       <tr key={report.userReportId} className="bg-white hover:bg-gray-100">
+        //         {/* <td className="px-4 py-2 border-b">
+        //           <input
+        //             type="checkbox"
+        //             checked={selectedReports.includes(report.userReportId)}
+        //             onChange={() => toggleReportSelection(report.userReportId)}
+        //           />
+        //         </td> */}
+        //         <td className="px-4 py-2 border-b">
+        //           <div className="font-semibold text-gray-700 cursor-pointer">
+        //             {report.userReportId}
+        //           </div>
+        //         </td>
+        //         <td className="px-4 py-2 border-b">
+        //           <div className="font-semibold text-sky-600 cursor-pointer">
+        //             {report.assetNo || report.assetName ? (
+        //               <>
+        //                 {report.assetNo}
+        //                 <div className="text-sm text-gray-500 mt-1">
+        //                   {report.assetName}
+        //                 </div>
+        //               </>
+        //             ) : (
+        //               <span className="text-gray-700 font-bold">X</span>
+        //             )}
+        //           </div>
+        //         </td>
 
 
-                <td className="px-4 py-2 border-b font-semibold text-gray-700 relative group">
-                  {report.reportDescription ? (
-                    <>
-                      {/* Display truncated description */}
-                      <span>
-                        {report.reportDescription.length > 25
-                          ? `${report.reportDescription.substring(0, 25)}...`
-                          : report.reportDescription}
-                      </span>
+        //         <td className="px-4 py-2 border-b font-semibold text-gray-700 relative group">
+        //           {report.reportDescription ? (
+        //             <>
+        //               {/* Display truncated description */}
+        //               <span>
+        //                 {report.reportDescription.length > 25
+        //                   ? `${report.reportDescription.substring(0, 25)}...`
+        //                   : report.reportDescription}
+        //               </span>
 
-                      {/* Tooltip for full description */}
-                      <div className="absolute hidden group-hover:block z-10 bg-gray-800 text-white text-sm rounded p-2 shadow-lg max-w-sm w-auto">
-                        {report.reportDescription}
-                      </div>
-                    </>
-                  ) : (
-                    <span className="text-gray-700 font-bold">X</span>
-                  )}
-                </td>
-                <td className="px-4 py-2 border-b font-semibold text-gray-700">
-                  {report.userId ? report.userId : <span className="text-gray-700 font-bold">X</span>}
-                </td>
-                <td className="px-4 py-2 border-b font-semibold text-gray-700">
-                  {report.subLocationName ? report.subLocationName : <span className="text-gray-700 font-bold">X</span>}
-                </td>
+        //               {/* Tooltip for full description */}
+        //               <div className="absolute hidden group-hover:block z-10 bg-gray-800 text-white text-sm rounded p-2 shadow-lg max-w-sm w-auto">
+        //                 {report.reportDescription}
+        //               </div>
+        //             </>
+        //           ) : (
+        //             <span className="text-gray-700 font-bold">X</span>
+        //           )}
+        //         </td>
+        //         <td className="px-4 py-2 border-b font-semibold text-gray-700">
+        //           {report.userId ? report.userId : <span className="text-gray-700 font-bold">X</span>}
+        //         </td>
+        //         <td className="px-4 py-2 border-b font-semibold text-gray-700">
+        //           {report.subLocationName ? report.subLocationName : <span className="text-gray-700 font-bold">X</span>}
+        //         </td>
 
-                <td className="px-4 py-2 border-b">
-                  <div
-                    className={`flex ${report.Assignee === 'Unassigned' ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} font-semibold`}
-                    onClick={report.Assignee === 'Unassigned' ? () => handleAssignClick(report.userReportId, report.userId) : undefined}
-                  >
-                    {/* User Icon */}
-                    <span className={`text-gray-700 p-1 mr-2 `}>
-                      <FaUser />
-                    </span>
+        //         <td className="px-4 py-2 border-b">
+        //           <div
+        //             className={`flex ${report.Assignee === 'Unassigned' ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} font-semibold`}
+        //             onClick={report.Assignee === 'Unassigned' ? () => handleAssignClick(report.userReportId, report.userId) : undefined}
+        //           >
+        //             {/* User Icon */}
+        //             <span className={`text-gray-700 p-1 mr-2 `}>
+        //               <FaUser />
+        //             </span>
 
-                    {/* Assignee Text */}
-                    <span className={report.Assignee === 'Unassigned' ? 'text-sky-600' : 'text-gray-900'}>
-                      {report.Assignee}
-                    </span>
+        //             {/* Assignee Text */}
+        //             <span className={report.Assignee === 'Unassigned' ? 'text-sky-600' : 'text-gray-900'}>
+        //               {report.Assignee}
+        //             </span>
 
-                    {report.Assignee === 'Unassigned' && (
-                      <span className="text-gray-700 p-1 mr-2">
-                        <FaArrowRight />
-                      </span>
-                    )}
-                  </div>
-                </td>
+        //             {report.Assignee === 'Unassigned' && (
+        //               <span className="text-gray-700 p-1 mr-2">
+        //                 <FaArrowRight />
+        //               </span>
+        //             )}
+        //           </div>
+        //         </td>
 
-                <td className="px-4 py-2 border-b text-center">
-                  {report.image ? (
-                    <button
-                      className="text-sky-600 font-semibold cursor-pointer hover:underline focus:outline-none focus:ring focus:ring-blue-300 transition-all"
-                      onClick={() => setSelectedImage(report.image)}
-                      title="Click to view the image"
-                    >
-                      <FaImage />
-                    </button>
-                  ) : (
-                    <span className="text-gray-700 font-bold">X</span>
-                  )}
-                </td>
+        //         <td className="px-4 py-2 border-b text-center">
+        //           {report.image ? (
+        //             <button
+        //               className="text-sky-600 font-semibold cursor-pointer hover:underline focus:outline-none focus:ring focus:ring-blue-300 transition-all"
+        //               onClick={() => setSelectedImage(report.image)}
+        //               title="Click to view the image"
+        //             >
+        //               <FaImage />
+        //             </button>
+        //           ) : (
+        //             <span className="text-gray-700 font-bold">X</span>
+        //           )}
+        //         </td>
 
-                <td className="px-4 py-2 border-b whitespace-nowrap">
-                  <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getStatusClass(report.status)}`}>
-                    {report.status}
-                  </span>
-                </td>
+        //         <td className="px-4 py-2 border-b whitespace-nowrap">
+        //           <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getStatusClass(report.status)}`}>
+        //             {report.status}
+        //           </span>
+        //         </td>
 
-                <td className="px-4 py-2 border-b whitespace-nowrap">
-                  <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getCritClass(report.incidentCriticalityLevel)}`}>
-                    {report.incidentCriticalityLevel}
-                  </span>
-                </td>
+        //         <td className="px-4 py-2 border-b whitespace-nowrap">
+        //           <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getCritClass(report.incidentCriticalityLevel)}`}>
+        //             {report.incidentCriticalityLevel}
+        //           </span>
+        //         </td>
 
-                <td className="px-4 py-2 border-b font-semibold">
-                  {report.duration
-                    ? `${report.duration} hrs` // Display formatted date
-                    : <span className="text-gray-700 font-bold">X</span>}
-                </td>
-                <td className="px-4 py-2 border-b font-semibold">
-                  {report.dateTime
-                    ? formatDate(report.dateTime).date // Display formatted date
-                    : <span className="text-gray-700 font-bold">X</span>}
-                </td>
-                <td className="px-4 py-2 border-b font-semibold">
-                  {report.dateTime
-                    ? `${report.dateTime.split(' ')[1]} ${report.dateTime.split(' ')[2]}` // Extract and display the time and period
-                    : <span className="text-gray-700 font-bold">X</span>}
-                </td>
-
-
-
+        //         <td className="px-4 py-2 border-b font-semibold">
+        //           {report.duration
+        //             ? `${report.duration} hrs` // Display formatted date
+        //             : <span className="text-gray-700 font-bold">X</span>}
+        //         </td>
+        //         <td className="px-4 py-2 border-b font-semibold">
+        //           {report.dateTime
+        //             ? formatDate(report.dateTime).date // Display formatted date
+        //             : <span className="text-gray-700 font-bold">X</span>}
+        //         </td>
+        //         <td className="px-4 py-2 border-b font-semibold">
+        //           {report.dateTime
+        //             ? `${report.dateTime.split(' ')[1]} ${report.dateTime.split(' ')[2]}` // Extract and display the time and period
+        //             : <span className="text-gray-700 font-bold">X</span>}
+        //         </td>
 
 
 
-              </tr>
 
-            ))}
-          </tbody>
 
-        </table>
+
+        //       </tr>
+
+        //     ))}
+        //   </tbody>
+
+        // </table>
+        <Table
+          dataSource={filteredReports}
+          columns={columns}
+          rowKey="userReportId"
+          pagination={{ pageSize: 10 }}
+        />
       ) : (
 
         <div className="flex items-center justify-center h-64">
