@@ -66,7 +66,7 @@ const UserTopNav = ({ children }) => {
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center bg-primary text-white text-md font-medium`}
               >
-                {user.email.charAt(0).toUpperCase()}
+              {user.role === 'action_team' ? 'T' : user.role.charAt(0).toUpperCase()}
               </div>
             </button>
 
@@ -90,7 +90,7 @@ const UserTopNav = ({ children }) => {
                 </button>
               </div>
             )}
-            </div>
+          </div>
 
 
           <button

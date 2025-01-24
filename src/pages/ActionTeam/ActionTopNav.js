@@ -34,6 +34,16 @@ const ActionTopNav = ({ children }) => {
 
   const isActive = (path) => location.pathname === path;
 
+  const [showProfileCard, setShowProfileCard] = useState(false);
+  const toggleProfileCard = () => setShowProfileCard((prev) => !prev);
+
+  const user = {
+    name: localStorage.getItem('userName'),
+    email: localStorage.getItem('userId'),
+    role: localStorage.getItem('role')
+  };
+
+
 
 
   return (
@@ -51,7 +61,42 @@ const ActionTopNav = ({ children }) => {
         </div>
 
         {/* Hamburger Menu Button */}
-        <div className="flex md:hidden">
+        <div className="flex md:hidden gap-2">
+          <div className="relative">
+            <button
+              className="p-2 rounded-full hover:bg-gray-200 transition"
+              onClick={toggleProfileCard}
+            >
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center bg-primary text-white text-md font-medium`}
+              >
+              {user.role === 'action_team' ? 'T' : user.role.charAt(0).toUpperCase()}
+              </div>
+            </button>
+
+            {/* Profile Details Card */}
+            {showProfileCard && (
+              <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
+                <h3 className="text-lg font-semibold">{user.email}</h3>
+                {/* <p className="text-sm text-gray-600">{user.email}</p> */}
+                <p className="text-sm text-gray-600">Role: {user.role}</p>
+                <button
+                  onClick={() => {
+                    setShowLogoutConfirm(true);
+                  }}
+                  className="mt-1 px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded hover:text-red-500 transition"
+                >
+                  <span className="flex gap-2 items-center justify-center">
+                    <FaPowerOff />
+                    <p>Logout</p>
+                  </span>
+
+                </button>
+              </div>
+            )}
+          </div>
+
+
           <button
             className="p-2 rounded-full hover:bg-gray-200 transition"
             onClick={toggleMenu}
@@ -87,15 +132,39 @@ const ActionTopNav = ({ children }) => {
         </div>
 
         <div className="hidden md:flex items-center gap-4 w-auto justify-end">
+          <div className="relative">
+            <button
+              className="p-2 rounded-full hover:bg-gray-200 transition"
+              onClick={toggleProfileCard}
+            >
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center bg-primary text-white text-md font-medium`}
+              >
+              {user.role === 'action_team' ? 'T' : user.role.charAt(0).toUpperCase()}
+              </div>
+            </button>
 
-          <span
-            onClick={() => setShowLogoutConfirm(true)}
-            className="relative cursor-pointer hover:text-red-500 rounded-full group"
-          >
-            <FaPowerOff />
-            <span className="absolute top-full right-0 mt-2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition">
-              Logout</span>
-          </span>
+            {/* Profile Details Card */}
+            {showProfileCard && (
+              <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
+                <h3 className="text-lg font-semibold">{user.email}</h3>
+                {/* <p className="text-sm text-gray-600">{user.email}</p> */}
+                <p className="text-sm text-gray-600">Role: {user.role}</p>
+                <button
+                  onClick={() => {
+                    setShowLogoutConfirm(true);
+                  }}
+                  className="mt-1 px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded hover:text-red-500 transition"
+                >
+                  <span className="flex gap-2 items-center justify-center">
+                    <FaPowerOff />
+                    <p>Logout</p>
+                  </span>
+
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {showLogoutConfirm && (

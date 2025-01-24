@@ -132,6 +132,40 @@ const TopNav = ({ teams, fetchTeams }) => {
 
       {/* Hamburger Menu Button */}
       <div className="flex md:hidden">
+        <div className="relative">
+          <button
+            className="p-2 rounded-full hover:bg-gray-200 transition"
+            onClick={toggleProfileCard}
+          >
+            <div
+              className={`w-7 h-7 rounded-full flex items-center justify-center bg-primary text-white text-md font-medium`}
+            >
+              {user.role === 'action_team' ? 'T' : user.role.charAt(0).toUpperCase()}
+            </div>
+          </button>
+
+          {/* Profile Details Card */}
+          {showProfileCard && (
+            <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
+              <h3 className="text-lg font-semibold">{user.email}</h3>
+              {/* <p className="text-sm text-gray-600">{user.email}</p> */}
+              <p className="text-sm text-gray-600">Role: {user.role}</p>
+              <button
+                onClick={() => {
+                  setShowLogoutConfirm(true);
+                }}
+                className="mt-1 px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded hover:text-red-500 transition"
+              >
+                <span className="flex gap-2 items-center justify-center">
+                  <FaPowerOff />
+                  <p>Logout</p>
+                </span>
+
+              </button>
+            </div>
+          )}
+        </div>
+
         <button className="p-2 rounded-full hover:bg-gray-200 transition" onClick={toggleMenu}>
           {isMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
         </button>
@@ -196,7 +230,7 @@ const TopNav = ({ teams, fetchTeams }) => {
             <div
               className={`w-7 h-7 rounded-full flex items-center justify-center bg-primary text-white text-md font-medium`}
             >
-              {user.email.charAt(0).toUpperCase()}
+              {user.role === 'action_team' ? 'T' : user.role.charAt(0).toUpperCase()}
             </div>
           </button>
 
