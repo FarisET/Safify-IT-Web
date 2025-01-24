@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaList, FaPen, FaQuestion, FaQuestionCircle, FaResolving, FaRoad, FaStepForward } from 'react-icons/fa';
+import { Table, Tooltip, Button } from 'antd';
+
 import constants from '../../const';
 const SolutionForum = () => {
   const [forumEntries, setForumEntries] = useState([]);
@@ -65,8 +67,81 @@ const SolutionForum = () => {
   </div>;
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
 
+  const columns = [
+    {
+      title: 'ID',
+      key: 'id',
+      dataIndex: 'id',
+      render: (_, __, index) => <span className="">{index + 1}</span>,
+    },
+    {
+      title: '⚠️ Problem',
+      key: 'problem',
+      dataIndex: 'Problem',
+      render: (problem) => (
+        <span className="text-gray-700">{problem || 'N/A'}</span>
+      ),
+    },
+    {
+      title: '💡 Solution',
+      key: 'solution',
+      dataIndex: 'Solution',
+      render: (solution) => (
+        <span className="text-gray-700">{solution || 'N/A'}</span>
+      ),
+    },
+    {
+      title: 'Asset',
+      key: 'asset',
+      render: (_, record) => (
+        <div>
+          {record['Asset Number'] !== 'No asset number specified' ||
+            record['Asset Name'] !== 'No asset name specified' ? (
+            <div>
+              <span className="text-sky-600">{record['Asset Number']}</span>
+              <div className="text-sm text-gray-500">{record['Asset Name']}</div>
+            </div>
+          ) : (
+            <span className="text-gray-700 font-bold">X</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: 'Reported Time',
+      key: 'reportedTime',
+      dataIndex: 'Reported Time',
+      render: (time) => (
+        <span className="text-gray-700">{time || 'N/A'}</span>
+      ),
+    },
+    {
+      title: (
+        <div className="flex items-center">
+          Steps
+          <Tooltip title="Steps taken by the investigator to solve the issue">
+            <FaQuestionCircle className="ml-2 text-gray-500 text-sm hover:text-sky-500" />
+          </Tooltip>
+        </div>
+      ),
+      key: 'steps',
+      render: (_, record) =>
+        record.steps && record.steps.length > 0 ? (
+          <Button
+            type="link"
+            onClick={() => handleStepsClick(record.steps)}
+            icon={<FaList className="text-sky-600" />}
+          />
+        ) : (
+          <div className="flex justify-left items-left h-full">
+            <span className="ml-2 text-gray-700 font-bold">X</span>
+          </div>
+        ),
+    },
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       <h2 className="text-2xl font-semibold mb-4 text-left">Solution Forum</h2>
 
       <div className="flex items-center justify-between mb-4">
@@ -83,7 +158,7 @@ const SolutionForum = () => {
         {filteredEntries.length} forum entr{filteredEntries.length !== 1 ? 'ies' : 'y'}
       </div>
 
-      <table className="table-auto w-full shadow-lg rounded-md overflow-hidden">
+      {/* <table className="table-auto w-full shadow-lg rounded-md overflow-hidden">
         <thead className="text-black text-left">
           <tr>
             <th className="px-4 py-2 border-b">ID</th>
@@ -142,7 +217,15 @@ const SolutionForum = () => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table> */}
+      <Table
+        columns={columns}
+        dataSource={filteredEntries.map((item, index) => ({ ...item, id: index + 1 }))}
+        rowKey={(record) => record['Ticket ID']}
+        pagination={{ pageSize: 10 }}
+        bordered
+        className="shadow-lg rounded-md"
+      />
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">

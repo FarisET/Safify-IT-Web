@@ -235,7 +235,7 @@ const ApprovedReports = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       <h2 className="text-2xl font-semibold mb-4 text-left">Approved Reports</h2>
 
       <div className="flex items-center justify-between mb-4">
@@ -322,7 +322,7 @@ const ApprovedReports = () => {
           expandedRowRender={record => <p style={{ margin: 0 }}>
             <div>
               <span className="block text-gray-800">⚠️ Problem: {record.reportDescription}</span>
-              <span className="block text-gray-500 text-sm">💬Solution: {record.resolutionDescription}</span>
+              <span className="block text-gray-500 text-sm">💬Comment: {record.resolutionDescription}</span>
             </div>
 
           </p>}

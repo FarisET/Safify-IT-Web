@@ -337,7 +337,7 @@ const Approvals = () => {
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       <h2 className="text-2xl font-semibold mb-4 text-left">Approvals</h2>
 
       <div className="flex items-center justify-between mb-4">

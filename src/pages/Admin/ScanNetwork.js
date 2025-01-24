@@ -374,7 +374,7 @@ const ScanNetwork = () => {
     ];
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="mx-auto px-4 py-8">
             <h4 className="text-2xl font-semibold mb-4 text-left">Scan Network</h4>
 
             <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>

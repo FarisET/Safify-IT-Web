@@ -7,7 +7,7 @@ import { formatDate } from '../../utils/date';
 import { FaCircleExclamation } from 'react-icons/fa6';
 import { Select } from 'antd';
 import constants from '../../const';
-import { Table, Tooltip, Button } from 'antd';
+import { Table, Icon, Switch, Radio, Form, Divider, Tooltip, Button, InputNumber} from 'antd';
 
 const Incidents = () => {
   const [userReports, setUserReports] = useState([]);
@@ -47,6 +47,14 @@ const Incidents = () => {
   const [isDeleteLoading, setisDeleteLoading] = useState(false);
   const [DeleteError, setDeleteError] = useState('');
   const [DeleteMsg, setDeleteMsg] = useState('');
+
+  //Table options
+  const [bordered, setBordered] = useState(false);
+  const [size, setSize] = useState('default');
+  const [pagination, setPagination] = useState({ position: 'top', pageSize: 10 });
+  const [showHeader, setFixedHeader] = useState(true);
+  const [scroll, setScroll] = useState(undefined);
+
 
 
 
@@ -95,7 +103,7 @@ const Incidents = () => {
       setSelectedRowToggle(false); // Hide buttons
     }
   };
-  
+
   const rowSelection = {
     type: 'checkbox',
     selectedRowKeys,
@@ -103,7 +111,7 @@ const Incidents = () => {
     onSelect, // Trigger selection logic
   };
 
-  
+
 
   const handleRowDoubleClick = (row) => {
     if (selectedRow?.userReportId === row.userReportId) {
@@ -117,7 +125,7 @@ const Incidents = () => {
     }
   };
 
-  
+
 
 
   const handleAssignClick = (reportId, userId) => {
@@ -359,6 +367,47 @@ const Incidents = () => {
     }
   };
 
+  const state = {
+    bordered: false,
+    loading: false,
+    pagination,
+    size: 'default',
+    title: undefined,
+    showHeader: true,
+    rowSelection: {},
+    scroll: undefined,
+    hasData: true,
+    tableLayout: undefined,
+  };
+
+
+  const handleSizeChange = (e) => {
+    setSize(e.target.value);
+  };
+
+  const handlePaginationChange = (e) => {
+    const { value } = e.target;
+    setPagination(value === 'none' ? false : { ...pagination, position: value });
+  };
+
+  const handlePageSizeChange = (value) => {
+    setPagination((prev) => ({ ...prev, pageSize: value }));
+  };
+
+  const handleFixedHeaderChange = (enabled) => {
+    setFixedHeader(enabled);
+  };
+
+
+  const handleScrollChange = (enable) => {
+    setScroll(enable ? { y: 480 } : undefined);
+  };
+
+
+
+
+
+
 
   const columns = [
     {
@@ -380,8 +429,8 @@ const Incidents = () => {
             </>
           ) : (
             <div className="flex justify-center items-center h-full">
-            <span className="text-gray-700 font-bold">X</span>
-          </div>
+              <span className="text-gray-700 font-bold">X</span>
+            </div>
           )}
         </div>
       ),
@@ -403,19 +452,19 @@ const Incidents = () => {
       dataIndex: 'userId',
       key: 'reporter',
       render: (text) => text ||
-      <div className="flex justify-center items-center h-full">
-      <span className="text-gray-700 font-bold">X</span>
-    </div>
-},
+        <div className="flex justify-center items-center h-full">
+          <span className="text-gray-700 font-bold">X</span>
+        </div>
+    },
     {
       title: 'Location',
       dataIndex: 'subLocationName',
       key: 'location',
       render: (text) => text ||
-      <div className="flex justify-center items-center h-full">
-      <span className="text-gray-700 font-bold">X</span>
-    </div>
-},
+        <div className="flex justify-center items-center h-full">
+          <span className="text-gray-700 font-bold">X</span>
+        </div>
+    },
     {
       title: 'Team',
       dataIndex: 'Assignee',
@@ -451,10 +500,10 @@ const Incidents = () => {
             <FaImage />
           </Button>
         ) : (
-          <div className="flex justify-center items-center h-full">
+          <div className="flex justify-left items-left ml-4 h-full">
             <span className="text-gray-700 font-bold">X</span>
           </div>
-          )
+        )
       ),
     },
     {
@@ -482,35 +531,28 @@ const Incidents = () => {
       dataIndex: 'dateTime',
       key: 'date',
       render: (text) => (
-        text ? formatDate(text).date : 
-        <div className="flex justify-center items-center h-full">
-        <span className="text-gray-700 font-bold">X</span>
-      </div>
-  ),
+        text ? formatDate(text).date :
+          <div className="flex justify-center items-center h-full">
+            <span className="text-gray-700 font-bold">X</span>
+          </div>
+      ),
     },
     {
       title: 'Time',
       dataIndex: 'dateTime',
       key: 'time',
       render: (text) => (
-        text ? `${text.split(' ')[1]} ${text.split(' ')[2]}` : 
-        <div className="flex justify-center items-center h-full">
-        <span className="text-gray-700 font-bold">X</span>
-      </div>
-  ),
+        text ? `${text.split(' ')[1]} ${text.split(' ')[2]}` :
+          <div className="flex justify-center items-center h-full">
+            <span className="text-gray-700 font-bold">X</span>
+          </div>
+      ),
     },
   ];
 
 
-
-
-
-
-
-
-
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       <h2 className="text-2xl font-semibold mb-4 text-left">Tickets</h2>
 
 
@@ -595,29 +637,52 @@ const Incidents = () => {
 
       {/* Table to display reports */}
       {filteredReports.length != 0 ? (
-        // <Table
-        //   dataSource={filteredReports}
-        //   columns={columns}
-        //   rowKey="userReportId"
-        //   rowSelection={rowSelection} // Enable row selection
-        //   onRow={(record) => ({
-        //     onDoubleClick: () => {
-        //       handleRowDoubleClick(record);
-        //       setSelectedRowKeys([record.userReportId]);
-        //     }
-        //   })}
-        //   pagination={{ pageSize: 10 }}
-        // />
-
-
-        <Table
-          dataSource={filteredReports}
-          columns={columns}
-          rowKey="userReportId"
-          rowSelection={rowSelection}
-          pagination={{ pageSize: 10 }}
-        />
-
+        <div>
+          <Form layout="inline" style={{ marginBottom: 16 }}>
+            <Form.Item label="Bordered">
+              <Switch checked={bordered} onChange={setBordered} />
+            </Form.Item>
+            <Form.Item label="Size">
+              <Radio.Group value={size} onChange={handleSizeChange}>
+                <Radio.Button value="default">Default</Radio.Button>
+                <Radio.Button value="middle">Middle</Radio.Button>
+                <Radio.Button value="small">Small</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+            {/* <Form.Item label="Pagination">
+              <Radio.Group
+                value={pagination ? pagination.position : 'none'}
+                onChange={handlePaginationChange}
+              >
+                <Radio.Button value="top">Top</Radio.Button>
+                <Radio.Button value="bottom">Bottom</Radio.Button>
+                <Radio.Button value="both">Both</Radio.Button>
+                <Radio.Button value="none">None</Radio.Button>
+              </Radio.Group>
+            </Form.Item> */}
+            <Form.Item label="Page Size">
+              <InputNumber
+                min={1}
+                max={100}
+                value={pagination?.pageSize}
+                onChange={handlePageSizeChange}
+              />
+            </Form.Item>
+            <Form.Item label="Fixed Header">
+              <Switch checked={!!scroll} onChange={handleScrollChange} />
+            </Form.Item>
+          </Form>
+          <Table
+            columns={columns}
+            dataSource={filteredReports}
+            rowKey="userReportId"
+            bordered={bordered}
+            size={size}
+            scroll={scroll}
+            pagination={pagination}
+            showHeader={showHeader}
+          />
+        </div>
       ) : (
 
         <div className="flex items-center justify-center h-64">
