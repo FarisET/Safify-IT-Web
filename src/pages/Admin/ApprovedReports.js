@@ -5,6 +5,8 @@ import Report from '../../models/ActionReport';  // Adjust path as necessary
 import { formatDate } from '../../utils/date';
 import { FaChevronDown, FaCheck, FaTrash, FaImage } from 'react-icons/fa';
 import constants from '../../const';
+import { Table, Button } from 'antd';
+
 const ApprovedReports = () => {
   const [actionReports, setactionReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -149,6 +151,89 @@ const ApprovedReports = () => {
   </div>;
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
 
+
+  const columns = [
+    {
+      title: 'Ticket',
+      dataIndex: 'userReportId',
+      key: 'userReportId',
+    },
+    {
+      title: 'Asset',
+      dataIndex: 'assetName',
+      key: 'assetName',
+    },
+    {
+      title: 'Summary',
+      key: 'summary',
+      ellipsis: true,
+      key: 'reportDescription',
+      dataIndex: 'reportDescription'
+    },
+    {
+      title: 'Assignee',
+      dataIndex: 'reportedBy',
+      key: 'reportedBy',
+    },
+    {
+      title: 'Team',
+      dataIndex: 'actionTeamName',
+      key: 'actionTeamName',
+    },
+    {
+      title: 'Image',
+      key: 'proofImage',
+      render: (_, record) =>
+        record.proofImage ? (
+          <div
+            className="flex items-center justify-center text-gray-700 font-bold"
+            style={{ height: '100%', minHeight: '32px' }}
+          >
+            <Button
+              type="link"
+              className="text-sky-600 "
+              onClick={() => setSelectedImage(record.proofImage)}
+              title="Click to view the image"
+            >
+              <FaImage />
+            </Button>
+          </div>
+        ) : (
+          <div
+            className="flex items-center justify-center text-gray-700 font-bold"
+            style={{ height: '100%', minHeight: '32px' }}
+          >
+            X
+          </div>
+        ),
+    },
+    {
+      title: 'Status',
+      key: 'status',
+      render: (_, record) => (
+        <span
+          className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getStatusClass(record.status)}`}
+        >
+          {record.status}
+        </span>
+      ),
+    },
+    {
+      title: 'Date',
+      key: 'date',
+      render: (_, record) =>
+        record.dateTime ? formatDate(record.dateTime).date : 'X',
+    },
+    {
+      title: 'Time',
+      key: 'time',
+      render: (_, record) =>
+        record.dateTime
+          ? `${record.dateTime.split(' ')[1]} ${record.dateTime.split(' ')[2]}`
+          : 'X',
+    },
+  ];
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-semibold mb-4 text-left">Approved Reports</h2>
@@ -170,66 +255,83 @@ const ApprovedReports = () => {
 
       {/* Table to display reports */}
       {filteredReports.length != 0 ? (
-        <table className="table-auto w-full border-collapse shadow-lg rounded-md">
-          <thead className="bg-blue-600 text-black text-left">
-            <tr>
-              <th className="px-4 py-2 border-b">Ticket</th>
-              <th className="px-4 py-2 border-b">Asset</th>
-              <th className="px-4 py-2 border-b">Summary</th>
-              <th className="px-4 py-2 border-b">Assignee</th>
-              <th className="px-4 py-2 border-b">Action Team</th>
-              <th className="px-4 py-2 border-b">Image</th>
-              <th className="px-4 py-2 border-b">Status</th>
-              <th className="px-4 py-2 border-b">Date</th>
-              <th className="px-4 py-2 border-b">Time</th>
-            </tr>
-          </thead>
-          <tbody className="text-left">
-            {filteredReports.map((report) => (
-              <tr key={report.userReportId} className="bg-white hover:bg-gray-100">
-                <td className="px-4 py-2 border-b">{report.userReportId}</td>
-                <td className="px-4 py-2 border-b">{report.assetName}</td>
-                <td className="px-4 py-2 border-b font-semibold text-gray-700">
-                  <span className="block text-gray-800">⚠️ {report.reportDescription}</span>
-                  <span className="block text-gray-500 text-sm">💬 {report.resolutionDescription}</span>
-                </td>
-                <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportedBy}</td>
-                <td className="px-4 py-2 border-b">{report.actionTeamName}</td>
-                <td className="px-4 py-2 border-b text-center">
-                  {report.proofImage ? (
-                    <button
-                      className="text-sky-600 font-semibold cursor-pointer hover:underline focus:outline-none focus:ring focus:ring-blue-300 transition-all"
-                      onClick={() => setSelectedImage(report.proofImage)}
-                      title="Click to view the image"
-                    >
-                      <FaImage />
-                    </button>
-                  ) : (
-                    <span className="text-gray-700 font-bold">X</span>
-                  )}
-                </td>
-                <td
-                  className={`px-4 py-2 border-b whitespace-nowrap`}
-                >
-                  <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getStatusClass(report.status)}`}>
-                    {report.status}
-                  </span>
-                </td>
-                <td className="px-4 py-2 border-b font-semibold">
-                  {report.dateTime
-                    ? formatDate(report.dateTime).date // Display formatted date
-                    : <span className="text-gray-700 font-bold">X</span>}
-                </td>
-                <td className="px-4 py-2 border-b font-semibold">
-                  {report.dateTime
-                    ? `${report.dateTime.split(' ')[1]} ${report.dateTime.split(' ')[2]}` // Extract and display the time and period
-                    : <span className="text-gray-700 font-bold">X</span>}
-                </td>
+        // <table className="table-auto w-full border-collapse shadow-lg rounded-md">
+        //   <thead className="bg-blue-600 text-black text-left">
+        //     <tr>
+        //       <th className="px-4 py-2 border-b">Ticket</th>
+        //       <th className="px-4 py-2 border-b">Asset</th>
+        //       <th className="px-4 py-2 border-b">Summary</th>
+        //       <th className="px-4 py-2 border-b">Assignee</th>
+        //       <th className="px-4 py-2 border-b">Action Team</th>
+        //       <th className="px-4 py-2 border-b">Image</th>
+        //       <th className="px-4 py-2 border-b">Status</th>
+        //       <th className="px-4 py-2 border-b">Date</th>
+        //       <th className="px-4 py-2 border-b">Time</th>
+        //     </tr>
+        //   </thead>
+        //   <tbody className="text-left">
+        //     {filteredReports.map((report) => (
+        //       <tr key={report.userReportId} className="bg-white hover:bg-gray-100">
+        //         <td className="px-4 py-2 border-b">{report.userReportId}</td>
+        //         <td className="px-4 py-2 border-b">{report.assetName}</td>
+        //         <td className="px-4 py-2 border-b font-semibold text-gray-700">
+        //           <span className="block text-gray-800">⚠️ {report.reportDescription}</span>
+        //           <span className="block text-gray-500 text-sm">💬 {report.resolutionDescription}</span>
+        //         </td>
+        //         <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportedBy}</td>
+        //         <td className="px-4 py-2 border-b">{report.actionTeamName}</td>
+        //         <td className="px-4 py-2 border-b text-center">
+        //           {report.proofImage ? (
+        //             <button
+        //               className="text-sky-600 font-semibold cursor-pointer hover:underline focus:outline-none focus:ring focus:ring-blue-300 transition-all"
+        //               onClick={() => setSelectedImage(report.proofImage)}
+        //               title="Click to view the image"
+        //             >
+        //               <FaImage />
+        //             </button>
+        //           ) : (
+        //             <span className="text-gray-700 font-bold">X</span>
+        //           )}
+        //         </td>
+        //         <td
+        //           className={`px-4 py-2 border-b whitespace-nowrap`}
+        //         >
+        //           <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getStatusClass(report.status)}`}>
+        //             {report.status}
+        //           </span>
+        //         </td>
+        //         <td className="px-4 py-2 border-b font-semibold">
+        //           {report.dateTime
+        //             ? formatDate(report.dateTime).date // Display formatted date
+        //             : <span className="text-gray-700 font-bold">X</span>}
+        //         </td>
+        //         <td className="px-4 py-2 border-b font-semibold">
+        //           {report.dateTime
+        //             ? `${report.dateTime.split(' ')[1]} ${report.dateTime.split(' ')[2]}` // Extract and display the time and period
+        //             : <span className="text-gray-700 font-bold">X</span>}
+        //         </td>
 
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        //       </tr>
+        //     ))}
+        //   </tbody>
+        // </table>
+        <Table
+          dataSource={filteredReports}
+          columns={columns}
+          rowKey="userReportId"
+          expandedRowRender={record => <p style={{ margin: 0 }}>
+            <div>
+              <span className="block text-gray-800">⚠️ Problem: {record.reportDescription}</span>
+              <span className="block text-gray-500 text-sm">💬Solution: {record.resolutionDescription}</span>
+            </div>
+
+          </p>}
+          pagination={{
+            pageSize: 10,
+          }}
+          bordered
+          className="shadow-lg rounded-md"
+        />
       ) : (
         <div className="flex items-center justify-center h-64">
           <div className="text-center">

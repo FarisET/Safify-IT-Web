@@ -379,7 +379,9 @@ const Incidents = () => {
               <div className="text-sm text-gray-500 mt-1">{record.assetName}</div>
             </>
           ) : (
+            <div className="flex justify-center items-center h-full">
             <span className="text-gray-700 font-bold">X</span>
+          </div>
           )}
         </div>
       ),
@@ -400,14 +402,20 @@ const Incidents = () => {
       title: 'Reporter',
       dataIndex: 'userId',
       key: 'reporter',
-      render: (text) => text || <span className="text-gray-700 font-bold">X</span>,
-    },
+      render: (text) => text ||
+      <div className="flex justify-center items-center h-full">
+      <span className="text-gray-700 font-bold">X</span>
+    </div>
+},
     {
       title: 'Location',
       dataIndex: 'subLocationName',
       key: 'location',
-      render: (text) => text || <span className="text-gray-700 font-bold">X</span>,
-    },
+      render: (text) => text ||
+      <div className="flex justify-center items-center h-full">
+      <span className="text-gray-700 font-bold">X</span>
+    </div>
+},
     {
       title: 'Team',
       dataIndex: 'Assignee',
@@ -445,7 +453,8 @@ const Incidents = () => {
         ) : (
           <div className="flex justify-center items-center h-full">
             <span className="text-gray-700 font-bold">X</span>
-          </div>)
+          </div>
+          )
       ),
     },
     {
@@ -473,16 +482,22 @@ const Incidents = () => {
       dataIndex: 'dateTime',
       key: 'date',
       render: (text) => (
-        text ? formatDate(text).date : <span className="text-gray-700 font-bold">X</span>
-      ),
+        text ? formatDate(text).date : 
+        <div className="flex justify-center items-center h-full">
+        <span className="text-gray-700 font-bold">X</span>
+      </div>
+  ),
     },
     {
       title: 'Time',
       dataIndex: 'dateTime',
       key: 'time',
       render: (text) => (
-        text ? `${text.split(' ')[1]} ${text.split(' ')[2]}` : <span className="text-gray-700 font-bold">X</span>
-      ),
+        text ? `${text.split(' ')[1]} ${text.split(' ')[2]}` : 
+        <div className="flex justify-center items-center h-full">
+        <span className="text-gray-700 font-bold">X</span>
+      </div>
+  ),
     },
   ];
 

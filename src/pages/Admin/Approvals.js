@@ -4,6 +4,9 @@ import { formatDistanceToNow } from 'date-fns';
 import Report from '../../models/ActionReport';  // Adjust path as necessary
 import { formatDate } from '../../utils/date';
 import { FaChevronDown, FaCheck, FaTrash, FaImage } from 'react-icons/fa';
+import { Table, Button, Dropdown, Menu } from 'antd';
+
+
 import constants from '../../const';
 const Approvals = () => {
   const [actionReports, setactionReports] = useState([]);
@@ -142,6 +145,141 @@ const Approvals = () => {
     setModalSuccess('');
   };
 
+  const columns = [
+    {
+      title: 'Ticket',
+      dataIndex: 'userReportId',
+      key: 'userReportId',
+    },
+    {
+      title: 'Asset',
+      dataIndex: 'assetName',
+      key: 'assetName',
+    },
+    {
+      title: 'Summary',
+      key: 'summary',
+      render: (_, record) => (
+        <div>
+          <span
+            title={record.reportDescription}
+            className="block text-gray-800 cursor-pointer"
+          >
+            ⚠️{' '}
+            {record.reportDescription.length > 25
+              ? `${record.reportDescription.substring(0, 25)}...`
+              : record.reportDescription}
+          </span>
+          <span
+            title={record.resolutionDescription}
+            className="block text-gray-500 text-sm cursor-pointer"
+          >
+            💬{' '}
+            {record.resolutionDescription.length > 25
+              ? `${record.resolutionDescription.substring(0, 25)}...`
+              : record.resolutionDescription}
+          </span>
+        </div>
+      ),
+    },
+    {
+      title: 'Assignee',
+      dataIndex: 'reportedBy',
+      key: 'reportedBy',
+    },
+    {
+      title: 'Team',
+      dataIndex: 'actionTeamName',
+      key: 'actionTeamName',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => (
+        <span className={`px-2 py-1 rounded text-sm font-bold ${getStatusClass(status)}`}>
+          {status}
+        </span>
+      ),
+    },
+    {
+      title: 'Image',
+      key: 'proofImage',
+      render: (_, record) =>
+        record.proofImage ? (
+          <Button
+            type="link"
+            className="text-sky-600"
+            onClick={() => setSelectedImage(record.proofImage)}
+          >
+            <FaImage/>
+          </Button>
+        ) : (
+          <div className="flex justify-center items-center h-full mr-3">
+            <span className="text-gray-700 font-bold">X</span>
+          </div>
+        ),
+    },
+    {
+      title: 'Date',
+      key: 'date',
+      render: (_, record) =>
+        record.dateTime ? formatDate(record.dateTime).date :
+          <div className="flex justify-center items-center h-full">
+            <span className="text-gray-700 font-bold">X</span>
+          </div>
+      ,
+    },
+    {
+      title: 'Time',
+      key: 'time',
+      render: (_, record) =>
+        record.dateTime
+          ? `${record.dateTime.split(' ')[1]} ${record.dateTime.split(' ')[2]}`
+          :
+          <div className="flex justify-center items-center h-full">
+            <span className="text-gray-700 font-bold">X</span>
+          </div>
+
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) =>
+        record.status.toLowerCase() === 'approval pending' ? (
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key="approve">
+                  <Button
+                    type="link"
+                    className="text-emerald-600"
+                    onClick={() => openModal('approve', record)}
+                  >
+                    Approve
+                  </Button>
+                </Menu.Item>
+                <Menu.Item key="reject">
+                  <Button
+                    type="link"
+                    className="text-red-600"
+                    onClick={() => openModal('reject', record)}
+                  >
+                    Reject
+                  </Button>
+                </Menu.Item>
+              </Menu>
+            }
+            trigger={['click']}
+          >
+            <Button className="flex items-center">
+              <FaChevronDown />
+            </Button>
+          </Dropdown>
+        ) : null,
+    },
+  ];
+
 
   const deleteActionReport = async (actionReportId) => {
     const jwtToken = localStorage.getItem('jwt');
@@ -218,113 +356,123 @@ const Approvals = () => {
 
       {/* Table to display reports */}
       {filteredReports.length != 0 ? (
-        <table className="table-auto w-full border-collapse shadow-lg rounded-md">
-          <thead className="bg-blue-600 text-black text-left">
-            <tr>
-              <th className="px-4 py-2 border-b">Ticket</th>
-              <th className="px-4 py-2 border-b">Asset</th>
-              <th className="px-4 py-2 border-b">Summary</th>
-              <th className="px-4 py-2 border-b">Assignee</th>
-              <th className="px-4 py-2 border-b">Action Team</th>
-              <th className="px-4 py-2 border-b">Status</th>
-              <th className="px-4 py-2 border-b">Image</th>
-              <th className="px-4 py-2 border-b">Date</th>
-              <th className="px-4 py-2 border-b">Time</th>
-              <th className="px-4 py-2 border-b">Action</th>
-            </tr>
-          </thead>
-          <tbody className="text-left">
-            {filteredReports.map((report) => (
-              <tr key={report.userReportId} className="bg-white hover:bg-gray-100">
-                <td className="px-4 py-2 border-b">{report.userReportId}</td>
-                <td className="px-4 py-2 border-b">{report.assetName}</td>
-                <td className="px-4 py-2 border-b font-semibold text-gray-700 cursor-pointer">
-                  {/* Truncated report description */}
-                  <span
-                    className="block text-gray-800"
-                    title={report.reportDescription}
-                  >
-                    ⚠️ {report.reportDescription.length > 25
-                      ? report.reportDescription.substring(0, 25) + "..."
-                      : report.reportDescription}
-                  </span>
+        // <table className="table-auto w-full border-collapse shadow-lg rounded-md">
+        //   <thead className="bg-blue-600 text-black text-left">
+        //     <tr>
+        //       <th className="px-4 py-2 border-b">Ticket</th>
+        //       <th className="px-4 py-2 border-b">Asset</th>
+        //       <th className="px-4 py-2 border-b">Summary</th>
+        //       <th className="px-4 py-2 border-b">Assignee</th>
+        //       <th className="px-4 py-2 border-b">Action Team</th>
+        //       <th className="px-4 py-2 border-b">Status</th>
+        //       <th className="px-4 py-2 border-b">Image</th>
+        //       <th className="px-4 py-2 border-b">Date</th>
+        //       <th className="px-4 py-2 border-b">Time</th>
+        //       <th className="px-4 py-2 border-b">Action</th>
+        //     </tr>
+        //   </thead>
+        //   <tbody className="text-left">
+        //     {filteredReports.map((report) => (
+        //       <tr key={report.userReportId} className="bg-white hover:bg-gray-100">
+        //         <td className="px-4 py-2 border-b">{report.userReportId}</td>
+        //         <td className="px-4 py-2 border-b">{report.assetName}</td>
+        //         <td className="px-4 py-2 border-b font-semibold text-gray-700 cursor-pointer">
+        //           {/* Truncated report description */}
+        //           <span
+        //             className="block text-gray-800"
+        //             title={report.reportDescription}
+        //           >
+        //             ⚠️ {report.reportDescription.length > 25
+        //               ? report.reportDescription.substring(0, 25) + "..."
+        //               : report.reportDescription}
+        //           </span>
 
-                  {/* Truncated resolution description */}
-                  <span
-                    className="block text-gray-500 text-sm"
-                    title={report.resolutionDescription} // Tooltip with full content
-                  >
-                    💬 {report.resolutionDescription.length > 25
-                      ? report.resolutionDescription.substring(0, 25) + "..."
-                      : report.resolutionDescription}
-                  </span>
-                </td>
-                <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportedBy}</td>
-                <td className="px-4 py-2 border-b">{report.actionTeamName}</td>
-                <td
-                  className={`px-4 py-2 border-b whitespace-nowrap`}
-                >
-                  <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getStatusClass(report.status)}`}>
-                    {report.status}
-                  </span>
-                </td>
-                <td className="px-4 py-2 border-b text-center">
-                  {report.proofImage ? (
-                    <button
-                      className="text-sky-600 font-semibold cursor-pointer hover:underline focus:outline-none focus:ring focus:ring-blue-300 transition-all"
-                      onClick={() => setSelectedImage(report.proofImage)}
-                      title="Click to view the image"
-                    >
-                      <FaImage />
-                    </button>
-                  ) : (
-                    <span className="text-gray-700 font-bold">X</span>
-                  )}
-                </td>
-                <td className="px-4 py-2 border-b font-semibold">
-                  {report.dateTime
-                    ? formatDate(report.dateTime).date // Display formatted date
-                    : <span className="text-gray-700 font-bold">X</span>}
-                </td>
-                <td className="px-4 py-2 border-b font-semibold">
-                  {report.dateTime
-                    ? `${report.dateTime.split(' ')[1]} ${report.dateTime.split(' ')[2]}` // Extract and display the time and period
-                    : <span className="text-gray-700 font-bold">X</span>}
-                </td>
-                <td className="px-4 py-2 border-b">
-                  {report.status.toLowerCase() === 'approval pending' && (
-                    <div className="relative">
-                      <button
-                        onClick={() => toggleDropdown(report.userReportId)}
-                        className="bg-gray-300 text-gray-700 px-2 py-1 rounded flex items-center space-x-2"
-                      >
-                        <FaChevronDown />
-                      </button>
-                      {isDropdownOpen === report.userReportId && (
-                        <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-10 p-2"
-                        >
-                          <button
-                            onClick={() => openModal('approve', report)}
-                            className="block w-full text-gray-700 font-bold text-sm py-1 px-2 rounded bg-emerald-100 hover:bg-emerald-200 transition duration-200 ease-in-out"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => openModal('reject', report)}
-                            className="block w-full mt-2 text-gray-700 font-bold text-sm py-1 px-2 rounded bg-red-100 hover:bg-red-200 transition duration-200 ease-in-out"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      )}
+        //           {/* Truncated resolution description */}
+        //           <span
+        //             className="block text-gray-500 text-sm"
+        //             title={report.resolutionDescription} // Tooltip with full content
+        //           >
+        //             💬 {report.resolutionDescription.length > 25
+        //               ? report.resolutionDescription.substring(0, 25) + "..."
+        //               : report.resolutionDescription}
+        //           </span>
+        //         </td>
+        //         <td className="px-4 py-2 border-b font-semibold text-gray-700">{report.reportedBy}</td>
+        //         <td className="px-4 py-2 border-b">{report.actionTeamName}</td>
+        //         <td
+        //           className={`px-4 py-2 border-b whitespace-nowrap`}
+        //         >
+        //           <span className={`px-2 py-1 rounded text-sm font-bold text-gray-700 ${getStatusClass(report.status)}`}>
+        //             {report.status}
+        //           </span>
+        //         </td>
+        //         <td className="px-4 py-2 border-b text-center">
+        //           {report.proofImage ? (
+        //             <button
+        //               className="text-sky-600 font-semibold cursor-pointer hover:underline focus:outline-none focus:ring focus:ring-blue-300 transition-all"
+        //               onClick={() => setSelectedImage(report.proofImage)}
+        //               title="Click to view the image"
+        //             >
+        //               <FaImage />
+        //             </button>
+        //           ) : (
+        //             <span className="text-gray-700 font-bold">X</span>
+        //           )}
+        //         </td>
+        //         <td className="px-4 py-2 border-b font-semibold">
+        //           {report.dateTime
+        //             ? formatDate(report.dateTime).date // Display formatted date
+        //             : <span className="text-gray-700 font-bold">X</span>}
+        //         </td>
+        //         <td className="px-4 py-2 border-b font-semibold">
+        //           {report.dateTime
+        //             ? `${report.dateTime.split(' ')[1]} ${report.dateTime.split(' ')[2]}` // Extract and display the time and period
+        //             : <span className="text-gray-700 font-bold">X</span>}
+        //         </td>
+        //         <td className="px-4 py-2 border-b">
+        //           {report.status.toLowerCase() === 'approval pending' && (
+        //             <div className="relative">
+        //               <button
+        //                 onClick={() => toggleDropdown(report.userReportId)}
+        //                 className="bg-gray-300 text-gray-700 px-2 py-1 rounded flex items-center space-x-2"
+        //               >
+        //                 <FaChevronDown />
+        //               </button>
+        //               {isDropdownOpen === report.userReportId && (
+        //                 <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-10 p-2"
+        //                 >
+        //                   <button
+        //                     onClick={() => openModal('approve', report)}
+        //                     className="block w-full text-gray-700 font-bold text-sm py-1 px-2 rounded bg-emerald-100 hover:bg-emerald-200 transition duration-200 ease-in-out"
+        //                   >
+        //                     Approve
+        //                   </button>
+        //                   <button
+        //                     onClick={() => openModal('reject', report)}
+        //                     className="block w-full mt-2 text-gray-700 font-bold text-sm py-1 px-2 rounded bg-red-100 hover:bg-red-200 transition duration-200 ease-in-out"
+        //                   >
+        //                     Reject
+        //                   </button>
+        //                 </div>
+        //               )}
 
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        //             </div>
+        //           )}
+        //         </td>
+        //       </tr>
+        //     ))}
+        //   </tbody>
+        // </table>
+        <Table
+          dataSource={filteredReports}
+          columns={columns}
+          rowKey="userReportId"
+          pagination={{
+            pageSize: 10,
+          }}
+          className="shadow-lg rounded-md"
+          bordered
+        />
       ) : (
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
