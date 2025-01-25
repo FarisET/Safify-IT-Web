@@ -681,6 +681,8 @@ const Incidents = () => {
             scroll={scroll}
             pagination={pagination}
             showHeader={showHeader}
+            rowSelection={rowSelection}
+            
           />
         </div>
       ) : (
