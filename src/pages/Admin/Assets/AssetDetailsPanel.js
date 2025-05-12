@@ -95,7 +95,7 @@ const AssetDetailsPanel = ({
   
         <div className="h-screen border-l border-gray-200 bg-white overflow-auto flex flex-col">
           <span className='bg-gray-50 flex justify-between items-left p-4 border-b'>
-            <h2 className="text-lg font-semibold bg-white">Asset Details</h2>
+            <h2 className="text-lg font-semibold ">Asset Details</h2>
             <div className="flex space-x-4">
               {assetDetails ? (
                 <>
