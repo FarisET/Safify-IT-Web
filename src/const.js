@@ -1,7 +1,6 @@
 const constants = {
     API: {
-        BASE_URL: "http://20.234.50.20:3001",
-        // BASE_URL: "http://192.168.126.1:3001",
+         BASE_URL: "http://your-server-ip",
 
         TIMEOUT: 5000, // Example: timeout in milliseconds
     },
